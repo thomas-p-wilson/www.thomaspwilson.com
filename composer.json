@@ -1,0 +1,8 @@
+{
+    "require": {
+        "kriswallsmith/assetic": "1.2.1",
+        "twig/twig": "1.16.3",
+        "leafo/lessphp": "0.5.0",
+        "twbs/bootstrap": "3.3.1"
+    }
+}

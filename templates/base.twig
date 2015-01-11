@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Thomas P. Wilson{{ title is not null ? " | "~title : "" }}</title>
+        <link type="text/css" rel="stylesheet" href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+        <style type="text/css">
+            * {
+                font-family: lato,helvetica,sans-serif;
+            }
+            
+            h1,
+            h1 small,
+            h2,
+            h2 small,
+            h3,
+            h3 small,
+            h4,
+            h4 small,
+            h5,
+            h5 small,
+            h6,
+            h6 small {
+                color: black;
+                text-transform: uppercase;
+                text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0, 0, 0, 0.45);
+            }
+            
+            .inverse {}
+                .inverse h1,
+                .inverse h1 small,
+                .inverse h2,
+                .inverse h2 small,
+                .inverse h3,
+                .inverse h3 small,
+                .inverse h4,
+                .inverse h4 small,
+                .inverse h5,
+                .inverse h5 small,
+                .inverse h6,
+                .inverse h6 small {
+                    color: white;
+                    text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0, 0, 0, 0.45);
+                }
+            
+            
+            .container {
+                padding-top: 70px;
+                padding-bottom: 90px;
+            }
+            
+            
+            
+            
+            
+            
+                        a.icon-hover-text {
+                            background: white;
+                            color: green;
+                            display: block;
+                            width: 100%;
+                            height: 0;
+                            padding-bottom: 50%;
+                            padding-top: 50%;
+                            position: relative;
+                            line-height: 50px;
+                            font-size: 4em;
+                            text-align: center;
+                            border-radius: 50%;
+                            
+                           
+                            -moz-box-shadow: 0px 0px 2px #888;
+                            -webkit-box-shadow: 0px 0px 2px #888;
+                            box-shadow: 0px 0px 2px #888;
+                        }
+                            a.icon-hover-text .glyphicon {
+                                position: relative;
+                                top: 50%;
+                                transform: translateY(-50%);
+                            }
+                            
+                            
+                            
+                        span.text-content {
+                            background: rgba(0,0,0,0.7);
+                            color: white;
+                            cursor: pointer;
+                            display: table;
+{#                            height: 150px;#}
+                            left: 0;
+                            position: absolute;
+                            top: 0;
+{#                            width: 150px;#}
+                            
+                            width: 100%;
+                            height: 100%;
+                            
+                            border-radius: 50%;
+                            opacity: 0;
+                            -webkit-transition: opacity 500ms;
+                            -moz-transition: opacity 500ms;
+                            -o-transition: opacity 500ms;
+                            transition: opacity 500ms;
+                        }
+                        span.text-content span {
+                            display: table-cell;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+ 
+                        a.icon-hover-text:hover span.text-content {
+                            opacity: 1;
+                        }
+            
+            
+            
+            
+            
+            
+            #welcome-section {
+                background-image: url("http://uploads.striking.ly/page/images/custom/8879.png?1348546463");
+                background-position: 49% 50%;
+                background-repeat: no-repeat;
+                background-size: cover;
+                padding-bottom: 109px;
+                padding-top: 109px;
+            }
+                #welcome-section .container {
+                    text-align: center;
+                }
+                
+            #quick-links-section {
+                background: #ccccff;
+            }
+            
+            #businesses-section {
+                background: #ccffcc;
+            }
+        </style>
+    </head>
+    <body>
+        <section id="welcome-section" class="inverse">
+            <div class="container">
+                <h1>Thomas P. Wilson</h1>
+                <h3><small>Software Architecture & Development</small></h3>
+            </div>
+        </section>
+        <section id="quick-links-section">
+            <div class="container">
+                <div class="col-md-3">
+                    <a href="" class="icon-hover-text inverse">
+                        <i class="glyphicon glyphicon-list-alt"></i>
+                        <span class="text-content"><span><h4>Resume</h4></span></span>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="" class="icon-hover-text inverse">
+                        <i class="glyphicon glyphicon glyphicon-folder-open"></i>
+                        <span class="text-content"><span><h4>Portfolio</h4></span></span>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="" class="icon-hover-text inverse">
+                        <i class="glyphicon glyphicon glyphicon-camera"></i>
+                        <span class="text-content"><span><h4>Gallery</h4></span></span>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="" class="icon-hover-text inverse">
+                        <i class="glyphicon glyphicon glyphicon-bullhorn"></i>
+                        <span class="text-content"><span><h4>Blog</h4></span></span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        <section id="businesses-section">
+            <div class="container">
+                <h2>I create and consult diverse businesses in and around Toronto, ON, CA</h2>
+                <div class="row">
+                    <div class="col-md-3">
+                        <p><strong>Crosstree Labs</strong></p>
+                        <p>Founder &amp; CEO</p>
+                        
+                        <p>Implement unique business solutions for unique businesses with unique business problems. We also work on the boring stuff too. <a href="">Learn More</a></p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Deep Blue Reefers</strong></p>
+                        <p>Owner</p>
+                        
+                        <p>Promotes sustainable and non-destructive aquaculture for hobbyists and professionals alike. We build custom aquariums and accessories. <a href="">Learn More</a></p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Cognitive Studios</strong></p>
+                        <p>Founder &amp; CEO</p>
+                        
+                        <p>Build extremely detailed and massive simulations. Provide insight into real-world problems through analysis of user interaction. <a href="">Coming soon!</a></p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Titan Media</strong></p>
+                        <p>Founder &amp; CEO</p>
+                        
+                        <p>Produce top-notch photography, videography, and other multimedia for corporate and personal events and promotions. <a href="">Coming soon!</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="">
+            <div class="container">
+                
+            </div>
+        </section>
+    </body>
+</html>
