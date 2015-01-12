@@ -2,8 +2,12 @@
 <html>
     <head>
         <title>Thomas P. Wilson{{ title is not null ? " | "~title : "" }}</title>
+        
+        <meta content="width=device-width,initial-scale=1" name="viewport">
+        
         <link type="text/css" rel="stylesheet" href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
         <style type="text/css">
+            {% set brand_color = "#030E1C" %}
             * {
                 font-family: lato,helvetica,sans-serif;
             }
@@ -43,40 +47,30 @@
             }
 
 
-            section .container {
-                padding-top: 70px;
-                padding-bottom: 90px;
-            }
-
-
-
-
-
-
-            a.icon-hover-text {
-                background: white;
-                color: green;
-                display: block;
-                width: 100%;
-                height: 0;
-                padding-bottom: 50%;
-                padding-top: 50%;
-                position: relative;
-                line-height: 50px;
-                font-size: 4em;
+            section {
                 text-align: center;
-                border-radius: 50%;
+            }
+                section .container {
+                    padding-top: 70px;
+                    padding-bottom: 90px;
+                }
+                section h1,
+                section h2,
+                section h3,
+                section h4,
+                section h5,
+                section h6 {
+                    font-weight: bold;
+                }
+                section .shape {
+                    margin: .75em 0;
+                }
 
 
-                -moz-box-shadow: 0px 0px 2px #888;
-                -webkit-box-shadow: 0px 0px 2px #888;
-                box-shadow: 0px 0px 2px #888;
-            }
-            a.icon-hover-text .glyphicon {
-                position: relative;
-                top: 50%;
-                transform: translateY(-50%);
-            }
+
+
+
+
 
 
 
@@ -115,14 +109,21 @@
             
             
             #nav {
-                border-bottom-width: 0;
+                border-bottom-width: 1px;
+                border-bottom-color: white;
+                background-color: {{ brand_color }};
+                color: #EBE5FC;
             }
             #nav li a {
+                color: #EBE5FC;
                 transition: all ease-in-out .5s
+            }
+            #nav .navbar-brand {
+                color: #EBE5FC;
             }
             #nav li.active a,
             #nav li a:hover {
-                background-color: #ff9900;
+                background-color: #5E6FA0;
             }
 
 
@@ -131,7 +132,8 @@
 
 
             #welcome-section {
-                background-image: url(assets/images/sailboat.jpg);
+                background-attachment: fixed;
+                background-image: url(assets/images/800px/sailboat.jpg);
                 background-position: 49% 50%;
                 background-repeat: no-repeat;
                 background-size: cover;
@@ -145,13 +147,131 @@
                     text-align: center;
                 }
 
-            #quick-links-section {
-                background: #ccccff;
+            #about-section {
+                background: white;
+            }
+            
+            #hobbies-section {
+                background-attachment: fixed;
+                background-image: url(assets/images/800px/deer.jpg);
+                background-position: 50% 0px;
+                background-repeat: no-repeat;
+                background-size: cover;
+                padding-bottom: 109px;
+                padding-top: 109px;
             }
 
             #businesses-section {
-                background: #ccffcc;
+                background: #EBE5FC;
             }
+            
+            #contact-section {
+                background: {{ brand_color }};
+            }
+            
+{#            @media (min-width : 2500px) {#}
+                #welcome-section {
+                    background-image: url(assets/images/2500px/sailboat.jpg);
+                }
+                #hobbies-section {
+                    background-image: url(assets/images/2500px/deer.jpg);
+                }
+{#            }#}
+            @media (max-width : 2000px) {
+                #welcome-section {
+                    background-image: url(assets/images/2000px/sailboat.jpg);
+                }
+                #hobbies-section {
+                    background-image: url(assets/images/2000px/deer.jpg);
+                }
+            }
+            @media (max-width : 800px) {
+                #welcome-section {
+                    background-image: url(assets/images/800px/sailboat.jpg);
+                }
+                #hobbies-section {
+                    background-image: url(assets/images/800px/deer.jpg);
+                }
+            }
+            
+            
+            
+            
+        .shape {
+            background-color: #00ccff;
+            border-width: 0;
+            font-size: 20px;
+            height: 40px;
+            line-height: 2.00;
+            padding: 5px 0;
+            text-align: center;
+            width: 40px;
+        }
+            .shape.circle {
+                border-radius: 50%;
+            }
+            .shape-tiny {
+                font-size: 13px;
+                height: 20px;
+                line-height: 0.1;
+                padding: 1px 0;
+                width: 20px;
+            }
+            .shape-sm {
+                height: 30px;
+                line-height: 1.65;
+                padding: 2px 0;
+                width: 30px;
+            }
+            .shape-lg {
+                font-size: 30px;
+                height: 80px;
+                line-height: 2.00;
+                padding: 13px 0;
+                width: 80px;
+            }
+            
+        p {
+            margin-bottom: 18px;
+        }
+        
+        body {
+            color: #8c989e;
+            font-family: 'Open Sans',Helvetica,Arial,sans-serif;
+            font-size: 15px;
+            font-weight: 400;
+        }
+        
+        .tags,
+        .tags li {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+            .tags li {
+                display: inline-block;
+            }
+                .tags li {
+                    margin: .5em;
+                }
+                
+                
+        .light {
+            color: white;
+        }
+            .light h1,
+            .light h2,
+            .light h3,
+            .light h4,
+            .light h5,
+            .light h6 {
+                color: white;
+            }
+            
+        form .form-control {
+            border-radius: 0;
+            margin-bottom: 1em;
+        }
         </style>
     </head>
     <body data-spy="scroll" data-target="#nav">
@@ -173,6 +293,7 @@
                     <ul class="nav navbar-nav">
                         <li><a href="#welcome-section" class="current">Welcome</a></li>
                         <li><a href="#about-section" class="">About</a></li>
+                        <li><a href="#hobbies-section" class="">Hobbies</a></li>
                         <li><a href="#businesses-section" class="">Businesses</a></li>
                         <li><a href="#contact-section" class="">Contact</a></li>
                     </ul>
@@ -194,25 +315,57 @@
                 <p>Learning is important to me. It has to be in such a fast-moving industry. I endeavour to learn at least one new thing every day. Now not all of this information is useful. In fact, I assimilate a great deal of less-than-useful information. For example, did you know that according to a 2003 study at the University of Illinois, women are more likely than men to eat food off of a floor, which is important only when one understands that 93% of the population's footwear hosts fecal bacteria. While not entirely useless, this tidbit of information really only tells us that we should stop wearing our shoes indoors and avoid the five-second rule.</p>
 
                 <div class="col-md-3">
-                    <img height='50' width='50'>
+                    <a class="btn btn-primary shape circle shape-lg">
+                        <span class="glyphicon glyphicon-user"></span>
+                    </a>
                     <h3>Resume</h3>
                     <p>Learn more about my qualifications. Lots of things aren't included in my resume, so if you think I'm missing something you might need, why not <a href="">ask me first?</a> Just to make sure.</p>
                 </div>
                 <div class="col-md-3">
-                    <img height="50" width="50">
+                    <a class="btn btn-primary shape circle shape-lg">
+                        <span class="glyphicon glyphicon-folder-open"></span>
+                    </a>
                     <h3>Portfolio</h3>
                     <p>See some of the things I've worked on. NDAs prohibit me from exhibiting some of my work, but you'll still find a good deal of interesting stuff.</p>
                 </div>
                 <div class="col-md-3">
-                    <img height='50' width='50'>
+                    <a class="btn btn-primary shape circle shape-lg">
+                        <span class="glyphicon glyphicon-picture"></span>
+                    </a>
                     <h3>Gallery</h3>
                     <p>I like covering a wide variety of subjects. Water, boats on the water, debris in the water, birds, birds in the water, and clouds made of water feature heavily. Enjoy!</p>
                 </div>
                 <div class="col-md-3">
-                    <img height='50' width='50'>
+                    <a class="btn btn-primary shape circle shape-lg">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                    </a>
                     <h3>Blog</h3>
                     <p>I enjoy covering technical, business, life, and spirituality. Pick your desired read.</p>
                 </div>
+            </div>
+        </section>
+        <section id="hobbies-section" class="light">
+            <div class="container">
+                <h2>I enjoy many diverse hobbies</h2>
+                <p>Sometimes my hobbies find their way into my work too. In any case, I like to keep track of my hobbies on my <a href="">blog</a>. Click one to check it out. If you want to chat about something, feel free to <a href="">get in touch</a>.</p>
+                <ul class="tags">
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Scuba Diving</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Photography</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Fish Keeping</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Gaming</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Music</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Wood/metalworking</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Writing</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Reading</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Learning</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Paintball</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Movies</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Renovating</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Model Aircraft</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Model Railroading</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Puzzles</a></li>
+                    <li><a href="" class="label label-primary"><i class="glyphicon glyphicon-tag"></i> Boating</a></li>
+                </ul>
             </div>
         </section>
         <section id="businesses-section">
@@ -220,24 +373,36 @@
                 <h2>I create and consult diverse businesses in and around Toronto, ON, CA</h2>
                 <div class="row">
                     <div class="col-md-3">
+                        <a class="btn btn-primary shape circle shape-lg">
+                            {#<span class="glyphicon glyphicon-user"></span>#}
+                        </a>
                         <p><strong>Crosstree Labs</strong></p>
                         <p>Founder &amp; CEO</p>
 
                         <p>Implement unique business solutions for unique businesses with unique business problems. We also work on the boring stuff too. <a href="">Learn More</a></p>
                     </div>
                     <div class="col-md-3">
+                        <a class="btn btn-primary shape circle shape-lg">
+                            {#<span class="glyphicon glyphicon-user"></span>#}
+                        </a>
                         <p><strong>Deep Blue Reefers</strong></p>
                         <p>Owner</p>
 
                         <p>Promotes sustainable and non-destructive aquaculture for hobbyists and professionals alike. We build custom aquariums and accessories. <a href="">Learn More</a></p>
                     </div>
                     <div class="col-md-3">
+                        <a class="btn btn-primary shape circle shape-lg">
+                            {#<span class="glyphicon glyphicon-user"></span>#}
+                        </a>
                         <p><strong>Cognitive Studios</strong></p>
                         <p>Founder &amp; CEO</p>
 
                         <p>Build extremely detailed and massive simulations. Provide insight into real-world problems through analysis of user interaction. <a href="">Coming soon!</a></p>
                     </div>
                     <div class="col-md-3">
+                        <a class="btn btn-primary shape circle shape-lg">
+                            {#<span class="glyphicon glyphicon-user"></span>#}
+                        </a>
                         <p><strong>Titan Media</strong></p>
                         <p>Founder &amp; CEO</p>
 
@@ -246,54 +411,25 @@
                 </div>
             </div>
         </section>
-        <section id="contact-section">
-
-            <div class="container">             
-
+        <section id="contact-section" class="light">
+            <div class="container">
                 <div class="row text-center">
                     <div class="col-md-12">
-
                         <h1>Contact</h1>
-
                     </div>
                 </div>
-
-                <br>	
-
+                <br>
                 <div class="row">
-
-                    <div class="col-sm-6">
-
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
-
-                        <h4>Drop in for a second</h4>
-
-                        <p class="lead social">
-                            <a class="shape diamond" href="#"><i class="fa fa-facebook"></i></a>
-                            <a class="shape diamond" href="#"><i class="fa fa-github"></i></a>
-                            <a class="shape diamond" href="#"><i class="fa fa-twitter"></i></a>
-                            <a class="shape diamond" href="#"><i class="fa fa-linkedin"></i></a>
-                        </p>
-
-                        <p>5465 Silent Campus<br>Pillsbury, Vermont <br>05860-1751, US</p>
-
-                        <p>(802) 919-5740<br><a href="#">info@yourdomain.com</a></p>
-
-                    </div>
-
-                    <div class="col-sm-6">
-                        <form action="#">
-                            <input type="text" class="form-control" placeholder="Full Name">
+                    <div class="col-sm-6 col-md-push-3">
+                        <form action="#" method="post">
+                            <input type="text" class="form-control" placeholder="Name">
                             <input type="email" class="form-control" placeholder="Email Address">
-                            <textarea class="form-control" placeholder="Type your message here..." rows="5" cols="10"></textarea>
-                            <input type="submit" value="submit" class="btn btn-link">
+                            <textarea class="form-control" placeholder="Talk to me..." rows="5" cols="10"></textarea>
+                            <input type="submit" value="Submit" class="btn btn-primary">
                         </form>
                     </div>
-
-                </div>		
-
+                </div>
             </div>
-
         </section>
         
         
@@ -316,7 +452,8 @@
             });
             
             // Setup parallax
-            $('#welcome-section').parallax("50%", 0.3);
+            $('#welcome-section').parallax("50%", 0.2);
+            $('#hobbies-section').parallax("50%", 0.3);
             
 {#
                 // Start One Page Scrolling
