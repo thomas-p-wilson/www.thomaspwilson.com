@@ -110,6 +110,20 @@
             a.icon-hover-text:hover span.text-content {
                 opacity: 1;
             }
+            
+            
+            
+            
+            #nav {
+                border-bottom-width: 0;
+            }
+            #nav li a {
+                transition: all ease-in-out .5s
+            }
+            #nav li.active a,
+            #nav li a:hover {
+                background-color: #ff9900;
+            }
 
 
 
@@ -124,9 +138,12 @@
                 padding-bottom: 109px;
                 padding-top: 109px;
             }
-            #welcome-section .container {
-                text-align: center;
-            }
+                {# #welcome-section .img {
+                    background-image: url(assets/images/sailboat.jpg);
+                }#}
+                #welcome-section .container {
+                    text-align: center;
+                }
 
             #quick-links-section {
                 background: #ccccff;
@@ -282,9 +299,25 @@
         
         <script src="//code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>
         <script src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script>
+        <script src="assets/javascripts/jquery.parallax-1.1.3.js" charset="utf-8"></script>
         <script type="text/javascript">
         /* Custom Scripts */
         $(document).ready(function () {
+            // Resize main image
+            var viewHeight = $(window).height();
+            $("#welcome-section").css({
+                height: viewHeight
+            });
+            $(window).on('resize', function () {
+                var viewHeight = $(window).height();
+                $("#welcome-section").css({
+                    height: viewHeight
+                });
+            });
+            
+            // Setup parallax
+            $('#welcome-section').parallax("50%", 0.3);
+            
 {#
                 // Start One Page Scrolling
                 $('.top-menu').singlePageNav({
@@ -299,22 +332,8 @@
             });
 
                 // Start Parallax script
-                $('.bg-img').parallax("50%", 0.1);
-                $('#quoteArea').parallax("50%", 0.2);
-                $('#videoArea').parallax("50%", 0.1);
-                $('#clientsArea').parallax("50%", 0.1);
 
                 // Start main image 
-                var viewHeight = $(window).height();
-                $("#main-slider .bg-img").css({
-                        'height': viewHeight
-                });
-                $(window).on('resize', function () {
-                        var viewHeight = $(window).height();
-                        $("#main-slider .bg-img").css({
-                                'height': viewHeight
-                        });
-                });
 
                 // Start work gallery
                 $('#Grid').mixitup();
