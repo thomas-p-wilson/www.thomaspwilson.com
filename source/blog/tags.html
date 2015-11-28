@@ -1,0 +1,18 @@
+---
+layout: default
+title: Tags
+use:
+    - posts_tags
+---
+
+
+{% block content %}
+{% from 'macros' import tag, tag_list %}
+<section class="articles section-padded">
+	<h2>Tags</h2>
+
+	<div>
+		{{ tag_list(data.posts_tags|keys) }}
+	</div>
+</div>
+{% endblock %}

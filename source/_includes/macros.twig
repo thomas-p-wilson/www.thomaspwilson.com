@@ -1,0 +1,12 @@
+{% macro tag(name) %}
+<a href="{{ site.url }}/blog/tags/{{ name }}" class="label label-default"><i class="fa fa-tag"></i> {{ name }}</a>
+{% endmacro %}
+
+{% macro tag_list(tags) %}
+{% import _self as macros %}
+<ul class="tag-list">
+  {% for t in tags %}
+  <li>{{ macros.tag(t) }}</li>
+  {% endfor %}
+</ul>
+{% endmacro %}

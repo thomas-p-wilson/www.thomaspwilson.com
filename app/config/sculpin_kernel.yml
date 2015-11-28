@@ -1,0 +1,12 @@
+sculpin:
+    ignore:
+        - assets/stylesheets/variables.less
+        - assets/stylesheets/mixins.less
+        - assets/stylesheets/specifics/*.less
+        - assets/stylesheets/pages/*.less
+sculpin_content_types:
+    posts:
+        permalink: blog/:year/:month/:day/:filename/
+sculpin_less:
+    extensions: ["less"]
+    files: ["assets/stylesheets/main.less"]

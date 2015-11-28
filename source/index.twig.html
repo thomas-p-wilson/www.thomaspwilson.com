@@ -1,0 +1,114 @@
+---
+layout: base
+title: Home
+generator: pagination
+pagination:
+    max_per_page: 4
+use:
+    - posts
+    - posts_tags
+---
+
+
+{% set body_properties = body_properties ~ ' data-spy="scroll" data-target="#index-nav" data-offset="50"' %}
+
+{% block base_content %}
+{% from 'macros' import tag, tag_list %}
+    <main id="page" role="main">
+        {% include 'banner' %}
+
+        <section id="bio" class="section-padded">
+            <div class="container">
+                <h2 class="section-title">About Me</h2>
+                <p>I've been programming since I was five years old. I spend a great deal of my time in front of one screen or another. I passionately architect highly-scalable and fault-tolerant systems for my clients.</p>
+            </div>
+        </section>
+        <hr>
+
+        <section id="blog" class="section-padded">
+            <div class="container">
+                <h2 class="section-title">Recent Musings</h2>
+
+                {% for post in page.pagination.items %}
+                    {% if loop.index0 != 0 %}<br>{% endif %}
+                    <article>
+                        <h3><a href="{{ site.url }}{{ post.url }}" title="{{ post.title }}">{{ post.title }} <small>{{ post.categories|join(', ') }}</small></a></h3>
+                        {{ dump(post.meta.slug) }}
+                        <p class="meta">
+                            <small><i class="fa fa-clock-o"></i> {{ post.date|date('l, F j, Y @ g:ia') }}</small> |
+                            <a href="{{ site.url }}{{ post.url }}">
+                                <i class="fa fa-comments"></i>
+                                <span class="disqus-comment-count" {% if post.disqus.identifier %}data-disqus-identifier="{{ post.disqus.identifier }}" {% endif %}>0 Comments</span>
+                            </a>
+                        </p>
+                        <p>
+                            {% if post.excerpt %}
+                                {{ post.excerpt }}
+                            {% elseif '<!-- break -->' in post.blocks.content %}
+                                {% set break_array = post.blocks.content|split('<!-- break -->', 2) %}
+                                {{ break_array[0]|raw }}
+                                {% if break_array|length > 1 %}
+                                {% endif %}
+                            {% else %}
+                                {% set break_array = post.blocks.content|striptags|split('.', 4) %}
+                                {{ break_array[:3]|join('.')|raw }}...
+                            {% endif %}
+                            <p><a href="{{ site.url }}{{ post.url }}" title="{{ post.title }}">Read more of this post &raquo;</a></p>
+                        </p>
+                        {% if post.meta.tags %}
+                        {{ tag_list(post.meta.tags) }}
+                        {% endif %}
+                    </article>
+                {% endfor %}
+                
+            </div>
+        </section>
+
+        <section id="contact" class="light section-padded">
+            <div class="container">
+                <h2 class="section-title">Contact</h2>
+                <ul class="nav nav-horizontal social-button-list">
+                    <li><a href="https://ca.linkedin.com/in/thomaspwilson" title="Linkedin"><i class="fa fa-linkedin-square"></i></a></li>
+                    <li><a href="https://github.com/thomas-p-wilson" title="Github"><i class="fa fa-github-square"></i></a></li>
+                </ul>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form action="#" method="post">
+                            <input type="text" class="form-control" placeholder="Name">
+                            <input type="email" class="form-control" placeholder="Email Address">
+                            <textarea class="form-control" placeholder="Talk to me..." rows="5" cols="10"></textarea>
+                            <input type="submit" value="Submit" class="btn btn-primary">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
+
+{% block scripts_after %}
+    {% if site.disqus.shortname and site.disqus.shortname != '' %}
+    <script type="text/javascript">
+        var disqus_shortname = '{{ site.disqus.shortname }}';
+
+        {% if page.disqus.identifier  %}var disqus_identifier = '{{ page.disqus.identifier }}'; {% endif %}
+
+        {% if page.disqus.title %}var disqus_title = '{{ page.disqus.title }}';{% endif %}
+
+        {% if page.disqus.url %}var disqus_url = '{{ page.disqus.url }}';{% endif %}
+
+        {% if page.disqus.category_id %}var disqus_category_id = '{{ page.disqus.category_id }}';{% endif %}
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script> 
+    <noscript>Please enable JavaScript to view the
+        <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered byDisqus.</a>
+    </noscript>
+    {% endif %}
+{% endblock %}

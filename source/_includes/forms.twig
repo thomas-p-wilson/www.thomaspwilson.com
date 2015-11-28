@@ -1,0 +1,18 @@
+{% macro form_group(name, label, type, options) %}
+  {% import _self as inputs %}
+
+  <div class="form-group">
+    <label for="type" class="col-md-4 col-sm-12">Type</label>
+    <div class="col-md-8 col-sm-12">
+      {{ attribute(inputs, type, [name, options]) }}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro select(name, options) %}
+  <select name="{{ name }}" v-model="{{ name }}">
+    {% for k,v in options %}
+    <option value="{{ k }}">{{ v }}</option>
+    {% endfor %}
+  </select>
+{% endmacro %}

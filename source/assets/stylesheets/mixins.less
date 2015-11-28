@@ -1,0 +1,44 @@
+.responsive-xs(@rules) {
+    @media (max-width: @sm-size) {
+        @rules();
+    }
+}
+.responsive-sm(@rules) {
+    @media (min-width: @sm-size) {
+        @rules();
+    }
+}
+.responsive-md(@rules) {
+    @media (min-width: @md-size) {
+        @rules();
+    }
+}
+.responsive-lg(@rules) {
+    @media (min-width: @lg-size) {
+        @rules();
+    }
+}
+
+.responsive-background(@name, @color: transparent) {
+    background-color: @color;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    
+    .responsive-xs({
+        background-image: url("@{responsive-image-location-xs}@{name}");
+    });
+    .responsive-sm({
+        background-image: url("@{responsive-image-location-sm}@{name}");
+    });
+    .responsive-md({
+        background-image: url("@{responsive-image-location-md}@{name}");
+    });
+    .responsive-lg({
+        background-image: url("@{responsive-image-location-lg}@{name}");
+    });
+}

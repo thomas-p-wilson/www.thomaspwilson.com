@@ -1,0 +1,57 @@
+/*#506091*/
+.navbar {
+    background-color: white;
+    border: 0;
+    border-radius: 0;
+    color: #666;
+    margin: 0;
+    transition: all ease-in-out .25s;
+    
+    .navbar-nav {
+        a {
+            color: #666;
+            transition: all ease-in-out .5s;
+        }
+        .navbar-brand {
+            color: #EBE5FC;
+        }
+        li.active a,
+        li a:hover {
+            background-color: fade(@brand-color-hover, 30%);
+        }
+    }
+}
+
+.main-nav {
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+
+    .navbar {
+        background-color: rgba(0, 0, 0, 0.2);
+
+        .navbar-nav {
+            li, li a {
+                color: white;
+            }
+            li.active a,
+            li a:hover {
+                background-color: white;
+                color: #222;
+            }
+        }
+    }
+
+    .navbar-collapse.in,
+    .navbar-collapse.collapsing {
+        text-align: center;
+    }
+}
+
+.navbar-wrapper {
+    height: 50px;
+    posititon: relative
+}

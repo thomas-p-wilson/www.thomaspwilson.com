@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block base_content %}
+    {% include 'banner' %}
+
+    <div class="container{{ fluid ? '-fluid' : '' }}">
+    {% block content %}{% endblock %}
+    </div>
+{% endblock %}
