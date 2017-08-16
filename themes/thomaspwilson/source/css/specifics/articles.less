@@ -1,0 +1,160 @@
+article {
+  h3,
+  h3 a {
+    color: black;
+    font-size: 1em;
+    font-weight: normal;
+    text-align: center;
+  }
+  h3 small {
+    color: #333;
+    text-transform: normal;
+  }
+}
+
+.article-title {
+  margin-bottom: 2em;
+  margin-top: 2em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.block-caption {
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: color-grey;
+  margin-bottom: 1em;
+  margin-left: 5px;
+  line-height: 1em;
+  text-shadow: 0 1px #fff;
+  font-weight: bold;
+}
+
+.block {
+  background: #fff;
+  border: 1px solid @color-border;
+  border-radius: 3px;
+}
+
+@block-margin: 50px;
+
+
+@color-default: #555;
+@color-grey: #999;
+@color-border: #ddd;
+@color-link: #258fb8;
+@color-background: #eee;
+@color-sidebar-text: #777;
+@color-widget-background: #ddd;
+@color-widget-border: #ccc;
+@color-footer-background: #262a30;
+@color-mobile-nav-background: #191919;
+@color-twitter: #00aced;
+@color-facebook: #3b5998;
+@color-pinterest: #cb2027;
+@color-google: #dd4b39;
+
+
+// Fonts
+@font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-serif: Georgia, "Times New Roman", serif;
+@font-mono: "Source Code Pro", Consolas, Monaco, Menlo, Consolas, monospace;
+@font-icon: FontAwesome;
+@font-icon-path: "fonts/fontawesome-webfont";
+@font-icon-version: "4.0.3";
+@font-size: 14px;
+@line-height: 1.6em;
+@line-height-title: 1.1em;
+
+
+
+.archives-wrap {
+  margin: @block-margin 0;
+}
+
+.archives {
+  //.clearfix();
+
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+}
+
+.archive-year-wrap {
+  margin-bottom: 1em;
+}
+
+.archive-year {
+  .block-caption();
+}
+
+.archives {
+  column-gap: 10px;
+
+  @media screen and (min-width: 480px) and (max-width: 767px) {
+    column-count: 2;
+  }
+
+  @media screen and (min-width: 768px) {
+    column-count: 3;
+  }
+}
+
+.archive-article {
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  overflow: hidden;
+  break-inside: avoid-column;
+}
+
+.archive-article-inner {
+  .block();
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.archive-article-title {
+  text-decoration: none;
+  font-weight: bold;
+  font-size: @font-size;
+  color: @color-default;
+  transition: @color-default 0.2s;
+  line-height: @line-height;
+
+  &:hover {
+    color: @color-link
+  }
+}
+
+.archive-article-footer {
+  margin-top: 1em
+}
+
+.archive-article-date {
+  color: @color-grey;
+  text-decoration: none;
+  font-size: 12px;
+  line-height: 1em;
+  margin-bottom: 0.5em;
+  display: block;
+}
+
+#page-nav {
+  //.clearfix();
+  margin: @block-margin auto;
+  text-align: center;
+  overflow: hidden;
+}

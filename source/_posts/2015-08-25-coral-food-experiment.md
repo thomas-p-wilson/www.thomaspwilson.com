@@ -12,6 +12,8 @@ I recently picked up a [Trachyphyllia Radiata][radiata] that had been damaged in
 the care of another reefer. I'm not sure if it's because of the damage or not,
 but it seems very very picky about what it eats.
 
+<!-- more -->
+
 I've been wanting to try a new coral food mixture for a while, and decided that
 now is as good a time as any. Here's my planned mix:
 

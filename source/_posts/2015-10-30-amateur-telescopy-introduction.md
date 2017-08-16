@@ -14,6 +14,8 @@ use telescopes to explore the reaches of the galaxy that we can't yet physically
 reach. Some astronomical and scientific telescopes capture amazingly detailed
 portraits of galaxies, solar systems, planets, and other cosmic entities.
 
+<!-- more -->
+
 *Telescopy* is the art of study of making and operating telescopes. Some folks
 enjoy using telescopes to explore the universe. Others enjoy building
 telescopes. Yet others enjoy both. This series will concentrate on the effort

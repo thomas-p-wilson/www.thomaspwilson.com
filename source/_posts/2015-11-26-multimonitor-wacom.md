@@ -15,6 +15,8 @@ instead of just a single one. I recall having run into this problem in the past,
 but I couldn't immediately recall the solution. I did some digging around though
 and found an old script I wrote which fixed things up quite nicely.
 
+<!-- more -->
+
 This script is extremely simple.
 
 ```

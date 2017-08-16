@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <%- partial('_partial/head') %>
+    <body>
+        <%- partial('_partial/header', null, {cache: !config.relative_link}) %>
+
+        <section id="banner" class="banner">
+            <figure>
+                <!--<img src="{{ site.url }}/assets/images/lg/rain.jpg">-->
+            </figure>
+            <div class="banner-content">
+                <h1 class="slide-right">Thomas P. Wilson</h1>
+                <h2 class="slide-left">Software architect and developer</h2>
+                <small class="slide-up slide-late">- and serial hobbyist -</small>
+            </div>
+        </section>
+
+        <%- body %>
+
+        <div id="container">
+            <div id="wrap">
+                <div class="outer">
+                    <% if (theme.sidebar && theme.sidebar !== 'bottom'){ %>
+                        <%- partial('_partial/sidebar', null, {cache: !config.relative_link}) %>
+                    <% } %>
+                </div>
+                <%- partial('_partial/footer', null, {cache: !config.relative_link}) %>
+            </div>
+        </div>
+
+        <%- partial('_partial/after-footer') %>
+    </body>
+</html>

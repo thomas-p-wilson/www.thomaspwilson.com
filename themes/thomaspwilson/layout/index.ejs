@@ -1,0 +1,65 @@
+<main id="page" role="main">
+    <section id="bio" class="section-padded">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <p>I've been programming since I was five years old. I spend a great deal of my time in front of one screen or another. I passionately architect highly-scalable and fault-tolerant systems for my clients.</p>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="blog" class="section-padded">
+        <div class="container">
+            <h2 class="section-title">Recent Musings</h2>
+
+            <% get_posts({ limit: 3 }).each(function(post, i) { %>
+                <article>
+                    <h3>
+                        <a href="<%- post.permalink %>" title="<%- post.title %>">
+                            <%- post.title %> 
+                            <% post.categories.each(function(cat) { %>
+                                <small><a href="<%- cat.permalink %>" title="<%- cat.name %>"><%- cat.name %></a></small>
+                            <% }) %>
+                        </a>
+                    </h3>
+                    
+                    <p class="meta">
+                        <small><i class="fa fa-clock-o"></i> <%- post.date.format('dddd, MMMM D, YYYY @ h:mma') %></small> |
+                        <a href="<%- post.permalink %>">
+                            <i class="fa fa-comments"></i>
+                            <span class="disqus-comment-count" {% if post.disqus.identifier %}data-disqus-identifier="{{ post.disqus.identifier }}" {% endif %}>0 Comments</span>
+                        </a>
+                    </p>
+                    <p><%- post.excerpt %></p>
+                    <p><a href="<%- post.permalink %>" title="<%- post.title %>">Read more of this post »</a></p>
+                    
+                    <ul class="tag-list">
+                        <% post.tags.each(function(tag) { %>
+                            <li><a href="<%- tag.permalink %>" class="label label-default"><i class="fa fa-tag"></i> <%- tag.name %></a></li>
+                        <% }) %>
+                    </ul>
+                </article>
+            <% }) %>
+        </div>
+    </section>
+
+    <section id="contact" class="light section-padded">
+        <div class="container">
+            <h2 class="section-title">Contact</h2>
+            <ul class="nav nav-horizontal social-button-list">
+                <li><a href="https://ca.linkedin.com/in/thomaspwilson" title="Linkedin"><i class="fa fa-linkedin-square"></i></a></li>
+                <li><a href="https://github.com/thomas-p-wilson" title="Github"><i class="fa fa-github-square"></i></a></li>
+            </ul>
+            <div class="row">
+                <div class="col-sm-12">
+                    <form action="#" method="post">
+                        <input type="text" class="form-control" placeholder="Name">
+                        <input type="email" class="form-control" placeholder="Email Address">
+                        <textarea class="form-control" placeholder="Talk to me..." rows="5" cols="10"></textarea>
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

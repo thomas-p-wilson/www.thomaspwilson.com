@@ -1,0 +1,19 @@
+{
+    "presets": [ "es2015", "react" ],
+    "plugins": [
+        [
+            "module-resolver",
+            {
+                "root": ["."],
+                "alias": {
+                    "react": "preact-compat",
+                    "react-dom": "preact-compat",
+                    "react-redux": "preact-redux"
+                }
+            }
+        ],
+        "transform-es2015-shorthand-properties",
+        "transform-object-rest-spread",
+        "transform-class-properties"
+    ]
+}

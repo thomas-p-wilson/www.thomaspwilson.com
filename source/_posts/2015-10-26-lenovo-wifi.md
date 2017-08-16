@@ -12,6 +12,8 @@ Today I spent a few quick moments reformatting my [Lenovo G510][g510] and
 installing [Xubuntu 15.10][xubuntu]. I usually do a system clean up every three
 months or so, but all my systems are currently way overdue. So this is a start.
 
+<!-- more -->
+
 I ran into a bit of a problem though. I don't recall hitting this issue before,
 but I must have, as I don't see a way around it. After installation, the laptop
 booted like a champ, nice and quick. I logged in, only to find that WiFi didn't

@@ -1,0 +1,68 @@
+<%
+var title = page.title;
+
+if (is_archive()){
+  title = __('archive_a');
+
+  if (is_month()){
+    title += ': ' + page.year + '/' + page.month;
+  } else if (is_year()){
+    title += ': ' + page.year;
+  }
+} else if (is_category()){
+  title = __('category') + ': ' + page.category;
+} else if (is_tag()){
+  title = __('tag') + ': ' + page.tag;
+}
+
+if (title) {
+    title = title + ' - ' + config.title;
+}
+%>
+
+<head>
+    <meta charset="utf-8">
+    <title><%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%- open_graph({twitter_id: theme.twitter, google_plus: theme.google_plus, fb_admins: theme.fb_admins, fb_app_id: theme.fb_app_id}) %>
+    <% if (theme.rss){ %>
+        <link rel="alternate" href="<%- theme.rss %>" title="<%= config.title %>" type="application/atom+xml">
+    <% } %>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Raleway:100">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro">
+    <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <style>
+        /* quick fix because bootstrap <pre> has a background-color. */
+        pre code { background-color: inherit; }
+    </style>
+    <%- css('css/style') %>
+
+    <!-- Icons -->
+    <link rel="apple-touch-startup-image" href="/images/jackson/2048x2048.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="shortcut icon" sizes="76x76" href="/images/jackson/76x76.png">
+    <link rel="shortcut icon" sizes="120x120" href="/images/jackson/120x120.png">
+    <link rel="shortcut icon" sizes="128x128" href="/images/jackson/128x128.png">
+    <link rel="shortcut icon" sizes="152x152" href="/images/jackson/152x152.png">
+    <link rel="shortcut icon" sizes="196x196" href="/images/jackson/196x196.png">
+    <link rel="shortcut icon" sizes="512x512" href="/images/jackson/512x512.png">
+    <link rel="shortcut icon" sizes="1024x1024" href="/images/jackson/1024x1024.png">
+    <link rel="shortcut icon" sizes="2048x2048" href="/images/jackson/2048x2048.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/jackson/76x76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/images/jackson/120x120.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="/images/jackson/128x128.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/jackson/152x152.png">
+    <link rel="apple-touch-icon" sizes="196x196" href="/images/jackson/196x196.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/images/jackson/512x512.png">
+    <link rel="apple-touch-icon" sizes="1024x1024" href="/images/jackson/1024x1024.png">
+    <link rel="apple-touch-icon" sizes="2048x2048" href="/images/jackson/2048x2048.png">
+
+    <%- partial('google-analytics') %>
+</head>

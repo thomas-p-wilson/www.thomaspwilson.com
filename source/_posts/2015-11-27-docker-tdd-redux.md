@@ -14,6 +14,8 @@ found relatively few containers that were tested before being pushed out. For
 the containers I built, I wanted to include testing to ensure that any changes I
 made didn't break existing functionality.
 
+<!-- more -->
+
 I started off with [Mamba][mamba] for testing. I've lately found that as my
 tests get more complex, my Mamba tests become nigh unreadable. So I was looking
 for a different solution. I've started getting back into Behaviour-Driven

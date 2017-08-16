@@ -14,6 +14,8 @@ For the first while, everything seems fine, until the project grows in
 complexity and every little change causes breakage somewhere else - or worse:
 world breakage.
 
+<!-- more -->
+
 I've been fortunate lately to be working with an organization that highly values
 (A)TDD, and it always makes things a whole lot easier during development. A
 comprehensive set of unit/functional/integration/behavioural tests act as a

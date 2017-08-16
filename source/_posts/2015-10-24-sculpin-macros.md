@@ -15,13 +15,11 @@ that I've attempted in the past as well. I found a couple places
 worked in *Sculpin 2.0.0*. It's very possible that it worked at some point in
 the past, but not now.
 
+<!-- more -->
+
 Ideally, I wanted to import like this:
 
-{% verbatim %}
-
     {% from 'macros.twig' import tag %}
-    
-{% endverbatim %}
 
 The *import* statement never seemed to fail, so long as I remembered that
 Sculpin requires me to leave off the file extension. The issue, it seemed, was

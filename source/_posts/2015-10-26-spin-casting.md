@@ -3,7 +3,7 @@ title: Spin Casting A Mirror - Research Phase
 categories:
     - diy
 tags: ['Astronomy','DIY','Optics']
-date: 
+date: 2015-10-26
 disqus:
     identifier: new-frontier
 ---
@@ -14,6 +14,8 @@ construction. Spherical mirrors suffer from [spherical aberration][spherical abe
 an optical defect which results in peripheral rays being reflected either in
 front of, or behind, the intended focal point of the mirror. Spherical mirrors
 are relatively simple to fashion, as are paraboloidal mirrors.
+
+<!-- more -->
 
 There is a lot of trial-and-error involved in crafting a mirror by hand,
 involving grinding the general shape, followed by progressively finer grit
