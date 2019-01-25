@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Field from './Field';
+import CalculatorField from './components/CalculatorField';
 import { queryStringToMap, updateQueryString } from './utils';
 
 export default class CalculatorView extends React.Component {
@@ -26,22 +26,31 @@ export default class CalculatorView extends React.Component {
     }
 
     componentWillMount() {
+        if (!this.props.calculator) {
+            return;
+        }
         const map = queryStringToMap();
+        console.log('Map: ', map);
         if (Object.keys(map).length === 1 && map.view) {
             updateQueryString(Object.assign({}, map, this.props.calculator.data));
         } else {
+            console.log('Map: ', map);
             this.props.calculator.data = map;
         }
     }
 
-    onChange(ev) {
-        this.props.calculator[ev.target.name] = ev.target.value;
-        this.setState({});
+    onChange(name, value) {
+        this.props.calculator.set(name, value);
+        console.log('Here');
+        this.setState({ calculator: this.props.calculator });
         const map = queryStringToMap();
         updateQueryString(Object.assign({}, { 'view': map.view }, this.props.calculator.data));
     }
 
     render() {
+        if (!this.props.calculator) {
+            return (<p>Loading calculator...</p>);
+        }
         return (
             <form className="form-horizontal">
                 {
@@ -50,12 +59,12 @@ export default class CalculatorView extends React.Component {
                         .sections
                         .filter((section) => (section.fields && section.fields.length > 0))
                         .map((section, i) => (
-                            <div className="col-md-4 col-sm-12" key={ i }>
+                            <div className="col-md-6 col-sm-12" key={ i }>
                                 <h3>{ section.title }</h3>
                                 {
                                     section.fields
                                         .map((fieldName, i) => (
-                                            <Field id={ fieldName }
+                                            <CalculatorField id={ fieldName }
                                                     key={ i }
                                                     calculator={ this.props.calculator }
                                                     onChange={ this.onChange }
@@ -65,6 +74,9 @@ export default class CalculatorView extends React.Component {
                             </div>
                         ))
                 }
+                <pre style={{ 'textAlign': 'left' }}>
+                { JSON.stringify(this.props.calculator, null, 4) }
+                </pre>
             </form>
         );
     }

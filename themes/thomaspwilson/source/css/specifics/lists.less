@@ -1,0 +1,25 @@
+.list-group-item {
+	margin: 0;
+	text-align: left;
+	white-space: normal;
+
+	&-heading {
+    	margin-top: 10px;
+	}
+	&-text {
+		text-align: left;
+		width: 100%;
+	}
+	+ .list-group-item {
+		border-top: none;
+	}
+}
+
+a.list-group-item .list-group-item-heading,
+button.list-group-item .list-group-item-heading {
+    color: #333;
+}
+
+.list-group-item.active .list-group-item-heading, .list-group-item.active .list-group-item-heading>.small, .list-group-item.active .list-group-item-heading>small, .list-group-item.active:focus .list-group-item-heading, .list-group-item.active:focus .list-group-item-heading>.small, .list-group-item.active:focus .list-group-item-heading>small, .list-group-item.active:hover .list-group-item-heading, .list-group-item.active:hover .list-group-item-heading>.small, .list-group-item.active:hover .list-group-item-heading>small {
+    color: inherit;
+}

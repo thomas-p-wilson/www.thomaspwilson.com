@@ -58,14 +58,31 @@ export function updateQueryStringParam(key, value) {
  * the value if it's a variable string, and returning the original if it's
  * nothing important.
  */
-export function evaluate(value, calculator, fallback) {
+export function evaluate(value, fallback, calculator) {
     if (typeof value === 'function') {
-        return value(calculator);
+        return value.apply(null, Array.prototype.slice.call(arguments, 2));
     }
-    if (typeof value === 'string'
-            && value[0] === '$'
-            && value.length > 1) {
-        return calculator[value.substr(1)];
+    if (value.indexOf('$unit') === 0) {
+        const prop = value.substr(6);
+        if (calculator.field_units[prop]) {
+            return calculator.field_units[prop];
+        }
+        if (calculator.fields[prop]
+                && calculator.fields[prop].unit
+                && calculator.units[calculator.fields[prop].unit.type]) {
+            return calculator.units[calculator.fields[prop].unit.type];
+        }
+        return null;
+    }
+    if (value.indexOf('$') === 0) {
+        const prop = value.substr(1);
+        if (Object.prototype.hasOwnProperty.call(calculator, prop)) {
+            return calculator[prop];
+        }
     }
     return value || fallback;
+}
+
+export function roundToScale(value, scale) {
+    return Number(Math.round(value + 'e+' + scale) + ('e-' + scale));
 }

@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import CalculatorSwitcher from './calculators/CalculatorSwitcher';
+import CalculatorPage from './calculators/CalculatorPage';
 
 import telescopyCalculator from './calculators/definitions/telescopy';
 import greenCalculator from './calculators/definitions/green-energy';
+import mortgageCalculator from './calculators/definitions/mortgage';
 
 
 
 
 
 // render an instance of Clock into <body>:
-ReactDOM.render(<CalculatorSwitcher calculators={[telescopyCalculator, greenCalculator]} />, document.getElementById('calculators'));
+ReactDOM.render(<CalculatorPage calculators={[telescopyCalculator, greenCalculator, mortgageCalculator]} />, document.getElementById('calculators'));

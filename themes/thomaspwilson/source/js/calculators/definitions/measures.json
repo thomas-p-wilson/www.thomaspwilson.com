@@ -1,0 +1,1637 @@
+{
+    "length": {
+        "title": "Length",
+        "units": {
+            "ym": {
+                "base": "m",
+                "symbol": "ym",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoMetre",
+                "category": "length"
+            },
+            "zm": {
+                "base": "m",
+                "symbol": "zm",
+                "multiplier": 1e-21,
+                "title": "ZeptoMetre",
+                "category": "length"
+            },
+            "am": {
+                "base": "m",
+                "symbol": "am",
+                "multiplier": 1e-18,
+                "title": "AttoMetre",
+                "category": "length"
+            },
+            "fm": {
+                "base": "m",
+                "symbol": "fm",
+                "multiplier": 1e-15,
+                "title": "FemtoMetre",
+                "category": "length"
+            },
+            "pm": {
+                "base": "m",
+                "symbol": "pm",
+                "multiplier": 1e-12,
+                "title": "PicoMetre",
+                "category": "length"
+            },
+            "nm": {
+                "base": "m",
+                "symbol": "nm",
+                "multiplier": 1e-9,
+                "title": "NanoMetre",
+                "category": "length"
+            },
+            "um": {
+                "base": "m",
+                "symbol": "um",
+                "multiplier": 0.000001,
+                "title": "MicroMetre",
+                "category": "length"
+            },
+            "mm": {
+                "base": "m",
+                "symbol": "mm",
+                "multiplier": 0.001,
+                "title": "MilliMetre",
+                "category": "length"
+            },
+            "cm": {
+                "base": "m",
+                "symbol": "cm",
+                "multiplier": 0.01,
+                "title": "CentiMetre",
+                "category": "length"
+            },
+            "dm": {
+                "base": "m",
+                "symbol": "dm",
+                "multiplier": 0.1,
+                "title": "DeciMetre",
+                "category": "length"
+            },
+            "m": {
+                "base": "m",
+                "symbol": "m",
+                "multiplier": 1,
+                "title": "Metre",
+                "category": "length"
+            },
+            "dam": {
+                "base": "m",
+                "symbol": "dam",
+                "multiplier": 10,
+                "title": "DecaMetre",
+                "category": "length"
+            },
+            "hm": {
+                "base": "m",
+                "symbol": "hm",
+                "multiplier": 100,
+                "title": "HectaMetre",
+                "category": "length"
+            },
+            "km": {
+                "base": "m",
+                "symbol": "km",
+                "multiplier": 1000,
+                "title": "KiloMetre",
+                "category": "length"
+            },
+            "Mm": {
+                "base": "m",
+                "symbol": "Mm",
+                "multiplier": 1000000,
+                "title": "MegaMetre",
+                "category": "length"
+            },
+            "Gm": {
+                "base": "m",
+                "symbol": "Gm",
+                "multiplier": 1000000000,
+                "title": "GigaMetre",
+                "category": "length"
+            },
+            "Tm": {
+                "base": "m",
+                "symbol": "Tm",
+                "multiplier": 1000000000000,
+                "title": "TeraMetre",
+                "category": "length"
+            },
+            "Pm": {
+                "base": "m",
+                "symbol": "Pm",
+                "multiplier": 1000000000000000,
+                "title": "PetaMetre",
+                "category": "length"
+            },
+            "Em": {
+                "base": "m",
+                "symbol": "Em",
+                "multiplier": 1000000000000000000,
+                "title": "ExaMetre",
+                "category": "length"
+            },
+            "Zm": {
+                "base": "m",
+                "symbol": "Zm",
+                "multiplier": 1e+21,
+                "title": "ZettaMetre",
+                "category": "length"
+            },
+            "Ym": {
+                "base": "m",
+                "symbol": "Ym",
+                "multiplier": 1e+24,
+                "title": "YottaMetre",
+                "category": "length"
+            },
+            "in": {
+                "base": "m",
+                "symbol": "in",
+                "multiplier": 0.0254,
+                "title": "Inch",
+                "category": "length"
+            },
+            "ft": {
+                "base": "m",
+                "symbol": "ft",
+                "multiplier": 0.3048,
+                "title": "Foot",
+                "category": "length"
+            }
+        }
+    },
+    "mass": {
+        "title": "Mass",
+        "units": {
+            "yg": {
+                "base": "g",
+                "symbol": "yg",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoGram",
+                "category": "mass"
+            },
+            "zg": {
+                "base": "g",
+                "symbol": "zg",
+                "multiplier": 1e-21,
+                "title": "ZeptoGram",
+                "category": "mass"
+            },
+            "ag": {
+                "base": "g",
+                "symbol": "ag",
+                "multiplier": 1e-18,
+                "title": "AttoGram",
+                "category": "mass"
+            },
+            "fg": {
+                "base": "g",
+                "symbol": "fg",
+                "multiplier": 1e-15,
+                "title": "FemtoGram",
+                "category": "mass"
+            },
+            "pg": {
+                "base": "g",
+                "symbol": "pg",
+                "multiplier": 1e-12,
+                "title": "PicoGram",
+                "category": "mass"
+            },
+            "ng": {
+                "base": "g",
+                "symbol": "ng",
+                "multiplier": 1e-9,
+                "title": "NanoGram",
+                "category": "mass"
+            },
+            "ug": {
+                "base": "g",
+                "symbol": "ug",
+                "multiplier": 0.000001,
+                "title": "MicroGram",
+                "category": "mass"
+            },
+            "mg": {
+                "base": "g",
+                "symbol": "mg",
+                "multiplier": 0.001,
+                "title": "MilliGram",
+                "category": "mass"
+            },
+            "cg": {
+                "base": "g",
+                "symbol": "cg",
+                "multiplier": 0.01,
+                "title": "CentiGram",
+                "category": "mass"
+            },
+            "dg": {
+                "base": "g",
+                "symbol": "dg",
+                "multiplier": 0.1,
+                "title": "DeciGram",
+                "category": "mass"
+            },
+            "g": {
+                "base": "g",
+                "symbol": "g",
+                "multiplier": 1,
+                "title": "Gram",
+                "category": "mass"
+            },
+            "dag": {
+                "base": "g",
+                "symbol": "dag",
+                "multiplier": 10,
+                "title": "DecaGram",
+                "category": "mass"
+            },
+            "hg": {
+                "base": "g",
+                "symbol": "hg",
+                "multiplier": 100,
+                "title": "HectaGram",
+                "category": "mass"
+            },
+            "kg": {
+                "base": "g",
+                "symbol": "kg",
+                "multiplier": 1000,
+                "title": "KiloGram",
+                "category": "mass"
+            },
+            "Mg": {
+                "base": "g",
+                "symbol": "Mg",
+                "multiplier": 1000000,
+                "title": "MegaGram",
+                "category": "mass"
+            },
+            "Gg": {
+                "base": "g",
+                "symbol": "Gg",
+                "multiplier": 1000000000,
+                "title": "GigaGram",
+                "category": "mass"
+            },
+            "Tg": {
+                "base": "g",
+                "symbol": "Tg",
+                "multiplier": 1000000000000,
+                "title": "TeraGram",
+                "category": "mass"
+            },
+            "Pg": {
+                "base": "g",
+                "symbol": "Pg",
+                "multiplier": 1000000000000000,
+                "title": "PetaGram",
+                "category": "mass"
+            },
+            "Eg": {
+                "base": "g",
+                "symbol": "Eg",
+                "multiplier": 1000000000000000000,
+                "title": "ExaGram",
+                "category": "mass"
+            },
+            "Zg": {
+                "base": "g",
+                "symbol": "Zg",
+                "multiplier": 1e+21,
+                "title": "ZettaGram",
+                "category": "mass"
+            },
+            "Yg": {
+                "base": "g",
+                "symbol": "Yg",
+                "multiplier": 1e+24,
+                "title": "YottaGram",
+                "category": "mass"
+            },
+            "oz": {
+                "base": "g",
+                "symbol": "oz",
+                "multiplier": 28.3495231,
+                "title": "Ounce",
+                "category": "mass"
+            },
+            "lb": {
+                "base": "g",
+                "symbol": "lb",
+                "multiplier": 453.59237,
+                "title": "Pound",
+                "category": "mass"
+            }
+        }
+    },
+    "time": {
+        "title": "Time",
+        "units": {
+            "h": {
+                "base": "s",
+                "symbol": "h",
+                "multiplier": 0.0002777777777777778,
+                "title": "Hour",
+                "category": "time"
+            },
+            "min": {
+                "base": "s",
+                "symbol": "min",
+                "multiplier": 0.016666666666666666,
+                "title": "Second",
+                "category": "time"
+            },
+            "s": {
+                "base": "s",
+                "symbol": "s",
+                "multiplier": 1,
+                "title": "Second",
+                "category": "time"
+            },
+            "ns": {
+                "base": "s",
+                "symbol": "ns",
+                "multiplier": 1000000000,
+                "title": "Nanosecond",
+                "category": "time"
+            },
+            "us": {
+                "base": "s",
+                "symbol": "us",
+                "multiplier": 1000000,
+                "title": "Microsecond",
+                "category": "time"
+            },
+            "ms": {
+                "base": "s",
+                "symbol": "ms",
+                "multiplier": 1000,
+                "title": "Millisecond",
+                "category": "time"
+            }
+        }
+    },
+    "current": {
+        "title": "Electric Current",
+        "units": {
+            "yA": {
+                "base": "A",
+                "symbol": "yA",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoAmpere",
+                "category": "current"
+            },
+            "zA": {
+                "base": "A",
+                "symbol": "zA",
+                "multiplier": 1e-21,
+                "title": "ZeptoAmpere",
+                "category": "current"
+            },
+            "aA": {
+                "base": "A",
+                "symbol": "aA",
+                "multiplier": 1e-18,
+                "title": "AttoAmpere",
+                "category": "current"
+            },
+            "fA": {
+                "base": "A",
+                "symbol": "fA",
+                "multiplier": 1e-15,
+                "title": "FemtoAmpere",
+                "category": "current"
+            },
+            "pA": {
+                "base": "A",
+                "symbol": "pA",
+                "multiplier": 1e-12,
+                "title": "PicoAmpere",
+                "category": "current"
+            },
+            "nA": {
+                "base": "A",
+                "symbol": "nA",
+                "multiplier": 1e-9,
+                "title": "NanoAmpere",
+                "category": "current"
+            },
+            "uA": {
+                "base": "A",
+                "symbol": "uA",
+                "multiplier": 0.000001,
+                "title": "MicroAmpere",
+                "category": "current"
+            },
+            "mA": {
+                "base": "A",
+                "symbol": "mA",
+                "multiplier": 0.001,
+                "title": "MilliAmpere",
+                "category": "current"
+            },
+            "cA": {
+                "base": "A",
+                "symbol": "cA",
+                "multiplier": 0.01,
+                "title": "CentiAmpere",
+                "category": "current"
+            },
+            "dA": {
+                "base": "A",
+                "symbol": "dA",
+                "multiplier": 0.1,
+                "title": "DeciAmpere",
+                "category": "current"
+            },
+            "A": {
+                "base": "A",
+                "symbol": "A",
+                "multiplier": 1,
+                "title": "Ampere",
+                "category": "current"
+            },
+            "daA": {
+                "base": "A",
+                "symbol": "daA",
+                "multiplier": 10,
+                "title": "DecaAmpere",
+                "category": "current"
+            },
+            "hA": {
+                "base": "A",
+                "symbol": "hA",
+                "multiplier": 100,
+                "title": "HectaAmpere",
+                "category": "current"
+            },
+            "kA": {
+                "base": "A",
+                "symbol": "kA",
+                "multiplier": 1000,
+                "title": "KiloAmpere",
+                "category": "current"
+            },
+            "MA": {
+                "base": "A",
+                "symbol": "MA",
+                "multiplier": 1000000,
+                "title": "MegaAmpere",
+                "category": "current"
+            },
+            "GA": {
+                "base": "A",
+                "symbol": "GA",
+                "multiplier": 1000000000,
+                "title": "GigaAmpere",
+                "category": "current"
+            },
+            "TA": {
+                "base": "A",
+                "symbol": "TA",
+                "multiplier": 1000000000000,
+                "title": "TeraAmpere",
+                "category": "current"
+            },
+            "PA": {
+                "base": "A",
+                "symbol": "PA",
+                "multiplier": 1000000000000000,
+                "title": "PetaAmpere",
+                "category": "current"
+            },
+            "EA": {
+                "base": "A",
+                "symbol": "EA",
+                "multiplier": 1000000000000000000,
+                "title": "ExaAmpere",
+                "category": "current"
+            },
+            "ZA": {
+                "base": "A",
+                "symbol": "ZA",
+                "multiplier": 1e+21,
+                "title": "ZettaAmpere",
+                "category": "current"
+            },
+            "YA": {
+                "base": "A",
+                "symbol": "YA",
+                "multiplier": 1e+24,
+                "title": "YottaAmpere",
+                "category": "current"
+            }
+        }
+    },
+    "temperature": {
+        "title": "Temperature",
+        "units": {
+            "K": {
+                "base": "K",
+                "symbol": "K",
+                "multiplier": 1,
+                "title": "Kelvin",
+                "category": "temperature"
+            },
+            "C": {
+                "base": "K",
+                "symbol": "C",
+                "multiplier": "+273.15",
+                "title": "Celsius",
+                "category": "temperature"
+            }
+        }
+    },
+    "quantity": {
+        "title": "Quantity",
+        "units": {
+            "ymol": {
+                "base": "mol",
+                "symbol": "ymol",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoMole",
+                "category": "quantity"
+            },
+            "zmol": {
+                "base": "mol",
+                "symbol": "zmol",
+                "multiplier": 1e-21,
+                "title": "ZeptoMole",
+                "category": "quantity"
+            },
+            "amol": {
+                "base": "mol",
+                "symbol": "amol",
+                "multiplier": 1e-18,
+                "title": "AttoMole",
+                "category": "quantity"
+            },
+            "fmol": {
+                "base": "mol",
+                "symbol": "fmol",
+                "multiplier": 1e-15,
+                "title": "FemtoMole",
+                "category": "quantity"
+            },
+            "pmol": {
+                "base": "mol",
+                "symbol": "pmol",
+                "multiplier": 1e-12,
+                "title": "PicoMole",
+                "category": "quantity"
+            },
+            "nmol": {
+                "base": "mol",
+                "symbol": "nmol",
+                "multiplier": 1e-9,
+                "title": "NanoMole",
+                "category": "quantity"
+            },
+            "umol": {
+                "base": "mol",
+                "symbol": "umol",
+                "multiplier": 0.000001,
+                "title": "MicroMole",
+                "category": "quantity"
+            },
+            "mmol": {
+                "base": "mol",
+                "symbol": "mmol",
+                "multiplier": 0.001,
+                "title": "MilliMole",
+                "category": "quantity"
+            },
+            "cmol": {
+                "base": "mol",
+                "symbol": "cmol",
+                "multiplier": 0.01,
+                "title": "CentiMole",
+                "category": "quantity"
+            },
+            "dmol": {
+                "base": "mol",
+                "symbol": "dmol",
+                "multiplier": 0.1,
+                "title": "DeciMole",
+                "category": "quantity"
+            },
+            "mol": {
+                "base": "mol",
+                "symbol": "mol",
+                "multiplier": 1,
+                "title": "Mole",
+                "category": "quantity"
+            },
+            "damol": {
+                "base": "mol",
+                "symbol": "damol",
+                "multiplier": 10,
+                "title": "DecaMole",
+                "category": "quantity"
+            },
+            "hmol": {
+                "base": "mol",
+                "symbol": "hmol",
+                "multiplier": 100,
+                "title": "HectaMole",
+                "category": "quantity"
+            },
+            "kmol": {
+                "base": "mol",
+                "symbol": "kmol",
+                "multiplier": 1000,
+                "title": "KiloMole",
+                "category": "quantity"
+            },
+            "Mmol": {
+                "base": "mol",
+                "symbol": "Mmol",
+                "multiplier": 1000000,
+                "title": "MegaMole",
+                "category": "quantity"
+            },
+            "Gmol": {
+                "base": "mol",
+                "symbol": "Gmol",
+                "multiplier": 1000000000,
+                "title": "GigaMole",
+                "category": "quantity"
+            },
+            "Tmol": {
+                "base": "mol",
+                "symbol": "Tmol",
+                "multiplier": 1000000000000,
+                "title": "TeraMole",
+                "category": "quantity"
+            },
+            "Pmol": {
+                "base": "mol",
+                "symbol": "Pmol",
+                "multiplier": 1000000000000000,
+                "title": "PetaMole",
+                "category": "quantity"
+            },
+            "Emol": {
+                "base": "mol",
+                "symbol": "Emol",
+                "multiplier": 1000000000000000000,
+                "title": "ExaMole",
+                "category": "quantity"
+            },
+            "Zmol": {
+                "base": "mol",
+                "symbol": "Zmol",
+                "multiplier": 1e+21,
+                "title": "ZettaMole",
+                "category": "quantity"
+            },
+            "Ymol": {
+                "base": "mol",
+                "symbol": "Ymol",
+                "multiplier": 1e+24,
+                "title": "YottaMole",
+                "category": "quantity"
+            }
+        }
+    },
+    "brightness": {
+        "title": "Luminous Intensity",
+        "units": {
+            "ycd": {
+                "base": "cd",
+                "symbol": "ycd",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoCandela",
+                "category": "brightness"
+            },
+            "zcd": {
+                "base": "cd",
+                "symbol": "zcd",
+                "multiplier": 1e-21,
+                "title": "ZeptoCandela",
+                "category": "brightness"
+            },
+            "acd": {
+                "base": "cd",
+                "symbol": "acd",
+                "multiplier": 1e-18,
+                "title": "AttoCandela",
+                "category": "brightness"
+            },
+            "fcd": {
+                "base": "cd",
+                "symbol": "fcd",
+                "multiplier": 1e-15,
+                "title": "FemtoCandela",
+                "category": "brightness"
+            },
+            "pcd": {
+                "base": "cd",
+                "symbol": "pcd",
+                "multiplier": 1e-12,
+                "title": "PicoCandela",
+                "category": "brightness"
+            },
+            "ncd": {
+                "base": "cd",
+                "symbol": "ncd",
+                "multiplier": 1e-9,
+                "title": "NanoCandela",
+                "category": "brightness"
+            },
+            "ucd": {
+                "base": "cd",
+                "symbol": "ucd",
+                "multiplier": 0.000001,
+                "title": "MicroCandela",
+                "category": "brightness"
+            },
+            "mcd": {
+                "base": "cd",
+                "symbol": "mcd",
+                "multiplier": 0.001,
+                "title": "MilliCandela",
+                "category": "brightness"
+            },
+            "ccd": {
+                "base": "cd",
+                "symbol": "ccd",
+                "multiplier": 0.01,
+                "title": "CentiCandela",
+                "category": "brightness"
+            },
+            "dcd": {
+                "base": "cd",
+                "symbol": "dcd",
+                "multiplier": 0.1,
+                "title": "DeciCandela",
+                "category": "brightness"
+            },
+            "cd": {
+                "base": "cd",
+                "symbol": "cd",
+                "multiplier": 1,
+                "title": "Candela",
+                "category": "brightness"
+            },
+            "dacd": {
+                "base": "cd",
+                "symbol": "dacd",
+                "multiplier": 10,
+                "title": "DecaCandela",
+                "category": "brightness"
+            },
+            "hcd": {
+                "base": "cd",
+                "symbol": "hcd",
+                "multiplier": 100,
+                "title": "HectaCandela",
+                "category": "brightness"
+            },
+            "kcd": {
+                "base": "cd",
+                "symbol": "kcd",
+                "multiplier": 1000,
+                "title": "KiloCandela",
+                "category": "brightness"
+            },
+            "Mcd": {
+                "base": "cd",
+                "symbol": "Mcd",
+                "multiplier": 1000000,
+                "title": "MegaCandela",
+                "category": "brightness"
+            },
+            "Gcd": {
+                "base": "cd",
+                "symbol": "Gcd",
+                "multiplier": 1000000000,
+                "title": "GigaCandela",
+                "category": "brightness"
+            },
+            "Tcd": {
+                "base": "cd",
+                "symbol": "Tcd",
+                "multiplier": 1000000000000,
+                "title": "TeraCandela",
+                "category": "brightness"
+            },
+            "Pcd": {
+                "base": "cd",
+                "symbol": "Pcd",
+                "multiplier": 1000000000000000,
+                "title": "PetaCandela",
+                "category": "brightness"
+            },
+            "Ecd": {
+                "base": "cd",
+                "symbol": "Ecd",
+                "multiplier": 1000000000000000000,
+                "title": "ExaCandela",
+                "category": "brightness"
+            },
+            "Zcd": {
+                "base": "cd",
+                "symbol": "Zcd",
+                "multiplier": 1e+21,
+                "title": "ZettaCandela",
+                "category": "brightness"
+            },
+            "Ycd": {
+                "base": "cd",
+                "symbol": "Ycd",
+                "multiplier": 1e+24,
+                "title": "YottaCandela",
+                "category": "brightness"
+            }
+        }
+    },
+    "angle": {
+        "title": "Angle",
+        "units": {
+            "rad": {
+                "base": "rad",
+                "symbol": "rad",
+                "multiplier": 1,
+                "title": "Radian",
+                "category": "angle"
+            },
+            "deg": {
+                "base": "rad",
+                "symbol": "deg",
+                "multiplier": 0.0174533,
+                "title": "Degree",
+                "category": "angle"
+            },
+            "rot": {
+                "base": "rad",
+                "symbol": "rot",
+                "multiplier": 6.283185307179586,
+                "title": "Rotation",
+                "category": "angle"
+            }
+        }
+    },
+    "frequency": {
+        "title": "Frequency",
+        "units": {
+            "yHz": {
+                "base": "Hz",
+                "symbol": "yHz",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoHertz",
+                "category": "frequency"
+            },
+            "zHz": {
+                "base": "Hz",
+                "symbol": "zHz",
+                "multiplier": 1e-21,
+                "title": "ZeptoHertz",
+                "category": "frequency"
+            },
+            "aHz": {
+                "base": "Hz",
+                "symbol": "aHz",
+                "multiplier": 1e-18,
+                "title": "AttoHertz",
+                "category": "frequency"
+            },
+            "fHz": {
+                "base": "Hz",
+                "symbol": "fHz",
+                "multiplier": 1e-15,
+                "title": "FemtoHertz",
+                "category": "frequency"
+            },
+            "pHz": {
+                "base": "Hz",
+                "symbol": "pHz",
+                "multiplier": 1e-12,
+                "title": "PicoHertz",
+                "category": "frequency"
+            },
+            "nHz": {
+                "base": "Hz",
+                "symbol": "nHz",
+                "multiplier": 1e-9,
+                "title": "NanoHertz",
+                "category": "frequency"
+            },
+            "uHz": {
+                "base": "Hz",
+                "symbol": "uHz",
+                "multiplier": 0.000001,
+                "title": "MicroHertz",
+                "category": "frequency"
+            },
+            "mHz": {
+                "base": "Hz",
+                "symbol": "mHz",
+                "multiplier": 0.001,
+                "title": "MilliHertz",
+                "category": "frequency"
+            },
+            "cHz": {
+                "base": "Hz",
+                "symbol": "cHz",
+                "multiplier": 0.01,
+                "title": "CentiHertz",
+                "category": "frequency"
+            },
+            "dHz": {
+                "base": "Hz",
+                "symbol": "dHz",
+                "multiplier": 0.1,
+                "title": "DeciHertz",
+                "category": "frequency"
+            },
+            "Hz": {
+                "base": "Hz",
+                "symbol": "Hz",
+                "multiplier": 1,
+                "title": "Hertz",
+                "category": "frequency"
+            },
+            "daHz": {
+                "base": "Hz",
+                "symbol": "daHz",
+                "multiplier": 10,
+                "title": "DecaHertz",
+                "category": "frequency"
+            },
+            "hHz": {
+                "base": "Hz",
+                "symbol": "hHz",
+                "multiplier": 100,
+                "title": "HectaHertz",
+                "category": "frequency"
+            },
+            "kHz": {
+                "base": "Hz",
+                "symbol": "kHz",
+                "multiplier": 1000,
+                "title": "KiloHertz",
+                "category": "frequency"
+            },
+            "MHz": {
+                "base": "Hz",
+                "symbol": "MHz",
+                "multiplier": 1000000,
+                "title": "MegaHertz",
+                "category": "frequency"
+            },
+            "GHz": {
+                "base": "Hz",
+                "symbol": "GHz",
+                "multiplier": 1000000000,
+                "title": "GigaHertz",
+                "category": "frequency"
+            },
+            "THz": {
+                "base": "Hz",
+                "symbol": "THz",
+                "multiplier": 1000000000000,
+                "title": "TeraHertz",
+                "category": "frequency"
+            },
+            "PHz": {
+                "base": "Hz",
+                "symbol": "PHz",
+                "multiplier": 1000000000000000,
+                "title": "PetaHertz",
+                "category": "frequency"
+            },
+            "EHz": {
+                "base": "Hz",
+                "symbol": "EHz",
+                "multiplier": 1000000000000000000,
+                "title": "ExaHertz",
+                "category": "frequency"
+            },
+            "ZHz": {
+                "base": "Hz",
+                "symbol": "ZHz",
+                "multiplier": 1e+21,
+                "title": "ZettaHertz",
+                "category": "frequency"
+            },
+            "YHz": {
+                "base": "Hz",
+                "symbol": "YHz",
+                "multiplier": 1e+24,
+                "title": "YottaHertz",
+                "category": "frequency"
+            }
+        }
+    },
+    "power": {
+        "title": "Power",
+        "units": {
+            "yW": {
+                "base": "W",
+                "symbol": "yW",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoWatt",
+                "category": "power"
+            },
+            "zW": {
+                "base": "W",
+                "symbol": "zW",
+                "multiplier": 1e-21,
+                "title": "ZeptoWatt",
+                "category": "power"
+            },
+            "aW": {
+                "base": "W",
+                "symbol": "aW",
+                "multiplier": 1e-18,
+                "title": "AttoWatt",
+                "category": "power"
+            },
+            "fW": {
+                "base": "W",
+                "symbol": "fW",
+                "multiplier": 1e-15,
+                "title": "FemtoWatt",
+                "category": "power"
+            },
+            "pW": {
+                "base": "W",
+                "symbol": "pW",
+                "multiplier": 1e-12,
+                "title": "PicoWatt",
+                "category": "power"
+            },
+            "nW": {
+                "base": "W",
+                "symbol": "nW",
+                "multiplier": 1e-9,
+                "title": "NanoWatt",
+                "category": "power"
+            },
+            "uW": {
+                "base": "W",
+                "symbol": "uW",
+                "multiplier": 0.000001,
+                "title": "MicroWatt",
+                "category": "power"
+            },
+            "mW": {
+                "base": "W",
+                "symbol": "mW",
+                "multiplier": 0.001,
+                "title": "MilliWatt",
+                "category": "power"
+            },
+            "cW": {
+                "base": "W",
+                "symbol": "cW",
+                "multiplier": 0.01,
+                "title": "CentiWatt",
+                "category": "power"
+            },
+            "dW": {
+                "base": "W",
+                "symbol": "dW",
+                "multiplier": 0.1,
+                "title": "DeciWatt",
+                "category": "power"
+            },
+            "W": {
+                "base": "W",
+                "symbol": "W",
+                "multiplier": 1,
+                "title": "Watt",
+                "category": "power"
+            },
+            "daW": {
+                "base": "W",
+                "symbol": "daW",
+                "multiplier": 10,
+                "title": "DecaWatt",
+                "category": "power"
+            },
+            "hW": {
+                "base": "W",
+                "symbol": "hW",
+                "multiplier": 100,
+                "title": "HectaWatt",
+                "category": "power"
+            },
+            "kW": {
+                "base": "W",
+                "symbol": "kW",
+                "multiplier": 1000,
+                "title": "KiloWatt",
+                "category": "power"
+            },
+            "MW": {
+                "base": "W",
+                "symbol": "MW",
+                "multiplier": 1000000,
+                "title": "MegaWatt",
+                "category": "power"
+            },
+            "GW": {
+                "base": "W",
+                "symbol": "GW",
+                "multiplier": 1000000000,
+                "title": "GigaWatt",
+                "category": "power"
+            },
+            "TW": {
+                "base": "W",
+                "symbol": "TW",
+                "multiplier": 1000000000000,
+                "title": "TeraWatt",
+                "category": "power"
+            },
+            "PW": {
+                "base": "W",
+                "symbol": "PW",
+                "multiplier": 1000000000000000,
+                "title": "PetaWatt",
+                "category": "power"
+            },
+            "EW": {
+                "base": "W",
+                "symbol": "EW",
+                "multiplier": 1000000000000000000,
+                "title": "ExaWatt",
+                "category": "power"
+            },
+            "ZW": {
+                "base": "W",
+                "symbol": "ZW",
+                "multiplier": 1e+21,
+                "title": "ZettaWatt",
+                "category": "power"
+            },
+            "YW": {
+                "base": "W",
+                "symbol": "YW",
+                "multiplier": 1e+24,
+                "title": "YottaWatt",
+                "category": "power"
+            }
+        }
+    },
+    "volume": {
+        "title": "Volume",
+        "units": {
+            "yL": {
+                "base": "L",
+                "symbol": "yL",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoLitre",
+                "category": "volume"
+            },
+            "zL": {
+                "base": "L",
+                "symbol": "zL",
+                "multiplier": 1e-21,
+                "title": "ZeptoLitre",
+                "category": "volume"
+            },
+            "aL": {
+                "base": "L",
+                "symbol": "aL",
+                "multiplier": 1e-18,
+                "title": "AttoLitre",
+                "category": "volume"
+            },
+            "fL": {
+                "base": "L",
+                "symbol": "fL",
+                "multiplier": 1e-15,
+                "title": "FemtoLitre",
+                "category": "volume"
+            },
+            "pL": {
+                "base": "L",
+                "symbol": "pL",
+                "multiplier": 1e-12,
+                "title": "PicoLitre",
+                "category": "volume"
+            },
+            "nL": {
+                "base": "L",
+                "symbol": "nL",
+                "multiplier": 1e-9,
+                "title": "NanoLitre",
+                "category": "volume"
+            },
+            "uL": {
+                "base": "L",
+                "symbol": "uL",
+                "multiplier": 0.000001,
+                "title": "MicroLitre",
+                "category": "volume"
+            },
+            "mL": {
+                "base": "L",
+                "symbol": "mL",
+                "multiplier": 0.001,
+                "title": "MilliLitre",
+                "category": "volume"
+            },
+            "cL": {
+                "base": "L",
+                "symbol": "cL",
+                "multiplier": 0.01,
+                "title": "CentiLitre",
+                "category": "volume"
+            },
+            "dL": {
+                "base": "L",
+                "symbol": "dL",
+                "multiplier": 0.1,
+                "title": "DeciLitre",
+                "category": "volume"
+            },
+            "L": {
+                "base": "L",
+                "symbol": "L",
+                "multiplier": 1,
+                "title": "Litre",
+                "category": "volume"
+            },
+            "daL": {
+                "base": "L",
+                "symbol": "daL",
+                "multiplier": 10,
+                "title": "DecaLitre",
+                "category": "volume"
+            },
+            "hL": {
+                "base": "L",
+                "symbol": "hL",
+                "multiplier": 100,
+                "title": "HectaLitre",
+                "category": "volume"
+            },
+            "kL": {
+                "base": "L",
+                "symbol": "kL",
+                "multiplier": 1000,
+                "title": "KiloLitre",
+                "category": "volume"
+            },
+            "ML": {
+                "base": "L",
+                "symbol": "ML",
+                "multiplier": 1000000,
+                "title": "MegaLitre",
+                "category": "volume"
+            },
+            "GL": {
+                "base": "L",
+                "symbol": "GL",
+                "multiplier": 1000000000,
+                "title": "GigaLitre",
+                "category": "volume"
+            },
+            "TL": {
+                "base": "L",
+                "symbol": "TL",
+                "multiplier": 1000000000000,
+                "title": "TeraLitre",
+                "category": "volume"
+            },
+            "PL": {
+                "base": "L",
+                "symbol": "PL",
+                "multiplier": 1000000000000000,
+                "title": "PetaLitre",
+                "category": "volume"
+            },
+            "EL": {
+                "base": "L",
+                "symbol": "EL",
+                "multiplier": 1000000000000000000,
+                "title": "ExaLitre",
+                "category": "volume"
+            },
+            "ZL": {
+                "base": "L",
+                "symbol": "ZL",
+                "multiplier": 1e+21,
+                "title": "ZettaLitre",
+                "category": "volume"
+            },
+            "YL": {
+                "base": "L",
+                "symbol": "YL",
+                "multiplier": 1e+24,
+                "title": "YottaLitre",
+                "category": "volume"
+            }
+        }
+    },
+    "pressure": {
+        "title": "Pressure",
+        "units": {
+            "yPa": {
+                "base": "Pa",
+                "symbol": "yPa",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoPascal",
+                "category": "pressure"
+            },
+            "zPa": {
+                "base": "Pa",
+                "symbol": "zPa",
+                "multiplier": 1e-21,
+                "title": "ZeptoPascal",
+                "category": "pressure"
+            },
+            "aPa": {
+                "base": "Pa",
+                "symbol": "aPa",
+                "multiplier": 1e-18,
+                "title": "AttoPascal",
+                "category": "pressure"
+            },
+            "fPa": {
+                "base": "Pa",
+                "symbol": "fPa",
+                "multiplier": 1e-15,
+                "title": "FemtoPascal",
+                "category": "pressure"
+            },
+            "pPa": {
+                "base": "Pa",
+                "symbol": "pPa",
+                "multiplier": 1e-12,
+                "title": "PicoPascal",
+                "category": "pressure"
+            },
+            "nPa": {
+                "base": "Pa",
+                "symbol": "nPa",
+                "multiplier": 1e-9,
+                "title": "NanoPascal",
+                "category": "pressure"
+            },
+            "uPa": {
+                "base": "Pa",
+                "symbol": "uPa",
+                "multiplier": 0.000001,
+                "title": "MicroPascal",
+                "category": "pressure"
+            },
+            "mPa": {
+                "base": "Pa",
+                "symbol": "mPa",
+                "multiplier": 0.001,
+                "title": "MilliPascal",
+                "category": "pressure"
+            },
+            "cPa": {
+                "base": "Pa",
+                "symbol": "cPa",
+                "multiplier": 0.01,
+                "title": "CentiPascal",
+                "category": "pressure"
+            },
+            "dPa": {
+                "base": "Pa",
+                "symbol": "dPa",
+                "multiplier": 0.1,
+                "title": "DeciPascal",
+                "category": "pressure"
+            },
+            "Pa": {
+                "base": "Pa",
+                "symbol": "Pa",
+                "multiplier": 1,
+                "title": "Pascal",
+                "category": "pressure"
+            },
+            "daPa": {
+                "base": "Pa",
+                "symbol": "daPa",
+                "multiplier": 10,
+                "title": "DecaPascal",
+                "category": "pressure"
+            },
+            "hPa": {
+                "base": "Pa",
+                "symbol": "hPa",
+                "multiplier": 100,
+                "title": "HectaPascal",
+                "category": "pressure"
+            },
+            "kPa": {
+                "base": "Pa",
+                "symbol": "kPa",
+                "multiplier": 1000,
+                "title": "KiloPascal",
+                "category": "pressure"
+            },
+            "MPa": {
+                "base": "Pa",
+                "symbol": "MPa",
+                "multiplier": 1000000,
+                "title": "MegaPascal",
+                "category": "pressure"
+            },
+            "GPa": {
+                "base": "Pa",
+                "symbol": "GPa",
+                "multiplier": 1000000000,
+                "title": "GigaPascal",
+                "category": "pressure"
+            },
+            "TPa": {
+                "base": "Pa",
+                "symbol": "TPa",
+                "multiplier": 1000000000000,
+                "title": "TeraPascal",
+                "category": "pressure"
+            },
+            "PPa": {
+                "base": "Pa",
+                "symbol": "PPa",
+                "multiplier": 1000000000000000,
+                "title": "PetaPascal",
+                "category": "pressure"
+            },
+            "EPa": {
+                "base": "Pa",
+                "symbol": "EPa",
+                "multiplier": 1000000000000000000,
+                "title": "ExaPascal",
+                "category": "pressure"
+            },
+            "ZPa": {
+                "base": "Pa",
+                "symbol": "ZPa",
+                "multiplier": 1e+21,
+                "title": "ZettaPascal",
+                "category": "pressure"
+            },
+            "YPa": {
+                "base": "Pa",
+                "symbol": "YPa",
+                "multiplier": 1e+24,
+                "title": "YottaPascal",
+                "category": "pressure"
+            },
+            "ypsi": {
+                "base": "Pa",
+                "symbol": "ypsi",
+                "multiplier": 1.0000000000000001e-24,
+                "title": "YoctoPSI",
+                "category": "pressure"
+            },
+            "zpsi": {
+                "base": "Pa",
+                "symbol": "zpsi",
+                "multiplier": 1e-21,
+                "title": "ZeptoPSI",
+                "category": "pressure"
+            },
+            "apsi": {
+                "base": "Pa",
+                "symbol": "apsi",
+                "multiplier": 1e-18,
+                "title": "AttoPSI",
+                "category": "pressure"
+            },
+            "fpsi": {
+                "base": "Pa",
+                "symbol": "fpsi",
+                "multiplier": 1e-15,
+                "title": "FemtoPSI",
+                "category": "pressure"
+            },
+            "ppsi": {
+                "base": "Pa",
+                "symbol": "ppsi",
+                "multiplier": 1e-12,
+                "title": "PicoPSI",
+                "category": "pressure"
+            },
+            "npsi": {
+                "base": "Pa",
+                "symbol": "npsi",
+                "multiplier": 1e-9,
+                "title": "NanoPSI",
+                "category": "pressure"
+            },
+            "upsi": {
+                "base": "Pa",
+                "symbol": "upsi",
+                "multiplier": 0.000001,
+                "title": "MicroPSI",
+                "category": "pressure"
+            },
+            "mpsi": {
+                "base": "Pa",
+                "symbol": "mpsi",
+                "multiplier": 0.001,
+                "title": "MilliPSI",
+                "category": "pressure"
+            },
+            "cpsi": {
+                "base": "Pa",
+                "symbol": "cpsi",
+                "multiplier": 0.01,
+                "title": "CentiPSI",
+                "category": "pressure"
+            },
+            "dpsi": {
+                "base": "Pa",
+                "symbol": "dpsi",
+                "multiplier": 0.1,
+                "title": "DeciPSI",
+                "category": "pressure"
+            },
+            "psi": {
+                "base": "Pa",
+                "symbol": "psi",
+                "multiplier": 1,
+                "title": "PSI",
+                "category": "pressure"
+            },
+            "dapsi": {
+                "base": "Pa",
+                "symbol": "dapsi",
+                "multiplier": 10,
+                "title": "DecaPSI",
+                "category": "pressure"
+            },
+            "hpsi": {
+                "base": "Pa",
+                "symbol": "hpsi",
+                "multiplier": 100,
+                "title": "HectaPSI",
+                "category": "pressure"
+            },
+            "kpsi": {
+                "base": "Pa",
+                "symbol": "kpsi",
+                "multiplier": 1000,
+                "title": "KiloPSI",
+                "category": "pressure"
+            },
+            "Mpsi": {
+                "base": "Pa",
+                "symbol": "Mpsi",
+                "multiplier": 1000000,
+                "title": "MegaPSI",
+                "category": "pressure"
+            },
+            "Gpsi": {
+                "base": "Pa",
+                "symbol": "Gpsi",
+                "multiplier": 1000000000,
+                "title": "GigaPSI",
+                "category": "pressure"
+            },
+            "Tpsi": {
+                "base": "Pa",
+                "symbol": "Tpsi",
+                "multiplier": 1000000000000,
+                "title": "TeraPSI",
+                "category": "pressure"
+            },
+            "Ppsi": {
+                "base": "Pa",
+                "symbol": "Ppsi",
+                "multiplier": 1000000000000000,
+                "title": "PetaPSI",
+                "category": "pressure"
+            },
+            "Epsi": {
+                "base": "Pa",
+                "symbol": "Epsi",
+                "multiplier": 1000000000000000000,
+                "title": "ExaPSI",
+                "category": "pressure"
+            },
+            "Zpsi": {
+                "base": "Pa",
+                "symbol": "Zpsi",
+                "multiplier": 1e+21,
+                "title": "ZettaPSI",
+                "category": "pressure"
+            },
+            "Ypsi": {
+                "base": "Pa",
+                "symbol": "Ypsi",
+                "multiplier": 1e+24,
+                "title": "YottaPSI",
+                "category": "pressure"
+            }
+        }
+    }
+}
