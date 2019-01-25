@@ -1,0 +1,23 @@
+@import "../../public/assets/css/bootstrap";
+
+@import "old/style.scss";
+
+@import "variables";
+@import "general";
+
+@import "vendor/flaticon";
+
+@import "elements/definition-list";
+@import "elements/main-title";
+@import "elements/navbar";
+
+@import "partials/about-card";
+@import "partials/calculators-page";
+@import "partials/contact-section";
+@import "partials/experience-section";
+@import "partials/footer-section";
+@import "partials/main-navigation";
+@import "partials/resume-page";
+@import "partials/services-section";
+@import "partials/tag-list";
+@import "partials/tools-and-tech-list";

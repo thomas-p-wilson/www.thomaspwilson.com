@@ -1,0 +1,78 @@
+.contact-section {
+	//background: $background-color;
+	text-align: center;
+
+	.container {
+	    max-width: 600px;
+	}
+
+	input,
+	textarea {
+		background: white;
+		border: none;
+		border-bottom: 1px solid lighten($background-color, 25%);
+		border-radius: 0px;
+		box-shadow: none;
+		color: $background-color;
+		font-family: $rob;
+		font-size: 14px;
+		line-height: 1.5;
+     	margin-bottom: 1em;
+		outline: none;
+		padding: 6px 15px;
+		transition: all 0.3s;
+		width: 100%;
+
+		@include placeholder {
+			color: lighten($background-color, 25%);
+			transition: all 0.3s;
+		}
+		&:focus {
+			border-bottom: 1px solid $background-color;
+			box-shadow: 0 5px 5px -5px $background-color;
+
+			@include placeholder {
+				color: $background-color;
+			}
+		}
+	}
+
+	.btn-primary {
+		background: transparent;
+		border: 1px solid $background-color;
+		border-radius: 0;
+		color: $background-color;
+		margin: 0;
+		transition: all 0.3s;
+		width: 100%;
+
+		&:hover,
+		&:focus {
+			box-shadow: 0 0 5px 1px rgba($background-color, 50%);
+			outline: none;
+		}
+	}
+
+	.social-button-list {
+		display: block;
+    	list-style: none;
+	    margin-bottom: 2em;
+	    
+	    li {
+	    	display: inline-block;
+	    }
+
+	    a {
+	        color: $background-color;
+			padding: 10px 15px;
+
+	        &:hover {
+	            color: lighten($background-color, 15%);
+	        }
+	    }
+
+	    i {
+	        font-size: 3em;
+	    }
+	}
+}

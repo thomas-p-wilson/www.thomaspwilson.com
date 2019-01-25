@@ -1,0 +1,80 @@
+.about-card {
+	background: $background-color; /* For browsers that do not support gradients */
+  	background: -moz-linear-gradient(top, $background-color 50%, transparent 50%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, $background-color 50%, transparent 50%); /* Chrome10-25,Safari5.1-6 */
+  	background: -o-linear-gradient(top, $background-color 50%, transparent 50%); /* For Opera 11.1 to 12.0 */
+	background: linear-gradient(to bottom, $background-color 50%, transparent 50%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$background-color}', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
+	position: relative;
+	z-index: 1;
+
+	.wide {
+		background: #fff;
+		padding: 10px;
+		box-shadow: 0px 20px 80px 0px rgba(153, 153, 153, 0.3);
+	}
+
+	.banner-inner {
+		position: relative;
+		width: 100%;
+		display: flex;
+		position: relative;
+		z-index: 1;
+		min-height: 350px;
+
+		.banner_content {
+			color: $dip;
+			vertical-align: middle;
+			align-self: center;
+			text-align: left;
+			.media {
+				.d-flex {
+					padding-right: 125px;
+				}
+				.media-body {
+					vertical-align: middle;
+					align-self: center;
+				}
+			}
+			h2 {
+				color: $dip;
+				font-size: 48px;
+				font-family: $hee;
+				margin-bottom: 0px;
+				font-weight: bold;
+			}
+		}
+	}
+
+	.about-text {
+		h6 {
+			font-size: 14px;
+			font-family: $rob;
+			text-transform: uppercase;
+			letter-spacing: 2.1px;
+			font-weight: normal;
+			margin-bottom: 12px;
+		}
+
+		h4 {
+			font-size: 16px;
+			font-weight: 500;
+			font-family: $rob;
+			text-transform: uppercase;
+			margin-bottom: 20px;
+		}
+
+		h3 {
+			font-size: 48px;
+			text-transform: uppercase;
+			margin-bottom: 15px;
+		}
+
+		p {
+			font-family: $rob;
+			max-width: 540px;
+			color: $pfont;
+			margin-bottom: 40px;
+		}
+	}
+}

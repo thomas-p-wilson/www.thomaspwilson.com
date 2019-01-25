@@ -1,0 +1,49 @@
+a {
+    text-decoration:none;
+    transition: all 0.3s ease-in-out;
+    &:hover,
+    &:focus {
+       text-decoration:none;
+       outline: none;
+    }
+}
+
+body{
+    line-height: 26px;
+    font-size: 16px;
+    font-family: $rob;
+    font-weight: normal;
+    color: $pfont;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 { 
+    font-family: $hee; 
+    font-weight: bold;
+}
+
+button:focus{
+    outline: none;
+	box-shadow: none;
+}
+.p_120{
+	padding-top: 120px;
+	padding-bottom: 120px;
+}
+.container{
+    @media(min-width:1200px){
+        max-width: 1170px;
+    }
+}
+@media(min-width: 1620px) {
+	.wide {
+		max-width: 1620px;
+		margin: auto;
+		width: 100%;
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+}

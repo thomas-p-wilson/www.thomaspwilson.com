@@ -1,0 +1,91 @@
+.primary-header {
+    .main-menu {
+        background: $background-color;
+        transition: background 0.4s;
+    }
+
+    @at-root {
+        body {
+            padding-top: 74px;
+        }
+    }
+
+	&.navbar-fixed {
+		.main-menu {
+			position: fixed;
+			width: 100%;
+            top: 0;
+			left: 0;
+			right: 0;
+            z-index: 100;
+		}
+	}
+}
+
+.top_menu {
+	background: #f9f9ff;
+	.header_social {
+		li {
+			display: inline-block;
+			margin-right: 15px; 
+			a {
+				font-size: 14px;
+				color: $pfont;
+				display: inline-block;
+				line-height: 42px;
+				@include transition;
+			}
+			&:last-child {
+				margin-right: 0px;
+			}
+			&:hover {
+				a {
+					color: $baseColor;
+				}
+			}
+		}
+	}
+	.dn_btn {
+		line-height: 42px;
+		display: inline-block;
+		font-size: 12px;
+		margin-right: 30px;
+		font-family: $rob;
+		font-weight: normal;
+		color: $pfont;
+		@include transition;
+		&:hover {
+			color: $baseColor;
+		}
+		&:last-child {
+			margin-right: 0px;
+		}
+	}
+	.lan_pack {
+		height: 30px;
+		border: 1px solid #eeeeee;
+		border-radius: 3px;
+		line-height: 28px;
+		font-size: 12px;
+		font-family: $rob;
+		font-weight: 500;
+		padding-left: 19px;
+		padding-right: 36px; 
+		color: $pfont; 
+		background: #f9f9ff;
+		margin-right: 5px;
+		margin-top: 8px;
+		.current {
+			color: $pfont;
+		}
+		&:after {
+			content: "\f0d7";
+			border: none !important;
+			font: normal normal normal 12px/1 FontAwesome;
+			transform: rotate(0deg);
+			height: auto;
+			margin-top: -6px;
+			right: 20px;
+		}
+	}
+}
