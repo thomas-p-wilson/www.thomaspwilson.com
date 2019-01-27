@@ -153,7 +153,7 @@ export default class ThermalMassStorage extends Component {
                                     <NumberField field="mass"
                                             value={ output.mass(this.state) }
                                             state={ this.state }
-                                            unit="g"
+                                            unit="gram"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -163,7 +163,7 @@ export default class ThermalMassStorage extends Component {
                                     <NumberField field="volume"
                                             value={ output.volume(this.state) }
                                             state={ this.state }
-                                            unit="L"
+                                            unit="litre"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -179,7 +179,7 @@ export default class ThermalMassStorage extends Component {
                                     <NumberField field="burst"
                                             value={ output.burst(this.state) }
                                             state={ this.state }
-                                            unit="Pa"
+                                            unit="pascal"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -212,9 +212,6 @@ export default class ThermalMassStorage extends Component {
                         </div>
                     </div>
                 </section>
-                <pre>
-                { JSON.stringify(this.state, null, 4) }
-                </pre>
             </div>
         );
     }

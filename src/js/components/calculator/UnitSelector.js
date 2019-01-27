@@ -61,7 +61,15 @@ export default class UnitSelector extends React.Component {
         const measure = getMeasure(unit);
         return (
             <React.Fragment>
-                <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded={ this.state.open } onClick={ this.onToggle }>{ value }{ this.renderExponent() }</button>
+                <button className="btn btn-outline-secondary dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded={ this.state.open }
+                        onClick={ this.onToggle }
+                        disabled={ this.props.disabled }>
+                    { measure[value].plural } ({ measure[value].symbol }){ this.renderExponent() }
+                </button>
                 <div className={ classnames('dropdown-menu dropdown-menu-right', { show: this.state.open }) }
                         ref={ (ref) => { this.node = ref; } }>
                     {

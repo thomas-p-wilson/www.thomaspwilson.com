@@ -10,14 +10,17 @@ export default ({
     field,
     state = {},
     unit,
+    display,
+    unconvertible,
     time,
+    displayTime,
     exponent,
     value,
     onChange,
     ...props
 }) => {
-    let currentUnit = (state.displayUnits && state.displayUnits[field]) || unit;
-    let currentTimeUnit = (state.displayUnits && state.displayUnits[field + 'Time']) || time;
+    let currentUnit = display || (state.displayUnits && state.displayUnits[field]) || unit;
+    let currentTimeUnit = displayTime || (state.displayUnits && state.displayUnits[field + 'Time']) || time;
 
     return (
         <div className="input-group">
@@ -25,7 +28,9 @@ export default ({
                     field={ field }
                     state={ state }
                     unit={ unit }
+                    display={ display }
                     time={ time }
+                    displayTime={ displayTime }
                     exponent={ exponent }
                     value={ value }
                     onChange={ onChange } />
@@ -36,7 +41,8 @@ export default ({
                         value={ currentUnit }
                         exponent={ exponent }
                         number={ getRawValue(state, field, value) }
-                        onChange={ onChange } />
+                        onChange={ onChange }
+                        disabled={ unconvertible } />
                 {
                     time ? (
                         <UnitSelector field={ field + 'Time' }
@@ -44,7 +50,8 @@ export default ({
                                 unit={ time }
                                 value={ currentTimeUnit }
                                 number={ getRawValue(state, field, value) }
-                                onChange={ onChange } />
+                                onChange={ onChange }
+                                disabled={ unconvertible } />
                     ) : null
                 }
             </div>

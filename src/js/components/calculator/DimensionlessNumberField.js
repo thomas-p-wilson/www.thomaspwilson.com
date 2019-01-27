@@ -10,27 +10,33 @@ export default ({
     state = {},
     value,
     unit,
+    display,
     time,
+    displayTime,
     exponent,
     ...props
 }) => {
-    let currentUnit = (state.displayUnits && state.displayUnits[field]) || unit;
-    let convertedValue = getRawValue(state, field, value);
+    let currentUnit = display || (state.displayUnits && state.displayUnits[field]) || unit;
+    let result = getRawValue(state, field, value);
     if (currentUnit !== unit) {
-        convertedValue = convert(convertedValue, exponent).from(unit).to(currentUnit);
+        result = convert(result, exponent).from(unit).to(currentUnit);
     }
 
-    let currentTimeUnit = (state.displayUnits && state.displayUnits[field + 'Time']) || time;
+    let currentTimeUnit = displayTime || (state.displayUnits && state.displayUnits[field + 'Time']) || time;
     if (currentTimeUnit !== time) {
-        convertedValue = convert(convertedValue, exponent).from(time).to(currentTimeUnit);
+        result = convert(result, exponent).from(time).to(currentTimeUnit);
     }
 
-    let fixedValue = Number(convertedValue).toLocaleString({}, {
+    if (isNaN(result)) {
+        result = '';
+    }
+
+    result = Number(result).toLocaleString({}, {
         minimumFractionDigits: 0,
         maximumFractionDigits: 16
     });
-    if (`${ convertedValue }`.substr(-1) === '.') {
-        fixedValue += '.';
+    if (`${ result }`.substr(-1) === '.') {
+        result += '.';
     }
 
     return (
@@ -40,7 +46,7 @@ export default ({
                 data-base-unit={ unit }
                 data-current-unit={ currentUnit }
                 data-exponent={ exponent }
-                value={ fixedValue }
+                value={ result }
                 className="form-control" />
     );
 }

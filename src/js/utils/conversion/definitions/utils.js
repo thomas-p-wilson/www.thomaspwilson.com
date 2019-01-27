@@ -6,7 +6,9 @@ const scaleData = {
     c: [-2, 'Centi'],
     m: [-3, 'Milli'],
     u: [-6, 'Micro'],
-    n: [-9, 'Nano']
+    n: [-9, 'Nano'],
+    p: [-12, 'Pico'],
+    f: [-15, 'Femto']
 }
 
 export const generateScale = (symbol, singular, plural, measure, system, prefixes = symbols) => {
@@ -15,7 +17,7 @@ export const generateScale = (symbol, singular, plural, measure, system, prefixe
     Object.keys(scaleData)
         .forEach((prefix) => {
             if (use.indexOf(prefix) !== -1) {
-                result[prefix + symbol] = {
+                result[(scaleData[prefix][1] + singular).toLowerCase()] = {
                     symbol: prefix + symbol,
                     singular: scaleData[prefix][1] + singular.toLowerCase(),
                     plural: scaleData[prefix][1] + plural.toLowerCase(),

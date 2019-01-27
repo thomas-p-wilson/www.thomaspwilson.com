@@ -55,7 +55,7 @@ class Photovoltaic extends Component {
                                 <dd>
                                     <NumberField field="dailyDemand"
                                             state={ this.state }
-                                            unit="W"
+                                            unit="watt"
                                             time="h"
                                             onChange={ this.onChange } />
                                 </dd>
@@ -72,7 +72,7 @@ class Photovoltaic extends Component {
                                     <NumberField field="demandPerLightHour"
                                             value={ output.demandPerLightHour(this.state) }
                                             state={ this.state }
-                                            unit="W"
+                                            unit="watt"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -87,7 +87,7 @@ class Photovoltaic extends Component {
                                 <dd>
                                     <NumberField field="panelRating"
                                             state={ this.state }
-                                            unit="W"
+                                            unit="watt"
                                             onChange={ this.onChange } />
                                 </dd>
 
@@ -110,7 +110,7 @@ class Photovoltaic extends Component {
                                     <NumberField field="realRating"
                                             value={ output.panelRealRating(this.state) }
                                             state={ this.state }
-                                            unit="W"
+                                            unit="watt"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
