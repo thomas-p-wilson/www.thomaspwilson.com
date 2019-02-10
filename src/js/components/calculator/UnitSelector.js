@@ -59,6 +59,7 @@ export default class UnitSelector extends React.Component {
             return (<div />);
         }
         const measure = getMeasure(unit);
+        const obj = measure[value];
         return (
             <React.Fragment>
                 <button className="btn btn-outline-secondary dropdown-toggle"
@@ -68,7 +69,7 @@ export default class UnitSelector extends React.Component {
                         aria-expanded={ this.state.open }
                         onClick={ this.onToggle }
                         disabled={ this.props.disabled }>
-                    { measure[value].plural } ({ measure[value].symbol }){ this.renderExponent() }
+                    { obj.plural }{ obj.symbol ? `(${ obj.symbol })` : '' }{ this.renderExponent() }
                 </button>
                 <div className={ classnames('dropdown-menu dropdown-menu-right', { show: this.state.open }) }
                         ref={ (ref) => { this.node = ref; } }>
