@@ -64,6 +64,12 @@
         padding: 1em;
         width: 33%;
 
+        @include screen-xs {
+            & {
+                width: 100%;
+            }
+        }
+
         a {
             border: 1px solid $background-color;
             box-shadow: 0 10px 20px rgba($background-color, 0.2);
