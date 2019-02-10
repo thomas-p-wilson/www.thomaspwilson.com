@@ -57,7 +57,10 @@ module.exports = extend({
     'module': { 'rules': [
         {
             'test': /\.js$/,
-            'exclude': /node_modules/,
+            'include': [
+                path.resolve(__dirname, 'src'),
+                path.resolve(__dirname, 'node_modules/preact-chartjs-2')
+            ],
             'loaders': [
                 'strip-sourcemap-loader',
                 {

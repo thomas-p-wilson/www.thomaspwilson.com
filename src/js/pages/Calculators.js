@@ -6,6 +6,9 @@ import CalculatorList from './CalculatorList';
 // Conversions
 import Length from './calculators/conversion/Length';
 
+// Finance
+import Retirement from './calculators/finance/Retirement';
+
 // Other
 import Telescopy from './calculators/telescopy/Telescopy';
 import Photovoltaic from './calculators/renewables/photovoltaic/Photovoltaic';
@@ -19,6 +22,9 @@ export default ({ match }) => (
 
 	        	{/* CONVERSIONS */}
 	        	<Route path={ match.path + '/length' } component={ Length } />
+
+	        	{/* FINANCE */}
+	        	<Route path={ match.path + '/finance/retirement' } component={ Retirement } />
 
 
 	        	{/* OTHER */}

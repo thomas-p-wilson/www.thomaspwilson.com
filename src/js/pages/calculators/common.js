@@ -16,6 +16,12 @@ export const normalizeValue = (value) => {
 export const onChange = () => {
     return function onChange(ev) {
         let field = ev.target.getAttribute('data-field');
+
+        if (ev.target.type === 'checkbox') {
+            this.setState({ [field]: ev.target.checked });
+            return;
+        }
+
         let unit = ev.target.getAttribute('data-unit');
         if (unit) {
             this.setState((state) => ({
