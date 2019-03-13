@@ -10,174 +10,174 @@ const result = {
     // English Units - In use until 1826
     // ----
     // All conversions to the metre are through the late 13th century foot
-    twip: {
+    'twip-english': {
         singular: 'Twip',
         plural: 'Twips',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .000694444444444444 * englishInchInMetres // 1/20 of a point, 1/200 of a pica, 1/1440 of an inch
     },
-    point: {
+    'point-english': {
         singular: 'Point',
         plural: 'Points',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .013888888888888888 * englishInchInMetres // 1/12 of a pica, 1/72 of an inch
     },
-    pica: {
+    'pica-english': {
         singular: 'Pica',
         plural: 'Picas',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .166666666666666666 * englishInchInMetres // 1/6 of an inch
     },
-    line: {
+    'line-english': {
         singular: 'Line',
         plural: 'Lines',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .083333333333333333 * englishInchInMetres, // 1/12 of an inch
         synonyms: [{
             singular: 'Poppyseed',
             plural: 'Poppyseeds'
         }]
     },
-    barleycorn: {
+    'barleycorn-english': {
         singular: 'Barleycorn',
         plural: 'Barleycorns',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .333333333333333333 * englishInchInMetres // 1/3 of an inch
     },
-    finger: {
+    'finger-english': {
         singular: 'Finger',
         plural: 'Fingers',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .875 * englishInchInMetres // 7/8 of an inch
     },
-    inch: {
+    'inch-english': {
         singular: 'Inch',
         plural: 'Inches',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .083333333333333333 * englishFootInMetres // 1/12 of a foot
     },
-    stick: {
+    'stick-english': {
         singular: 'Stick',
         plural: 'Sticks',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .166666666666666666 * englishFootInMetres // 1/6 of an foot
     },
-    hand: {
+    'hand-english': {
         singular: 'Hand',
         plural: 'Hands',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 0.333333333333333333 * englishFootInMetres // 1/3 of a foot
     },
-    digit: {
+    'digit-english': {
         singular: 'Digit',
         plural: 'Digits',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .0625 * englishFootInMetres // 1/16 of a foot
     },
-    palm: {
+    'palm-english': {
         singular: 'Palm',
         plural: 'Palms',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .25 * englishFootInMetres // 1/4 of a foot
     },
-    nail: {
+    'nail-english': {
         singular: 'Nail',
         plural: 'Nails',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .1875 * englishFootInMetres // 3/16 of a foot
     },
-    shaftment: {
+    'shaftment-english': {
         singular: 'Shaftment',
         plural: 'Shaftments',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .5 * englishFootInMetres // 1/2 of a foot
     },
-    span: {
+    'span-english': {
         singular: 'Span',
         plural: 'Spans',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .75 * englishFootInMetres // 3/4 of a foot
     },
-    link: {
+    'link-english': {
         singular: 'Link',
         plural: 'Links',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: .201168 * englishFootInMetres // 33/50 of a foot
     },
-    foot: {
+    'foot-english': {
         singular: 'Foot',
         plural: 'Feet',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: englishFootInMetres // To metres
     },
-    cubit: {
+    'cubit-english': {
         singular: 'Cubit',
         plural: 'Cubits',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 1.5 * englishFootInMetres // 3/2 of a foot
     },
-    pace: {
+    'pace-english': {
         singular: 'Pace',
         plural: 'Paces',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 2.5 * englishFootInMetres // 5/2 of a foot
     },
-    yard: {
+    'yard-english': {
         singular: 'Yard',
         plural: 'Yards',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 3* englishFootInMetres // 3 feet
     },
-    step: {
+    'step-english': {
         singular: 'Step',
         plural: 'Steps',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 5 * englishFootInMetres, // 5 feet
         synonyms: [{
             singular: 'Grade',
             plural: 'Grades'
         }]
     },
-    ell: {
+    'ell-english': {
         singular: 'Ell',
         plural: 'Ells',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 3.75 * englishFootInMetres // 15/4 of a foot
     },
-    skein: {
+    'skein-english': {
         singular: 'Skein',
         plural: 'Skeins',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 360 * englishFootInMetres // 360 feet
     },
-    spindle: {
+    'spindle-english': {
         singular: 'Spindle',
         plural: 'Spindles',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 450 * englishFootInMetres // 450 feet
     },
-    rope: {
+    'rope-english': {
         singular: 'Rope',
         plural: 'Ropes',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 20 * englishFootInMetres // 20 feet
     },
-    ramsden_chain: {
+    'ramsden_chain-english': {
         singular: 'Ramsden\'s chain',
         plural: 'Ramsden\'s chains',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 100 * englishFootInMetres // 100 feet (5 ropes)
     },
-    roman_mile: {
+    'roman_mile-english': {
         singular: 'Roman mile',
         plural: 'Roman miles',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier:  5000 * englishFootInMetres // 5000 feet (50 Ramsden's chains)
     },
-    rod: {
+    'rod-english': {
         singular: 'Rod',
         plural: 'Rods',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 16.5 * englishFootInMetres, // 33/2 feet (11 cubits)
         synonyms: [{
             singular: 'Pole',
@@ -187,134 +187,136 @@ const result = {
             plural: 'Perches'
         }]
     },
-    gunter_chain: {
-        singular: 'Gunter\'s chain',
-        plural: 'Gunter\'s chains',
-        system: 'English Units',
-        multiplier: 66 * englishFootInMetres // 66 feet (4 rods)
-    },
-    furlong: {
+    'furlong-english': {
         singular: 'Furlong',
         plural: 'Furlongs',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 660 * englishFootInMetres // 660 feet (10 Gunter's chains)
     },
-    mile: {
+    'mile-english': {
         singular: 'Mile',
         plural: 'Miles',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 5280 * englishFootInMetres // 5280 feet (1760 yards)
     },
-    fathom: {
+    'fathom-english': {
         singular: 'Fathom',
         plural: 'Fathoms',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 6 * englishFootInMetres // 6 feet (2 yards)
     },
-    shackle: {
+    'shackle-english': {
         singular: 'Shackle',
         plural: 'Shackles',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 90 * englishFootInMetres // 90 feet (15 fathoms)
     },
-    cable: {
+    'cable-english': {
         singular: 'Cable',
         plural: 'Cables',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 600 * englishFootInMetres // 600 feet (100 fathoms)
     },
-    nautical_mile: {
+    'nautical_mile-english': {
         singular: 'Nautical mile',
         plural: 'Nautical miles',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 6000 * englishFootInMetres // 6000 feet (10 cables)
     },
-    league: {
+    'league-english': {
         singular: 'League',
         plural: 'Leagues',
-        system: 'English Units',
+        system: 'English Units - Pre 1826',
         multiplier: 9000 * englishFootInMetres // 9000 feet (3 Nautical Miles)
     },
 
     // British Imperial
-    thou: {
+    'thou-imperial': {
         symbol: 'th',
         singular: 'Thou',
         plural: 'Thou',
         system: 'Imperial',
         multiplier: 0.0000254 // To metres
     },
-    inch: {
+    'inch-imperial': {
         symbol: 'in',
         singular: 'Inch',
         plural: 'Inches',
         system: 'Imperial',
         multiplier: .0254 // To metres
     },
-    foot: {
+    'foot-imperial': {
         symbol: 'ft',
         singular: 'Foot',
         plural: 'Feet',
         system: 'Imperial',
         multiplier: 0.3048 // To metres
     },
-    yard: {
+    'yard-imperial': {
         symbol: 'yd',
         singular: 'Yard',
         plural: 'Yards',
         system: 'Imperial',
         multiplier: 0.9144 // To metres
     },
-    chain: {
+    'chain-imperial': {
         symbol: 'ch',
         singular: 'Chain',
         plural: 'Chains',
         system: 'Imperial',
         multiplier: 20.1168 // To metres
     },
-    furlong: {
+    'furlong-imperial': {
         symbol: 'fur',
         singular: 'Furlong',
         plural: 'Furlongs',
         system: 'Imperial',
         multiplier: 201.168 // To metres
     },
-    mile: {
+    'mile-imperial': {
         symbol: 'mi',
         singular: 'Mile',
         plural: 'Miles',
         system: 'Imperial',
         multiplier: 1609.344 // To metres
     },
-    fathom: {
+    'fathom-imperial-maritime': {
         symbol: 'ftm',
         singular: 'Fathom',
         plural: 'Fathoms',
         system: 'Imperial - Maritime',
         multiplier: 1.852 // To metres
     },
-    cable: {
+    'cable-imperial-maritime': {
         symbol: 'cable',
         singular: 'Cable',
         plural: 'Cable',
         system: 'Imperial - Maritime',
         multiplier: 185.2
     },
-    nautical_mile: {
+    'nautical-mile-imperial-maritime': {
         symbol: 'nmi',
         singular: 'Nautical Mile',
         plural: 'Nautical Miles',
         system: 'Imperial - Maritime',
         multiplier: 1852 // To metres
     },
-    link: {
+
+    // Gunter's Survey Units
+    'chain-gunter': {
+        singular: 'Chain',
+        plural: 'Chains',
+        system: 'Imperial - Gunter\s Survey Units',
+        multiplier: 66 * englishFootInMetres // 66 feet (4 rods)
+    },
+    'link-gunter': {
         symbol: 'link',
         singular: 'Link',
         plural: 'Links',
         system: 'Imperial - Gunter\'s Survey Units',
         multiplier: 0.201168 // To metres
     },
-    rod: {
+    'rod-gunter': {
         symbol: 'rod',
         singular: 'Rods',
         plural: 'Rods',
@@ -323,14 +325,14 @@ const result = {
     },
 
     // U.S. Customary Units
-    point: {
+    'point-us': {
         symbol: 'p',
         singular: 'Point',
         plural: 'Points',
         system: 'US Customary',
         multiplier: 1 / 2834.64 // To metres, 1/12 of a pica
     },
-    pica: {
+    'pica-us': {
         symbol: 'pc',
         singular: 'Pica',
         plural: 'Picas',
