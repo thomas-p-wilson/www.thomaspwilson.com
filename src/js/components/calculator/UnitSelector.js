@@ -1,5 +1,6 @@
 import React from 'react';
 import classnames from 'classnames';
+import transform from 'lodash/transform';
 import { getMeasure } from '../../utils/conversion';
 
 /**
@@ -9,10 +10,12 @@ export default class UnitSelector extends React.Component {
     constructor() {
         super();
         this.state = {
-            open: false
+            open: false,
+            search: ''
         };
         this.onOutsideClick = this.onOutsideClick.bind(this);
         this.onToggle = this.onToggle.bind(this);
+        this.onSearch = this.onSearch.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.renderExponent = this.renderExponent.bind(this);
 
@@ -37,6 +40,10 @@ export default class UnitSelector extends React.Component {
         this.setState((state) => ({ open: !state.open }));
     }
 
+    onSearch(ev) {
+        this.setState((state) => ({ search: ev.target.value }));
+    }
+
     onSelect(ev) {
         this.props.onChange(ev);
         this.setState({ open: false });
@@ -46,6 +53,37 @@ export default class UnitSelector extends React.Component {
         if (this.props.exponent) {
             return (<sup>{ this.props.exponent }</sup>);
         }
+    }
+
+    renderUnits() {
+        const {
+            unit,
+            field
+        } = this.props;
+        const measure = transform(getMeasure(unit), (result, item, name) => {
+            if (this.state.search === '' || String.prototype.toLowerCase.call(item.singular || '').indexOf(String.prototype.toLowerCase.call(this.state.search || '')) > -1) {
+                result[item.system] = result[item.system] || {};
+                result[item.system][name] = item;
+            }
+        });
+        return Object.keys(measure)
+                .reduce((arr, system) => (
+                    arr
+                        .concat([(
+                            <span className="dropdown-header">{ system } ({ Object.keys(measure[system]).length })</span>
+                        )])
+                        .concat(
+                            Object.keys(measure[system])
+                                    .map((symbol) => (
+                                        <a className="dropdown-item"
+                                                data-field={ field }
+                                                data-unit={ symbol }
+                                                onClick={ this.onSelect }>
+                                            { measure[system][symbol].singular }{ this.renderExponent() }
+                                        </a>
+                                    ))
+                        )
+                ), []);
     }
 
     render() {
@@ -69,21 +107,13 @@ export default class UnitSelector extends React.Component {
                         aria-expanded={ this.state.open }
                         onClick={ this.onToggle }
                         disabled={ this.props.disabled }>
-                    { obj.plural }{ obj.symbol ? `(${ obj.symbol })` : '' }{ this.renderExponent() }
+                    { obj.plural }{ obj.symbol ? ` (${ obj.symbol })` : '' }{ this.renderExponent() }
                 </button>
                 <div className={ classnames('dropdown-menu dropdown-menu-right', { show: this.state.open }) }
                         ref={ (ref) => { this.node = ref; } }>
-                    {
-                        Object.keys(getMeasure(unit))
-                            .map((symbol) => (
-                                <a className="dropdown-item"
-                                        data-field={ field }
-                                        data-unit={ symbol }
-                                        onClick={ this.onSelect }>
-                                    { measure[symbol].singular }{ this.renderExponent() }
-                                </a>
-                            ))
-                    }
+                    <input type="search"  value={ this.state.search } onChange={ this.onSearch } placeholder="Search..." className="form-control" />
+                    <span className="dropdown-divider" />
+                    { this.renderUnits() }
                 </div>
             </React.Fragment>
         );
