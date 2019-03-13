@@ -82,7 +82,7 @@ export class Converter {
 
         this.target = units[symbol];
         if (!this.target) {
-            this.throwUnsupportedUnitError(symbol);
+            throw new Error(`Unrecognized symbol: ${ symbol }`);
         }
 
         // If the origin and target are the same, so is the value

@@ -10,6 +10,7 @@ import NumberField from '../../../components/calculator/NumberField';
 import SelectField from '../../../components/calculator/SelectField';
 import { hide } from '../../../utils/calculator';
 import { onChange } from '../common';
+import transform from 'lodash/transform';
 
 export default class Telescopy extends React.Component {
     //
@@ -24,101 +25,38 @@ export default class Telescopy extends React.Component {
     }
 
     render() {
+        const measure = transform(measures.length, (result, item, name) => {
+            result[item.system] = result[item.system] || {};
+            result[item.system][name] = item;
+        });
         return (
-            <div className="App">
+            <div className="App length-conversion">
                 <section className="App-content">
-                    <div className="row">
-                        <div className="col col100">
-                            <h2>Metric Units</h2>
-                            <ul className="unit-list">
-                                {
-                                    Object.keys(measures.length)
-                                        .filter((key) => (measures.length[key].system === 'Metric'))
-                                        .map((key) => ([key, measures.length[key]]))
-                                        .map(([key, unit]) => (
-                                            <li>
-                                                <NumberField field="value"
-                                                        state={ this.state }
-                                                        unit="metre"
-                                                        display={ key }
-                                                        onChange={ this.onChange }
-                                                        unconvertible />
-                                            </li>
-                                        ))
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col col100">
-                            <h2>English Units - Pre-1826</h2>
-
-                            <ul className="unit-list">
-                                {
-                                    Object.keys(measures.length)
-                                        .filter((key) => (measures.length[key].system === 'English Units'))
-                                        .map((key) => ([key, measures.length[key]]))
-                                        .map(([key, unit]) => (
-                                            <li>
-                                                <NumberField field="value"
-                                                        state={ this.state }
-                                                        unit="metre"
-                                                        display={ key }
-                                                        onChange={ this.onChange }
-                                                        unconvertible />
-                                            </li>
-                                        ))
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col col100">
-                            <h2>Imperial Units</h2>
-
-                            <ul className="unit-list">
-                                {
-                                    Object.keys(measures.length)
-                                        .filter((key) => (measures.length[key].system === 'Imperial'))
-                                        .map((key) => ([key, measures.length[key]]))
-                                        .map(([key, unit]) => (
-                                            <li>
-                                                <NumberField field="value"
-                                                        state={ this.state }
-                                                        unit="metre"
-                                                        display={ key }
-                                                        onChange={ this.onChange }
-                                                        unconvertible />
-                                            </li>
-                                        ))
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col col100">
-                            <h2>U.S. Customary Units</h2>
-                            <small>Those units whose conversions are identical to their Imperial counterparts are omitted.</small>
-
-                            <ul className="unit-list">
-                                {
-                                    Object.keys(measures.length)
-                                        .filter((key) => (measures.length[key].system === 'US Customary'))
-                                        .map((key) => ([key, measures.length[key]]))
-                                        .map(([key, unit]) => (
-                                            <li>
-                                                <NumberField field="value"
-                                                        state={ this.state }
-                                                        unit="metre"
-                                                        display={ key }
-                                                        onChange={ this.onChange }
-                                                        unconvertible />
-                                            </li>
-                                        ))
-                                }
-                            </ul>
-                        </div>
-                    </div>
+                    {
+                        Object.keys(measure)
+                            .map((system) => (
+                                <div className="row">
+                                    <div className="col col100">
+                                        <h2>{ system } ({ Object.keys(measure[system]).length })</h2>
+                                        <ul className="unit-list">
+                                            {
+                                                Object.keys(measure[system])
+                                                    .map((key) => (
+                                                        <li>
+                                                            <NumberField field="value"
+                                                                    state={ this.state }
+                                                                    unit="metre"
+                                                                    display={ key }
+                                                                    onChange={ this.onChange }
+                                                                    unconvertible />
+                                                        </li>
+                                                    ))
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            ))
+                    }
                 </section>
             </div>
         );
