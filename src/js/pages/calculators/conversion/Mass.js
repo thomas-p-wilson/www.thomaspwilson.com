@@ -30,7 +30,7 @@ export default class Mass extends React.Component {
             result[item.system][name] = item;
         });
         return (
-            <div className="App mass-conversion">
+            <div className="App mass-conversion conversion-page">
                 <section className="App-content">
                     {
                         Object.keys(measure)

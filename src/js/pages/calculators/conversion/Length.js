@@ -30,7 +30,7 @@ export default class Telescopy extends React.Component {
             result[item.system][name] = item;
         });
         return (
-            <div className="App length-conversion">
+            <div className="App length-conversion conversion-page">
                 <section className="App-content">
                     {
                         Object.keys(measure)
