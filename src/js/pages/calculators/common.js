@@ -21,6 +21,10 @@ export const onChange = () => {
             this.setState({ [field]: ev.target.checked });
             return;
         }
+        if (ev.target.type === 'select-one') {
+            this.setState({ [field]: ev.target.value });
+            return;
+        }
 
         let unit = ev.target.getAttribute('data-unit');
         if (unit) {

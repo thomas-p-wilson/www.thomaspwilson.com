@@ -11,7 +11,7 @@ const scaleData = {
     f: [-15, 'Femto']
 }
 
-export const generateScale = (symbol, singular, plural, measure, system, prefixes = symbols) => {
+export const generateScale = (symbol, singular, plural, prefixes = symbols) => {
     const use = [ ...prefixes, '' ];
     const result = {};
     Object.keys(scaleData)
@@ -21,8 +21,6 @@ export const generateScale = (symbol, singular, plural, measure, system, prefixe
                     symbol: prefix + symbol,
                     singular: scaleData[prefix][1] + singular.toLowerCase(),
                     plural: scaleData[prefix][1] + plural.toLowerCase(),
-                    measure,
-                    system,
                     multiplier: Math.pow(10, scaleData[prefix][0])
                 }
             }

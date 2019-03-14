@@ -56,6 +56,10 @@
     margin: 2em 0;
     padding: 0;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 
     li {
         border: 1px solid $background-color;
@@ -90,12 +94,14 @@
 
         small {
             display: block;
+            height: 3rem;
             margin-bottom: 1rem;
         }
 
         > a {
             color: $background-color;
             display: block;
+            padding: 0 1rem;
             text-align: center;
         }
     }

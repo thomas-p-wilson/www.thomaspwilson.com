@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 import transform from 'lodash/transform';
-import { getMeasure } from '../../utils/conversion';
+import { getMeasure, units } from '../../utils/conversion';
 
 /**
  *
@@ -60,30 +60,32 @@ export default class UnitSelector extends React.Component {
             unit,
             field
         } = this.props;
-        const measure = transform(getMeasure(unit), (result, item, name) => {
-            if (this.state.search === '' || String.prototype.toLowerCase.call(item.singular || '').indexOf(String.prototype.toLowerCase.call(this.state.search || '')) > -1) {
-                result[item.system] = result[item.system] || {};
-                result[item.system][name] = item;
-            }
-        });
+        const measure = getMeasure(unit)
         return Object.keys(measure)
-                .reduce((arr, system) => (
-                    arr
-                        .concat([(
-                            <span className="dropdown-header">{ system } ({ Object.keys(measure[system]).length })</span>
-                        )])
-                        .concat(
-                            Object.keys(measure[system])
-                                    .map((symbol) => (
-                                        <a className="dropdown-item"
-                                                data-field={ field }
-                                                data-unit={ symbol }
-                                                onClick={ this.onSelect }>
-                                            { measure[system][symbol].singular }{ this.renderExponent() }
-                                        </a>
-                                    ))
-                        )
-                ), []);
+                .reduce((arr, system) => {
+                    const units = Object.keys(measure[system].units)
+                        .filter((symbol) => {
+                            const item = measure[system].units[symbol];
+                            return this.state.search === ''
+                                    || String.prototype.toLowerCase.call(item.singular || '').indexOf(String.prototype.toLowerCase.call(this.state.search || '')) > -1;
+                        })
+                        .map((symbol) => (
+                            <a className="dropdown-item"
+                                    data-field={ field }
+                                    data-unit={ measure[system].units[symbol].id }
+                                    onClick={ this.onSelect }>
+                                { measure[system].units[symbol].singular }{ this.renderExponent() }
+                            </a>
+                        ));
+                    if (units.length > 0) {
+                        return arr
+                            .concat([(
+                                <span className="dropdown-header">{ measure[system].name } ({ Object.keys(measure[system].units).length })</span>
+                            )])
+                            .concat(units);
+                    }
+                    return arr;
+                }, []);
     }
 
     render() {
@@ -96,8 +98,8 @@ export default class UnitSelector extends React.Component {
         if (!unit) {
             return (<div />);
         }
-        const measure = getMeasure(unit);
-        const obj = measure[value];
+
+        const obj = units[value];
         return (
             <React.Fragment>
                 <button className="btn btn-outline-secondary dropdown-toggle"

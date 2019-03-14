@@ -31,8 +31,8 @@ export default ({ match }) => (
 
 	        	{/* OTHER */}
 	        	<Route path={ match.path + '/telescopy' } component={ Telescopy } />
-	        	<Route path={ match.path + '/photovoltaic-sizing' } component={ Photovoltaic } />
-	        	<Route path={ match.path + '/thermal-mass-storage' } component={ ThermalMassStorage } />
+	        	<Route path={ match.path + '/photovoltaic' } component={ Photovoltaic } />
+	        	<Route path={ match.path + '/thermal-mass' } component={ ThermalMassStorage } />
 	        </Switch>
         </div>
 	</div>

@@ -47,16 +47,6 @@ export default class ThermalMassStorage extends Component {
     render() {
         return (
             <div className="App">
-                <header className="App-header">
-                    <h1 className="App-title">Telescope Design Parameters</h1>
-                    <p>The telescope design parameters calculator is designed to aid me when I'm building telescope components. I intend to expand the feature set of this calculator as time permits and as I find the need...or desire.</p>
-                    <p>Currently, the calculator supports telescope designs with the following properties:</p>
-                    <ul>
-                        <li>Newtonian (single-mirror), Cassegrain (twin-mirror) types</li>
-                        <li>Spherical or paraboloidal mirrors (where acceptable)</li>
-                        <li>Spin casting calculation</li>
-                    </ul>
-                </header>
                 <section className="App-content">
                     <div className="row">
                         <div className="col col100">
@@ -66,7 +56,7 @@ export default class ThermalMassStorage extends Component {
                                 <dd>
                                     <NumberField field="capacity"
                                             state={ this.state }
-                                            unit="J"
+                                            unit="energy-metric-J"
                                             onChange={ this.onChange } />
                                 </dd>
 
@@ -92,7 +82,7 @@ export default class ThermalMassStorage extends Component {
                                 <dd>
                                     <NumberField field="pressure"
                                             state={ this.state }
-                                            unit="psi"
+                                            unit="pressure-other-psi"
                                             onChange={ this.onChange } />
                                 </dd>
 
@@ -101,7 +91,7 @@ export default class ThermalMassStorage extends Component {
                                     <NumberField field="boilingPoint"
                                             value={ output.boilingPoint(this.state) }
                                             state={ this.state }
-                                            unit="K"
+                                            unit="temperature-metric-kelvin"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -134,7 +124,7 @@ export default class ThermalMassStorage extends Component {
                                 <dd>
                                     <NumberField field="depleted"
                                             state={ this.state }
-                                            unit="K"
+                                            unit="temperature-metric-kelvin"
                                             onChange={ this.onChange } />
                                 </dd>
 
@@ -143,7 +133,7 @@ export default class ThermalMassStorage extends Component {
                                     <NumberField field="storedEnergy"
                                             value={ output.storedEnergy(this.state) }
                                             state={ this.state }
-                                            unit="J"
+                                            unit="energy-metric-J"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -153,7 +143,7 @@ export default class ThermalMassStorage extends Component {
                                     <NumberField field="mass"
                                             value={ output.mass(this.state) }
                                             state={ this.state }
-                                            unit="gram"
+                                            unit="mass-metric-gram"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -163,7 +153,7 @@ export default class ThermalMassStorage extends Component {
                                     <NumberField field="volume"
                                             value={ output.volume(this.state) }
                                             state={ this.state }
-                                            unit="litre"
+                                            unit="volume-metric-litre"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -179,7 +169,7 @@ export default class ThermalMassStorage extends Component {
                                     <NumberField field="burst"
                                             value={ output.burst(this.state) }
                                             state={ this.state }
-                                            unit="pascal"
+                                            unit="pressure-metric-pascal"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>

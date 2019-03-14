@@ -5,7 +5,7 @@ import DimensionlessNumberField from '../../../../components/calculator/Dimensio
 import NumberField from '../../../../components/calculator/NumberField';
 import { onChange } from '../../common';
 
-class Photovoltaic extends Component {
+export default class Photovoltaic extends Component {
     //
     // React Lifecycle
     //
@@ -55,8 +55,8 @@ class Photovoltaic extends Component {
                                 <dd>
                                     <NumberField field="dailyDemand"
                                             state={ this.state }
-                                            unit="watt"
-                                            time="h"
+                                            unit="power-metric-watt"
+                                            time="time-other-h"
                                             onChange={ this.onChange } />
                                 </dd>
 
@@ -72,7 +72,7 @@ class Photovoltaic extends Component {
                                     <NumberField field="demandPerLightHour"
                                             value={ output.demandPerLightHour(this.state) }
                                             state={ this.state }
-                                            unit="watt"
+                                            unit="power-metric-watt"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -87,7 +87,7 @@ class Photovoltaic extends Component {
                                 <dd>
                                     <NumberField field="panelRating"
                                             state={ this.state }
-                                            unit="watt"
+                                            unit="power-metric-watt"
                                             onChange={ this.onChange } />
                                 </dd>
 
@@ -110,7 +110,7 @@ class Photovoltaic extends Component {
                                     <NumberField field="realRating"
                                             value={ output.panelRealRating(this.state) }
                                             state={ this.state }
-                                            unit="watt"
+                                            unit="power-metric-watt"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -145,5 +145,3 @@ class Photovoltaic extends Component {
         );
     }
 }
-
-export default Photovoltaic;

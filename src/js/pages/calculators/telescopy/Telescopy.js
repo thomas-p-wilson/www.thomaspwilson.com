@@ -75,7 +75,7 @@ export default class Telescopy extends React.Component {
                                 <dd>
                                     <NumberField field="apertureDiameter"
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             onChange={ this.onChange } />
                                 </dd>
                                 <InfoSection show={ this.state.info === 'apertureDiameter' }>The diameter of the objective aperture determines the amount of light allowed to enter the telescope. Larger apertures allow more light to enter the telescope.</InfoSection>
@@ -85,7 +85,7 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="apertureArea"
                                             value={ output.apertureArea(this.state) }
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             exponent="2"
                                             readonly
                                             onChange={ this.onChange } />
@@ -95,7 +95,7 @@ export default class Telescopy extends React.Component {
                                 <dd>
                                     <NumberField field="systemFocalLength"
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             onChange={ this.onChange } />
                                 </dd>
 
@@ -157,7 +157,7 @@ export default class Telescopy extends React.Component {
                                 <dd>
                                     <NumberField field="primaryFocalLength"
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             onChange={ this.onChange } />
                                 </dd>
                                 <InfoSection show={ this.state.info === 'primaryFocalLength' }>The focal length of the primary mirror. Typcially twice the primary diameter.</InfoSection>
@@ -172,7 +172,7 @@ export default class Telescopy extends React.Component {
                                 <dd>
                                     <NumberField field="primaryEdgeThickness"
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             onChange={ this.onChange } />
                                 </dd>
 
@@ -181,7 +181,7 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="blankVolume"
                                             value={ output.volume(this.state.apertureDiameter, this.state.primaryEdgeThickness) }
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             exponent="3"
                                             readonly
                                             onChange={ this.onChange } />
@@ -192,7 +192,7 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="blankMass"
                                             value={ output.mass(output.volume(this.state.apertureDiameter, this.state.primaryEdgeThickness)) }
                                             state={ this.state }
-                                            unit="gram"
+                                            unit="mass-metric-gram"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -202,7 +202,7 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="primaryCenterDepth"
                                             value={ output.primaryCenterDepth(this.state) }
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -255,7 +255,7 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="primaryDishArea"
                                             value={ output.primaryDishArea(this.state) }
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             exponent="2"
                                             readonly
                                             onChange={ this.onChange } />
@@ -309,7 +309,7 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="primaryDishVolume"
                                             value={ output.primaryDishVolume(this.state) }
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             exponent="3"
                                             readonly
                                             onChange={ this.onChange } />
@@ -363,7 +363,7 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="primaryMaterialVolume"
                                             value={ output.primaryMaterialVolume(this.state) }
                                             state={ this.state }
-                                            unit="centimetre"
+                                            unit="length-metric-centimetre"
                                             exponent="3"
                                             readonly
                                             onChange={ this.onChange } />
@@ -375,7 +375,7 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="primaryMass"
                                             value={ output.mass(output.primaryMaterialVolume(this.state)) }
                                             state={ this.state }
-                                            unit="gram"
+                                            unit="mass-metric-gram"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>
@@ -385,8 +385,8 @@ export default class Telescopy extends React.Component {
                                     <NumberField field="primaryRotation"
                                             value={ output.rotation(this.state.primaryFocalLength) }
                                             state={ this.state }
-                                            unit="rad"
-                                            time="second"
+                                            unit="angle-other-rad"
+                                            time="time-metric-second"
                                             readonly
                                             onChange={ this.onChange } />
                                 </dd>

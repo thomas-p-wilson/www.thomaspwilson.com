@@ -1,14 +1,24 @@
-import angle from './definitions/angle';
-import energy from './definitions/energy';
-import frequency from './definitions/frequency';
-import length from './definitions/length';
-import mass from './definitions/mass';
-import power from './definitions/power';
-import pressure from './definitions/pressure';
-import temperature from './definitions/temperature';
-import time from './definitions/time';
-import volume from './definitions/volume';
+import * as angle from './definitions/angle';
+import * as energy from './definitions/energy';
+import * as frequency from './definitions/frequency';
+import * as length from './definitions/length';
+import * as mass from './definitions/mass';
+import * as power from './definitions/power';
+import * as pressure from './definitions/pressure';
+import * as temperature from './definitions/temperature';
+import * as time from './definitions/time';
+import * as volume from './definitions/volume';
 
+/**
+ * measures
+ *   - system
+ *       - name
+ *       - description
+ *       - units
+ *           - singular
+ *           - plural
+ *           - multiplier
+ */
 export const measures = {
     angle,
     energy,
@@ -24,14 +34,20 @@ export const measures = {
 
 // Merge all units for easy searching
 export const units = Object.keys(measures)
-    .reduce((acc, m) => {
-        const measure = measures[m];
-        Object.keys(measure).forEach((symbol) => {
-            if (acc[symbol]) {
-                throw new Error('Symbol ' + symbol + ' already exists. Existing definition for ' + acc[symbol].measure + '. New definition for ' + measure[symbol].measure);
-            }
-            acc[symbol] = measure[symbol];
-        });
+    .reduce((acc, type) => {
+        const measure = measures[type];
+        Object.keys(measure).forEach((system) => {
+            Object.keys(measure[system].units).forEach((name) => {
+                const id = `${ type}-${ system }-${ name }`;
+                if (acc[id]) {
+                    throw new Error(`Unit with id ${ id } already exists. Existing definition: ${ acc[id] }. New definition: ${ measure[system].units[name] }`);
+                }
+                acc[id] = measure[system].units[name];
+                measure[system].units[name].id = id;
+                measure[system].units[name].measure = type;
+                measure[system].units[name].system = system;
+            })
+        })
         return acc;
     }, {});
 
@@ -68,7 +84,7 @@ export class Converter {
 
         this.origin = units[symbol];
         if (!this.origin) {
-            this.throwUnsupportedUnitError(symbol);
+            throw new Error('Unrecognized measure ' + symbol);
         }
 
         return this;
@@ -90,6 +106,8 @@ export class Converter {
         }
 
         if (this.origin.measure != this.target.measure) {
+            console.log('Origin: ', this.origin);
+            console.log('Target: ', this.target);
             throw new Error(`Cannot convert between measures of ${ this.origin.measure } and ${ this.target.measure }`);
         }
 
