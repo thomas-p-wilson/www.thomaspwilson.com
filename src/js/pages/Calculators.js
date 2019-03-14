@@ -5,6 +5,7 @@ import CalculatorList from './CalculatorList';
 
 // Conversions
 import Length from './calculators/conversion/Length';
+import Mass from './calculators/conversion/Mass';
 
 // Finance
 import Retirement from './calculators/finance/Retirement';
@@ -22,6 +23,7 @@ export default ({ match }) => (
 
 	        	{/* CONVERSIONS */}
 	        	<Route path={ match.path + '/length' } component={ Length } />
+	        	<Route path={ match.path + '/mass' } component={ Mass } />
 
 	        	{/* FINANCE */}
 	        	<Route path={ match.path + '/finance/retirement' } component={ Retirement } />

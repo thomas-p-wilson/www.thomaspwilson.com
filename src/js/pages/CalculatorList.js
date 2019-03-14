@@ -7,6 +7,7 @@ export default ({ match }) => (
 			<h2>Conversions</h2>
 			<ul className="calculator-list">
 				<li><Link to={ `${ match.path }/length` }>Length <small>Convert between units of length in several systems</small></Link></li>
+				<li><Link to={ `${ match.path }/mass` }>Mass <small>Convert between units of mass in several systems</small></Link></li>
 			</ul>
 
 			<h2>Finance</h2>

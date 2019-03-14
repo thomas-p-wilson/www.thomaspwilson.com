@@ -43,7 +43,6 @@ export const getMeasure = (symbol) => {
 
     const unit = units[symbol];
     if (!unit.measure) {
-        console.log('Unit: ', unit);
         throw new Error('Misconfigured unit ' + symbol);
     }
     if (!measures[unit.measure.toLowerCase()]) {
