@@ -16,3 +16,29 @@ h6 {
 table {
 	width: 100%;
 }
+
+.App-content,
+.App-header {
+	h1,
+	h2 {
+		margin-top: 3rem;
+    	text-align: center;
+	}
+}
+
+.stripe {
+	background-color: #f3f3f3;
+}
+
+.lightGreenBg {
+	background-color: lighten(green, 70%);
+}
+
+.sticky {
+	position: sticky;
+	top: 74px;
+}
+
+.bg-white {
+	background: white;
+}

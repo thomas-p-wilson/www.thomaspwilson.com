@@ -8,6 +8,7 @@ import Length from './calculators/conversion/Length';
 import Mass from './calculators/conversion/Mass';
 
 // Finance
+import Mortgage from './calculators/finance/Mortgage';
 import Retirement from './calculators/finance/Retirement';
 
 // Other
@@ -26,6 +27,7 @@ export default ({ match }) => (
 	        	<Route path={ match.path + '/mass' } component={ Mass } />
 
 	        	{/* FINANCE */}
+	        	<Route path={ match.path + '/finance/mortgage' } component={ Mortgage } />
 	        	<Route path={ match.path + '/finance/retirement' } component={ Retirement } />
 
 

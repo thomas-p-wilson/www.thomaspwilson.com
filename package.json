@@ -69,6 +69,7 @@
     "glob-all": "3.1.0",
     "less": "2.7.3",
     "less-loader": "4.0.5",
+    "memoize-one": "^5.0.0",
     "mocha": "^5.2.0",
     "node-sass": "4.11.0",
     "postcss-loader": "^2.0.10",

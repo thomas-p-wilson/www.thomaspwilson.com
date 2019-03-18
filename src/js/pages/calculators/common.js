@@ -1,3 +1,6 @@
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
+import set from 'lodash/set';
 import convert from '../../utils/conversion';
 
 export const normalizeValue = (value) => {
@@ -18,11 +21,11 @@ export const onChange = () => {
         let field = ev.target.getAttribute('data-field');
 
         if (ev.target.type === 'checkbox') {
-            this.setState({ [field]: ev.target.checked });
+            this.setState((state) => (set(cloneDeep(state), field, ev.target.checked)));
             return;
         }
         if (ev.target.type === 'select-one') {
-            this.setState({ [field]: ev.target.value });
+            this.setState((state) => (set(cloneDeep(state), field, ev.target.value)));
             return;
         }
 
@@ -39,9 +42,9 @@ export const onChange = () => {
         let exponent = ev.target.getAttribute('data-exponent');
         let normalized = normalizeValue(ev.target.value);
         if (baseUnit !== currentUnit) {
-            this.setState({ [field]: convert(normalized, exponent || 1).from(currentUnit).to(baseUnit) });
+            this.setState((state) => (set(cloneDeep(state), field, convert(normalized, exponent || 1).from(currentUnit).to(baseUnit))));
         } else {
-            this.setState({ [field]: normalized });
+            this.setState((state) => (set(cloneDeep(state), field, normalized)));
         }
     }
 }

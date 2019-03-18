@@ -13,11 +13,12 @@ export default ({
     display,
     time,
     displayTime,
+    defaultValue,
     exponent,
     ...props
 }) => {
     let currentUnit = display || (state.displayUnits && state.displayUnits[field]) || unit;
-    let result = getRawValue(state, field, value);
+    let result = getRawValue(state, field, value, defaultValue);
     if (currentUnit !== unit) {
         result = convert(result, exponent).from(unit).to(currentUnit);
     }
