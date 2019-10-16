@@ -85,14 +85,6 @@ module.exports = extend({
             })
         },
         {
-            'test': /\.less$/,
-            'use': ExtractTextPlugin.extract({
-                'use': [cssLoader(), 'less-loader'],
-                'fallback': 'style-loader',
-                'publicPath': '../'
-            })
-        },
-        {
             'test': /\.html/,
             'loader': 'file-loader',
             'query': { 'name': '[name].[ext]' }
