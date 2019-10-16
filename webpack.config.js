@@ -1,9 +1,10 @@
 /* eslint-disable no-useless-escape */
 
+require('@babel/register');
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const extend = require('./webpack.config.production.js');
@@ -58,8 +59,8 @@ module.exports = extend({
         {
             'test': /\.js$/,
             'include': [
-                path.resolve(__dirname, 'src'),
-                path.resolve(__dirname, 'node_modules/preact-chartjs-2')
+                path.resolve(__dirname, 'src')
+                // path.resolve(__dirname, 'node_modules/preact-chartjs-2')
             ],
             'loaders': [
                 'strip-sourcemap-loader',
@@ -70,27 +71,24 @@ module.exports = extend({
         },
         {
             'test': /\.css$/,
-            'use': ExtractTextPlugin.extract({
-                'use': cssLoader(true),
-                'fallback': 'style-loader',
-                'publicPath': '../'
-            })
+            'use': [
+                { loader: MiniCssExtractPlugin.loader },
+                { loader: 'css-loader', options: { sourceMap: true } },
+            ]
         },
         {
             'test': /\.(sass|scss)$/,
-            'use': ExtractTextPlugin.extract({
-                'use': [cssLoader(), 'sass-loader'],
-                'fallback': 'style-loader',
-                'publicPath': '../'
-            })
-        },
-        {
-            'test': /\.less$/,
-            'use': ExtractTextPlugin.extract({
-                'use': [cssLoader(), 'less-loader'],
-                'fallback': 'style-loader',
-                'publicPath': '../'
-            })
+            'use': [
+                { loader: MiniCssExtractPlugin.loader },
+                { loader: 'css-loader', options: { sourceMap: true } },
+                {
+                    loader: 'sass-loader',
+                    options: {
+                        // data: `@import "${ path.resolve(__dirname, '../src/client/scss/shim.scss') }";`,
+                        sourceMap: true
+                    }
+                }
+            ]
         },
         {
             'test': /\.html/,
@@ -117,9 +115,9 @@ module.exports = extend({
             'node_modules'
         ],
         'alias': {
-            'react': 'preact-compat',
-            'react-dom': 'preact-compat',
-            'preact-compat': 'preact-compat/dist/preact-compat',
+            'react': path.resolve(__dirname, './node_modules/preact/compat'),
+            'react-dom': path.resolve(__dirname, './node_modules/preact/compat'),
+            'preact': path.resolve(__dirname, 'node_modules/preact'),
             'react-redux': 'preact-redux',
             // 'create-react-context': path.resolve(__dirname, 'src/js/shim/createPreactContext.js'),
             'lodash.get': path.resolve(__dirname, 'src/js/common/shims/lodash.get.js'),
@@ -130,10 +128,10 @@ module.exports = extend({
     },
     'plugins': [
         new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en|en-ca)$/),
-        new ExtractTextPlugin({
-            // 'filename': '[name].[contenthash].css'
-            'filename': 'css/[name].css',
-            'disable': !process.env.WEBPACK_ANALYZER && !process.env.BUILD
+        new MiniCssExtractPlugin({
+            filename: 'css/[name].css',
+            chunkFilename: 'css/[id].css',
+            ignoreOrder: true
         }),
         new BundleAnalyzerPlugin({
             'analyzerHost': '0.0.0.0',
