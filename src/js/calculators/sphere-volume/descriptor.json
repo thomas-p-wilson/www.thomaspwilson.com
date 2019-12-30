@@ -1,0 +1,16 @@
+{
+    "id": "sphere-volume",
+    "title": "Volume of a Sphere",
+    "description": "Determine the volume of a sphere",
+    "version": "1.0.0",
+    "category": "maths",
+    "keywords": [],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

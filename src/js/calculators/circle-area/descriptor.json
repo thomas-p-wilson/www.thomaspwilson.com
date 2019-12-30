@@ -1,0 +1,16 @@
+{
+    "id": "circle-area",
+    "title": "Area of a Circle",
+    "description": "Determine the area of a circle",
+    "version": "1.0.0",
+    "category": "maths",
+    "keywords": [],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

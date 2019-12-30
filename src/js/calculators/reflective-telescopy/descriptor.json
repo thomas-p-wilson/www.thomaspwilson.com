@@ -1,0 +1,16 @@
+{
+    "id": "reflective-telescopy",
+    "title": "Reflective Telescopy",
+    "description": "Calculate reflective telescope design and fabrication parameters",
+    "version": "1.0.0-beta.1",
+    "category": "other",
+    "keywords": [],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0-beta.1",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

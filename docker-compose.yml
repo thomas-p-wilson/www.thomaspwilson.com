@@ -1,0 +1,14 @@
+version: "3.6"
+
+services:
+  web:
+    build:
+        context: .
+    ports:
+        - '3001:3000'
+        - '3002:3001'
+    volumes:
+        - .:/usr/src/app
+        - ..:/usr/src/lib
+    working_dir: /usr/src/app
+    command: npm start

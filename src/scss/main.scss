@@ -1,0 +1,104 @@
+$start: #172D35;
+$end: lighten($start, 40%);
+
+* {
+    font-family: 'Lato', sans-serif;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 0;
+}
+
+html {
+    background: $start;
+    background: -moz-linear-gradient(117deg, $start 0%, $end 100%);
+    background: -webkit-linear-gradient(117deg, $start 0%, $end 100%);
+    background: linear-gradient(117deg, $start 0%, $end 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="$start",endColorstr="$end",GradientType=1);
+    background-repeat: no-repeat;
+}
+
+@import './partials/context-panel.scss';
+@import './partials/calculator.scss';
+
+ul.calculator-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        display: inline-block;
+        list-style: none;
+        margin: 5px;
+        padding: 0;
+        vertical-align: middle;
+
+        a {
+            align-items: center;
+            background: rgba(255, 255, 255, .1);
+            background-repeat: no-repeat;
+            border-radius: 2px;
+            color: white;
+            display: flex;
+            height: 130px;
+            justify-content: center;
+            font-family: sans-serif;
+            font-weight: 100;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            transition: all .3s ease;
+            width: 130px;
+
+            &:hover {
+                background: rgba(255, 255, 255, .3);
+                transform: translateY(-10px);
+            }
+        }
+    }
+}
+
+.card {
+    background: rgba(255, 255, 255, .3);
+    max-width: 350px;
+
+    &-header,
+    &-body,
+    &-footer {
+        padding: 8px 12px;
+    }
+
+    &-header,
+    &-footer {
+        background: rgba(255, 255, 255, .3);
+    }
+    &-title {
+
+    }
+    &-body {
+
+    }
+    &-footer {
+
+    }
+
+    &-header + &-body,
+    &-body + &-footer {
+        border-top: 1px solid #aaa;
+    }
+}
+
+.container {
+    display: table;
+    width: 100%;
+
+    .context-panel,
+    .content-panel {
+        display: table-cell;
+        height: 100vh;
+        vertical-align: middle;
+    }
+}
