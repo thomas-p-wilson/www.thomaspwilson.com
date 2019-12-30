@@ -33,12 +33,9 @@ export default class Calculator {
 			 * 
 			 */
 			this.fields[def.id].get = once((data) => {
-				console.log('get()')
 			    const storedValue = get(data, `${ this.meta.slug }.${ def.id }`);
 				if (typeof storedValue === 'undefined' && this.fields[def.id].calculate) {
-					console.log('Calculate value for %s', def.id);
 					const res = this.fields[def.id].calculate(data);
-					console.log('  Result: %s', res);
 					return res;
 				}
 			    const displayUnit = get(data, `${ this.meta.slug }.${ def.id }_unit`, def.unit);
@@ -55,7 +52,6 @@ export default class Calculator {
 			 * _may_ need to be converted.
 			 */
 			this.fields[def.id].display = once((data) => {
-				console.log('display()');
 
 				const storedValue = get(data, `${ this.meta.slug }.${ def.id }`);
 				if (typeof storedValue !== 'undefined') {
@@ -66,9 +62,7 @@ export default class Calculator {
 					return;
 				}
 
-				console.log('Calculate value for %s', def.id);
 				const res = this.fields[def.id].calculate(data);
-				console.log('  Result: %s', res);
 			    const displayUnit = get(data, `${ this.meta.slug }.${ def.id }_unit`, def.unit);
 			    if (displayUnit !== def.unit) {
 			        return convert(res, 1).from(def.unit).to(displayUnit);

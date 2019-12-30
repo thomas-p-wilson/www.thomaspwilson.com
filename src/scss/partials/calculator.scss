@@ -1,8 +1,35 @@
+.calculator {
+    display: flex;
+    margin: 0 auto;
+    max-width: 1200px;
+
+    .calc-column {
+        align-items: center;
+        display: flex;
+        height: 100vh;
+        max-width: 450px;
+
+        h2 {
+            color: white;
+            font-weight: 100;
+            text-align: center;
+        }
+    }
+
+    .desc-column {
+        align-items: center;
+        color: #ccc;
+        display: flex;
+        margin-left: 15px;
+    }
+}
+
 .calculator-box {
 	background: white;
 	border-radius: 3px;
 	list-style: none;
 	margin: 0;
+    max-width: 500px;
 	padding: 0;
 
 	li {

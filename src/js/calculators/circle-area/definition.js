@@ -20,7 +20,7 @@ export default new Calculator({
             if (circumference) {
                 return circumference / Math.PI / 2;
             }
-            const area = this.circumference.get(data);
+            const area = this.area.get(data);
             if (area) {
                 return Math.sqrt(area / Math.PI);
             }
