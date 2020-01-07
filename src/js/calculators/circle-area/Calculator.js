@@ -5,10 +5,7 @@ import calculator from './definition';
 export default () => (
 	<div className="calculator calc-circle-area">
 		<div className="calc-column">
-			<div>
-				<h2>Features of a Circle</h2>
-				<SimpleCalculator calculator={ calculator } />
-			</div>
+			<SimpleCalculator calculator={ calculator } />
 		</div>
 		<div className="desc-column">
 			<div>

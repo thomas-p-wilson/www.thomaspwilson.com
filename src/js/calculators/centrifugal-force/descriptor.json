@@ -1,0 +1,16 @@
+{
+    "id": "centrifugal-force",
+    "title": "Centrifugal Force",
+    "description": "Calculate centrifugal force of a spinning disc.",
+    "version": "1.0.0",
+    "category": "maths",
+    "keywords": [],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

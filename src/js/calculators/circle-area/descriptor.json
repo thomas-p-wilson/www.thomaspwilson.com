@@ -4,7 +4,7 @@
     "description": "Determine the area of a circle",
     "version": "1.0.0",
     "category": "maths",
-    "keywords": [],
+    "keywords": ["radius", "circumference", "area", "diameter"],
     "related": [],
     "changelog": [
         {

@@ -8,18 +8,15 @@ export const actions = {
         const state = getState().calculator || {};
         const { loading, loaded, failed, slug } = state;
         if (loading) {
-            console.log('Currently trying to load')
             return;
         }
 
         if (slug === props.match.params.calculator) {
-            console.log('slug {} is the same as param {}', slug, props.match.params.calculator);
             return;
         }
 
         // Check for existing calculator implementation
         if (calculatorService.getCalculators()[props.match.params.calculator]) {
-            console.log('Calculator {} is pre-loaded', props.match.params.calculator);
             return dispatch({
                 type: 'FETCH_CALCULATOR_SUCCESS',
                 slug: props.match.params.calculator,
@@ -29,7 +26,6 @@ export const actions = {
         }
 
         if (!loading) {
-            console.log('Load the calculator')
             return dispatch({
                 type: 'FETCH_CALCULATOR_REQUEST',
                 request: {

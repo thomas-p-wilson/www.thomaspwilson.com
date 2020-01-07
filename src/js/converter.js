@@ -52,8 +52,8 @@ export const units = Object.keys(measures)
         return acc;
     }, {});
 
-// Get a measure by the given symbol
-export const getMeasure = (symbol) => {
+// Get measure name from symbol
+export const getMeasureName = (symbol) => {
     if (!units[symbol]) {
         throw new Error('Unrecognized symbol ' + symbol);
     }
@@ -65,78 +65,55 @@ export const getMeasure = (symbol) => {
     if (!measures[unit.measure.toLowerCase()]) {
         throw new Error('Unrecognized measure ' + unit.measure.toLowerCase());
     }
-
-    return measures[unit.measure.toLowerCase()];
+    return unit.measure.toLowerCase();
 }
 
-export class Converter {
-    constructor(value, exponent = 1) {
-        this.value = value;
-        this.exponent = exponent;
-
-        this.from = this.from.bind(this);
-        this.to = this.to.bind(this);
-    }
-
-    from(symbol) {
-        if (this.target) {
-            throw new Error('.from must be called before .to');
-        }
-
-        this.origin = units[symbol];
-        if (!this.origin) {
-            throw new Error('Unrecognized measure ' + symbol);
-        }
-
-        return this;
-    }
-
-    to(symbol) {
-        if (!this.origin) {
-            throw new Error('.to must be called after .from');
-        }
-
-        this.target = units[symbol];
-        if (!this.target) {
-            throw new Error(`Unrecognized symbol: ${ symbol }`);
-        }
-
-        // If the origin and target are the same, so is the value
-        if (this.origin.symbol === this.target.symbol) {
-            return this.value;
-        }
-
-        if (this.origin.measure != this.target.measure) {
-            console.log('Origin: ', this.origin);
-            console.log('Target: ', this.target);
-            throw new Error(`Cannot convert between measures of ${ this.origin.measure } and ${ this.target.measure }`);
-        }
-
-        let result = new Decimal(this.value || 0);
-        if (this.exponent !== 1) {
-            result = result.toPower(new Decimal(1).dividedBy(this.exponent));
-        }
-        result = result.times(new Decimal(this.origin.multiplier || 1));
-        if (this.origin.transform) {
-            result = this.origin.transform(result);
-
-        } else if (this.origin.shift) {
-            result = result.subtract(this.origin.shift);
-        }
-
-        if (this.target.transform) {
-            result = this.target.transform(null, result);
-        } else if (this.target.shift) {
-            result = result.add(this.target.shift);
-        }
-        result = result.dividedBy(this.target.multiplier || 1);
-        if (this.exponent !== 1) {
-            return result.toPower(this.exponent);
-        }
-        return result;
-    }
+// Get a measure by the given symbol
+export const getMeasure = (symbol) => {
+    return measures[getMeasureName(symbol)];
 }
 
-export default function convert(value, exponent) {
-    return new Converter(value, exponent);
+export default function convert(value, exponent, origin, target) {
+    // If the origin and target are the same, so is the value
+    if (origin === target) {
+        return value;
+    }
+
+    // Validate measures
+    const originUnit = units[origin];
+    if (!originUnit) {
+        throw new Error(`Cannot convert from '${ origin }' to '${ target }'. Unrecognized origin.`);
+    }
+
+    const targetUnit = units[target];
+    if (!targetUnit) {
+        throw new Error(`Cannot convert from '${ origin }' to '${ target }'. Unrecognized target.`);
+    }
+
+    if (originUnit.measure != targetUnit.measure) {
+        throw new Error(`Cannot convert from '${ origin }' to '${ target }'. Different measures.`);
+    }
+
+    // Convert
+    let result = new Decimal(value || 0);
+    if (exponent !== 1) {
+        result = result.toPower(new Decimal(1).dividedBy(exponent));
+    }
+    result = result.times(new Decimal(originUnit.multiplier || 1));
+    if (originUnit.transform) {
+        result = originUnit.transform(result);
+    } else if (originUnit.shift) {
+        result = result.sub(originUnit.shift);
+    }
+
+    if (targetUnit.transform) {
+        result = targetUnit.transform(null, result);
+    } else if (targetUnit.shift) {
+        result = result.add(targetUnit.shift);
+    }
+    result = result.dividedBy(targetUnit.multiplier || 1);
+    if (exponent !== 1) {
+        return result.toPower(exponent);
+    }
+    return result;
 }

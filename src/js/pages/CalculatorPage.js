@@ -27,10 +27,9 @@ class CalculatorPage extends React.Component {
 	}
 
 	render({ calculator, data, settings, match, dispatch, ...rest }) {
-		console.log('data: ', data);
 		const slug =  `${ (calculator || {}).slug }`;
 		const module = getCalculators()[slug];
-		if (!module) {
+		if (!module || calculator.loading) {
 			return (
 				<div>Loading!!!</div>
 			)

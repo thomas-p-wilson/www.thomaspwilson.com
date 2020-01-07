@@ -1,22 +1,10 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
-import convert from '../converter'
+import convert, { getMeasureName } from '../converter';
+import { getBaseValue, getStoredValue, getDisplayUnit, getDisplayValue, trim, once, name, memoize } from './helpers';
 
-function once(cb) {
-	return (data) => {
-		// If this function has already been called, then return
-	    if (cb.in) {
-	    	cb.in = false;
-	        return;
-	    }
+function coalesce(...cbs) {
 
-	    try {
-	    	cb.in = true;
-	    	return cb(data);
-    	} finally {
-    		cb.in = false;
-    	}
-	}
 }
 
 export default class Calculator {
@@ -24,26 +12,23 @@ export default class Calculator {
 		this.meta = meta;
 		this.fields = {};
 		this._starter = undefined;
+		this._cache = {};
+
+		this.getCachedValue = this.getCachedValue.bind(this);
+		this.resetCache = this.resetCache.bind(this);
+
+		const _this = this;
 
 		definitions.forEach((def) => {
-			this.fields[def.id] = Object.assign({}, def, {
-				parent: this
+			_this.fields[def.id] = Object.assign({}, def, {
+				parent: _this
 			});
 			/**
 			 * 
 			 */
-			this.fields[def.id].get = once((data) => {
-			    const storedValue = get(data, `${ this.meta.slug }.${ def.id }`);
-				if (typeof storedValue === 'undefined' && this.fields[def.id].calculate) {
-					const res = this.fields[def.id].calculate(data);
-					return res;
-				}
-			    const displayUnit = get(data, `${ this.meta.slug }.${ def.id }_unit`, def.unit);
-			    if (displayUnit !== def.unit) {
-			        return convert(storedValue, 1).from(displayUnit).to(def.unit);
-			    }
-			    return storedValue;
-			})
+			_this.fields[def.id].get = _this.getCachedValue(def.id, once(name(`get_${ def.id }`, (data) => (
+				getBaseValue(data, _this.fields[def.id], _this)
+			))));
 			/**
 			 * Get display value. If the store has an explicit value for the
 			 * field, that value is already in the display unit of measure, and
@@ -51,46 +36,53 @@ export default class Calculator {
 			 * calculated value we receive is in the base unit of the field and
 			 * _may_ need to be converted.
 			 */
-			this.fields[def.id].display = once((data) => {
-
-				const storedValue = get(data, `${ this.meta.slug }.${ def.id }`);
-				if (typeof storedValue !== 'undefined') {
-					return storedValue;
-				}
-
-				if (!this.fields[def.id].calculate) {
-					return;
-				}
-
-				const res = this.fields[def.id].calculate(data);
-			    const displayUnit = get(data, `${ this.meta.slug }.${ def.id }_unit`, def.unit);
-			    if (displayUnit !== def.unit) {
-			        return convert(res, 1).from(def.unit).to(displayUnit);
+			_this.fields[def.id].display = once(name(`display_${ def.id }`, (data) => {
+			 	const result = getDisplayValue(data, _this.fields[def.id], _this);
+			 	if (typeof getStoredValue(data, _this.fields[def.id], _this) !== 'undefined') {
+			 		return result;
+			 	}
+			    if (isNaN(result) || typeof result === 'undefined' || result === '') {
+			    	return;
 			    }
-				return res;
-			})
+				return trim(result, data._settings);
+			}));
 			/**
 			 *
 			 */
-			this.fields[def.id].set = (value, data) => {
+			_this.fields[def.id].set = name(`set_${ def.id }`, (value, data) => {
 				let exclusive = [];
-				if (this.meta.exclusive) {
-					exclusive = Object.keys(this.fields).map((k) => (this.fields[k]));
+				if (_this.meta.exclusive) {
+					exclusive = Object.keys(_this.fields).map((k) => (_this.fields[k].id));
 				} else if (def.exclusive) {
 					exclusive = def.exclusive;
 				}
 				exclusive.forEach((e) => {
-					set(data, `${ this.meta.slug }.${ e.id }`, undefined);
+					set(data, `${ _this.meta.slug }.${ e }`, undefined);
 				});
 
 				// Set the new value
-				set(data, `${ this.meta.slug }.${ def.id }`, value);
-				// set(data, `${ slug }.${ field }`, toUnit(data, slug, field, ev.target.value, 1, getDisplayUnit(data, slug, field, unit), unit));
-			}
+				set(data, `${ _this.meta.slug }.${ def.id }`, value);
+				set(data, `${ _this.meta.slug }.${ def.id }_unit`, getDisplayUnit(data, _this.fields[def.id], _this));
+			})
 
 			if (def.calculate) {
-				this.fields[def.id].calculate = once(def.calculate.bind(this.fields));
+				_this.fields[def.id].calculate = once(name(`calculate_${ def.id }`, def.calculate.bind(_this.fields)));
 			}
 		});
+	}
+
+	getCachedValue(id, fallback) {
+		const _this = this;
+		return function(...args) {
+			if (typeof _this._cache[id] !== 'undefined') {
+				return _this._cache[id];
+			}
+
+			return _this._cache[id] = fallback.call(_this.fields, ...args);
+		};
+	}
+
+	resetCache() {
+		this._cache = {};
 	}
 }

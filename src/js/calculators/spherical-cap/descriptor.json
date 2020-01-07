@@ -1,0 +1,16 @@
+{
+    "id": "spherical-cap",
+    "title": "Spherical Cap",
+    "description": "Determine the properties of a spherical cap.",
+    "version": "1.0.0",
+    "category": "maths",
+    "keywords": ["radius", "volume", "sagitta"],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

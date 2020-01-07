@@ -1,6 +1,5 @@
 export class Registrar {
 	constructor(unregistered, listeners) {
-		console.log('Unregistered: ', unregistered)
 		this.registered = unregistered || {};
 		this.listeners = listeners || [];
 	}

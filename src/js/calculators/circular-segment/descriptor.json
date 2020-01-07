@@ -1,0 +1,16 @@
+{
+    "id": "circular-segment",
+    "title": "Circular Segment",
+    "description": "Determine the properties of a circular segment.",
+    "version": "1.0.0",
+    "category": "maths",
+    "keywords": ["radius", "area", "angle", "sagitta"],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

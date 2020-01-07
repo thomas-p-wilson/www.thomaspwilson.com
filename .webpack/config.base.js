@@ -146,7 +146,7 @@ module.exports = {
         }),
         new CopyWebpackPlugin([
             { from: htmlSrc, to: '.' },
-            { from: path.resolve(__dirname, '../src/images'), to: 'images/' }
+            { from: path.resolve(__dirname, '../assets'), to: '/' }
         ]),
         new MiniCssExtractPlugin({
             filename: 'css/[name].css',

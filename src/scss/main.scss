@@ -23,43 +23,11 @@ html {
 
 @import './partials/context-panel.scss';
 @import './partials/calculator.scss';
+@import './partials/modal.scss';
+@import './partials/overlay.scss';
+@import './partials/settings.scss';
 
-ul.calculator-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    li {
-        display: inline-block;
-        list-style: none;
-        margin: 5px;
-        padding: 0;
-        vertical-align: middle;
-
-        a {
-            align-items: center;
-            background: rgba(255, 255, 255, .1);
-            background-repeat: no-repeat;
-            border-radius: 2px;
-            color: white;
-            display: flex;
-            height: 130px;
-            justify-content: center;
-            font-family: sans-serif;
-            font-weight: 100;
-            padding: 10px;
-            text-align: center;
-            text-decoration: none;
-            transition: all .3s ease;
-            width: 130px;
-
-            &:hover {
-                background: rgba(255, 255, 255, .3);
-                transform: translateY(-10px);
-            }
-        }
-    }
-}
+@import './pages/calculator-list.scss';
 
 .card {
     background: rgba(255, 255, 255, .3);
@@ -91,14 +59,29 @@ ul.calculator-list {
     }
 }
 
-.container {
-    display: table;
-    width: 100%;
+@media (min-width: 600px) {
+    .container {
+        display: table;
+        width: 100%;
 
-    .context-panel,
-    .content-panel {
+        .context-panel,
+        .content-panel {
+            display: table-cell;
+            height: 100vh;
+            vertical-align: middle;
+        }
+    }
+}
+
+@media (max-width: 599px) {
+    .context-panel {
         display: table-cell;
         height: 100vh;
+        padding: 1rem;
         vertical-align: middle;
+    }
+
+    .card {
+        max-width: 50%;
     }
 }

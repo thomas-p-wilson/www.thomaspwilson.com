@@ -13,7 +13,13 @@ export const actions = new Registrar({
 export const reducers = new Registrar({
     ...initializers.reducers(),
     ...calculator.reducers(),
-    ...data.reducers(),
+    ...data.reducers({
+        _settings: {
+            scale: 2,
+            length: 'length-metric-centimetre',
+            temperature: 'temperature-metric-kelvin'
+        }
+    }),
     ...settings.reducers()
 });
 

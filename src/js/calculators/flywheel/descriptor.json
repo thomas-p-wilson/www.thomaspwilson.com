@@ -1,0 +1,16 @@
+{
+    "id": "flywheel",
+    "title": "Flywheel",
+    "description": "Determine the properties of a flywheel",
+    "version": "1.0.0",
+    "category": "maths",
+    "keywords": [],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

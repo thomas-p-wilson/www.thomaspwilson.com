@@ -1,10 +1,6 @@
 import React, { useContext } from 'react';
-import { Decimal } from 'decimal.js';
-import get from 'lodash/get';
 import set from 'lodash/set';
-import convert from '../../converter';
-import { getRawValue } from '../../utils';
-import { DataContext, toUnit, getDisplayValue } from '../../calculators/helpers';
+import { DataContext } from '../../calculators/helpers';
 import NumberField from './NumberField';
 
 /**
@@ -17,11 +13,13 @@ export default ({ definition, calculator }) => {
 
 	return (
 		<NumberField field={ definition.id }
+				readonly={ definition.readonly }
 				value={ value }
 				onChange={
 					(ev) => {
 						const result = JSON.parse(JSON.stringify(data)) || {};
 						definition.set(ev.target.value, result);
+						calculator.resetCache();
 						update(result);
 					}
 				} />

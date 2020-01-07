@@ -18,6 +18,7 @@ export default class UnitSelector extends React.Component {
         this.onSearch = this.onSearch.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.renderExponent = this.renderExponent.bind(this);
+        this.renderTitle = this.renderTitle.bind(this);
 
         document.addEventListener('mousedown', this.onOutsideClick, false);
     }
@@ -33,6 +34,8 @@ export default class UnitSelector extends React.Component {
         if (this.node && this.node.contains(ev.target)) {
             return;
         }
+        ev.preventDefault();
+        ev.stopPropagation();
         this.setState((state) => ({ open: false }));
     }
 
@@ -55,6 +58,13 @@ export default class UnitSelector extends React.Component {
         if (this.props.exponent) {
             return (<sup>{ this.props.exponent }</sup>);
         }
+    }
+
+    renderTitle(obj) {
+        if (this.props.verbose) {
+            return `${ obj.plural } (${ obj.symbol })`;
+        }
+        return obj.symbol || obj.plural.substr(0, 2);
     }
 
     renderUnits() {
@@ -111,7 +121,7 @@ export default class UnitSelector extends React.Component {
                         aria-expanded={ this.state.open }
                         onClick={ this.onToggle }
                         disabled={ this.props.disabled }>
-                    { obj.symbol || obj.plural.substr(0, 2) }{ this.renderExponent() }
+                    { (obj && this.renderTitle(obj)) || 'Select...' }{ this.renderExponent() }
                 </button>
                 <div className={ classnames('dropdown-menu dropdown-menu-right', { show: this.state.open }) }
                         ref={ (ref) => { this.node = ref; } }>

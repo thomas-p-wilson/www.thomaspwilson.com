@@ -40,7 +40,7 @@ export const onChange = () => {
         let exponent = ev.target.getAttribute('data-exponent');
         let normalized = normalizeValue(ev.target.value);
         if (baseUnit !== currentUnit) {
-            this.setState((state) => (set(cloneDeep(state), field, convert(normalized, exponent || 1).from(currentUnit).to(baseUnit))));
+            this.setState((state) => (set(cloneDeep(state), field, convert(normalized, exponent || 1, currentUnit, baseUnit))));
         } else {
             this.setState((state) => (set(cloneDeep(state), field, normalized)));
         }
