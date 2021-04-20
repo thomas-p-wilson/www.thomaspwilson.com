@@ -1,13 +1,13 @@
 {
-    "title": "Units of Length",
-    "path": "length",
-    "description": "Convert between units of length in several systems.",
+    "title": "Telescopy",
+    "path": "telescopy",
+    "description": "Telescope design and fabrication parameters.",
     "image": {
-        "small": "/img/calculators/length-sm.jpg",
-        "large": "/img/calculators/length-lg.jpg",
+        "small": "/img/calculators/telescope-sm.jpg",
+        "large": "/img/calculators/telescope-lg.jpg",
         "author": {
-            "handle": "@sernarial",
-            "name": "Patricia Serna"
+            "handle": "@anniespratt",
+            "name": "Annie Spratt"
         }
     }
 }

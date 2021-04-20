@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import * as output from './calculated.js';
-import MathJax from 'react-mathjax-preview';
-import DimensionlessNumberField from '../../../../components/calculator/DimensionlessNumberField';
-import NumberField from '../../../../components/calculator/NumberField';
-import { onChange } from '../../common';
+import DimensionlessNumberField from '../../components/calculator/DimensionlessNumberField';
+import NumberField from '../../components/calculator/NumberField';
+import { onChange, Wrap } from '../common';
 
-export default class Photovoltaic extends Component {
+@Wrap
+class Photovoltaic extends Component {
     //
     // React Lifecycle
     //
@@ -145,3 +145,5 @@ export default class Photovoltaic extends Component {
         );
     }
 }
+
+export default Photovoltaic;

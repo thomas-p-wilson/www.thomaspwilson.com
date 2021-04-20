@@ -61,8 +61,8 @@ export default class ProgressiveImage extends React.Component {
 		return (
 			<figure name={ name } id={ name } className={ classnames('progressive-image', name, className) }>
 				<Wrapper className="placeholder" data-large={ largeSrc } { ...wrapperProps }>
-  					<img src={ smallSrc } onLoad={ () => { console.log('onLoad'); this.setState({ small: true }); } } className={ classnames('small', { visible: small && !large && !loaded[largeSrc] }) } />
-  					<img src={ largeSrc } onLoad={ () => { this.setState({ large: true }); loaded[largeSrc] = true } } className={ classnames({ visible: large || loaded[largeSrc] }) } />
+  					<img src={ smallSrc } alt="" onLoad={ () => { console.log('onLoad'); this.setState({ small: true }); } } className={ classnames('small', { visible: small && !large && !loaded[largeSrc] }) } />
+  					<img src={ largeSrc } alt="" onLoad={ () => { this.setState({ large: true }); loaded[largeSrc] = true } } className={ classnames({ visible: large || loaded[largeSrc] }) } />
   					<div style={{
   						paddingBottom: `${ aspect }%`
   					}} />

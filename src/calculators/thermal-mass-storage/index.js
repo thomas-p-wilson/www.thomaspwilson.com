@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import * as output from './calculated.js';
 import MathJax from 'react-mathjax-preview'
-import DimensionlessNumberField from '../../../../components/calculator/DimensionlessNumberField';
-import Info from '../../../../components/calculator/Info';
-import InfoSection from '../../../../components/calculator/InfoSection';
-import MJ from '../../../../components/calculator/MJ';
-import NumberField from '../../../../components/calculator/NumberField';
-import SelectField from '../../../../components/calculator/SelectField';
-import convert from '../../../../utils/conversion';
-import { onChange } from '../../common';
+import DimensionlessNumberField from '../../components/calculator/DimensionlessNumberField';
+import Info from '../../components/calculator/Info';
+import InfoSection from '../../components/calculator/InfoSection';
+import MJ from '../../components/calculator/MJ';
+import NumberField from '../../components/calculator/NumberField';
+import SelectField from '../../components/calculator/SelectField';
+import { onChange, Wrap } from '../common';
 
-export default class ThermalMassStorage extends Component {
+@Wrap
+class ThermalMassStorage extends Component {
     //
     // React Lifecycle
     //
@@ -206,3 +206,5 @@ export default class ThermalMassStorage extends Component {
         );
     }
 }
+
+export default ThermalMassStorage;

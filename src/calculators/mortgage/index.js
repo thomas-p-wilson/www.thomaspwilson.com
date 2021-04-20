@@ -2,11 +2,8 @@ import React from 'react';
 import memoizeOne from 'memoize-one';
 import isEqual from 'lodash/isEqual';
 import classnames from 'classnames';
-// import { Line } from 'preact-chartjs-2';
-import CheckboxField from '../../../../components/calculator/CheckboxField';
-import DimensionlessNumberField from '../../../../components/calculator/DimensionlessNumberField';
-import SelectField from '../../../../components/calculator/SelectField';
-import { onChange } from '../../common';
+import DimensionlessNumberField from '../../components/calculator/DimensionlessNumberField';
+import { onChange, Wrap } from '../common';
 import * as output from './calculated.js';
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -14,7 +11,8 @@ const formatter = new Intl.NumberFormat('en-US', {
     currency: 'USD',
 });
 
-export default class Mortgage extends React.Component {
+@Wrap
+class Mortgage extends React.Component {
     constructor(props) {
         super(props);
 
@@ -42,14 +40,14 @@ export default class Mortgage extends React.Component {
         })
             .map((_, i) => ([
                 (
-                    <tr className={ classnames({ stripe: i % 2 == 0 }) }>
+                    <tr className={ classnames({ stripe: i % 2 === 0 }) }>
                         <td rowSpan="4" style={{ textAlign: 'center' }}>Term { i + 1 }</td>
                         <td>Interest Rate</td>
                         <td colSpan="6">{ schedule.monthly.terms[i].rate }</td>
                     </tr>
                 ),
                 (
-                    <tr className={ classnames({ stripe: i % 2 == 0 }) }>
+                    <tr className={ classnames({ stripe: i % 2 === 0 }) }>
                         <td>Payment Amount</td>
                         <td>{ formatter.format(schedule.monthly.terms[i].amount) }</td>
                         <td>{ formatter.format(schedule.semiMonthly.terms[i].amount) }</td>
@@ -60,7 +58,7 @@ export default class Mortgage extends React.Component {
                     </tr>
                 ),
                 (
-                    <tr className={ classnames({ stripe: i % 2 == 0 }) }>
+                    <tr className={ classnames({ stripe: i % 2 === 0 }) }>
                         <td>Term Interest</td>
                         <td>{ formatter.format(schedule.monthly.terms[i].interest) }</td>
                         <td>{ formatter.format(schedule.semiMonthly.terms[i].interest) }</td>
@@ -71,7 +69,7 @@ export default class Mortgage extends React.Component {
                     </tr>
                 ),
                 (
-                    <tr className={ classnames({ stripe: i % 2 == 0 }) }>
+                    <tr className={ classnames({ stripe: i % 2 === 0 }) }>
                         <td>Term Principal</td>
                         <td>{ formatter.format(schedule.monthly.terms[i].principal) }</td>
                         <td>{ formatter.format(schedule.semiMonthly.terms[i].principal) }</td>
@@ -199,8 +197,8 @@ export default class Mortgage extends React.Component {
                             <table className="table">
                                 <thead>
                                     <tr>
-                                        <th className="sticky bg-white" />
-                                        <th className="sticky bg-white" />
+                                        <th className="sticky bg-white" aria-label="None" />
+                                        <th className="sticky bg-white" aria-label="None" />
                                         <th className="sticky bg-white">Monthly</th>
                                         <th className="sticky bg-white">Semi-Monthly</th>
                                         <th className="sticky bg-white">Bi-Weekly</th>
@@ -262,7 +260,7 @@ export default class Mortgage extends React.Component {
                                 {
                                     Object.keys(output.handlers)
                                         .map((frequency) => (
-                                            <li><a onClick={ () => { this.setState({ frequency }); } } className="btn">{ output.handlers[frequency].title }</a></li>
+                                            <li><button onClick={ () => { this.setState({ frequency }); } } className="btn">{ output.handlers[frequency].title }</button></li>
                                         ))
                                 }
                             </ul>
@@ -320,3 +318,5 @@ export default class Mortgage extends React.Component {
         );
     }
 }
+
+export default Mortgage;

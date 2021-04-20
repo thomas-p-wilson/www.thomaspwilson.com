@@ -1,6 +1,5 @@
 import React from 'react';
 import classnames from 'classnames';
-import transform from 'lodash/transform';
 import { getMeasure, units } from '../../utils/conversion';
 
 /**
@@ -70,12 +69,12 @@ export default class UnitSelector extends React.Component {
                                     || String.prototype.toLowerCase.call(item.singular || '').indexOf(String.prototype.toLowerCase.call(this.state.search || '')) > -1;
                         })
                         .map((symbol) => (
-                            <a className="dropdown-item"
+                            <button className="dropdown-item"
                                     data-field={ field }
                                     data-unit={ measure[system].units[symbol].id }
                                     onClick={ this.onSelect }>
                                 { measure[system].units[symbol].singular }{ this.renderExponent() }
-                            </a>
+                            </button>
                         ));
                     if (units.length > 0) {
                         return arr
@@ -91,9 +90,7 @@ export default class UnitSelector extends React.Component {
     render() {
         const {
             unit,
-            field,
             value,
-            number
         } = this.props;
         if (!unit) {
             return (<div />);

@@ -1,11 +1,11 @@
 import React from 'react';
-// import { Line } from 'preact-chartjs-2';
-import CheckboxField from '../../../../components/calculator/CheckboxField';
-import DimensionlessNumberField from '../../../../components/calculator/DimensionlessNumberField';
-import { onChange } from '../../common';
+import CheckboxField from '../../components/calculator/CheckboxField';
+import DimensionlessNumberField from '../../components/calculator/DimensionlessNumberField';
+import { onChange, Wrap } from '../common';
 import * as output from './calculated.js';
 
-export default class Retirement extends React.Component {
+@Wrap
+class Retirement extends React.Component {
     constructor(props) {
         super(props);
 
@@ -21,7 +21,6 @@ export default class Retirement extends React.Component {
     }
 
     render() {
-        const self = this;
         return (
             <div className="App">
                 <header className="App-header">
@@ -58,7 +57,7 @@ export default class Retirement extends React.Component {
                                                         state={ this.state }
                                                         onChange={ this.onChange } />
 
-                                                <label className="form-check-label" for="netMatchInflation">
+                                                <label className="form-check-label" htmlFor="netMatchInflation">
                                                     Match inflation?
                                                 </label>
                                             </div>
@@ -78,7 +77,7 @@ export default class Retirement extends React.Component {
                                                         state={ this.state }
                                                         onChange={ this.onChange } />
 
-                                                <label className="form-check-label" for="expensesMatchInflation">
+                                                <label className="form-check-label" htmlFor="expensesMatchInflation">
                                                     Match inflation?
                                                 </label>
                                             </div>
@@ -241,3 +240,5 @@ export default class Retirement extends React.Component {
         );
     }
 }
+
+export default Retirement;

@@ -7,8 +7,8 @@ const ContactSection = () => (
     			<h2>Contact</h2>
     		</div>
     		<ul className="nav nav-horizontal social-button-list">
-                <li><a href="https://ca.linkedin.com/in/thomaspwilson" title="LinkedIn"><i className="fa fa-linkedin-square"></i></a></li>
-                <li><a href="https://github.com/thomas-p-wilson" title="Github"><i className="fa fa-github-square"></i></a></li>
+                <li><a href="https://ca.linkedin.com/in/thomaspwilson" title="LinkedIn" aria-label="LinkedIn"><i className="fa fa-linkedin-square"></i></a></li>
+                <li><a href="https://github.com/thomas-p-wilson" title="Github" aria-label="Github"><i className="fa fa-github-square"></i></a></li>
             </ul>
             <div className="row">
                 <div className="col-sm-12">

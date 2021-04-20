@@ -1,13 +1,15 @@
+import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 import set from 'lodash/set';
-import convert from '../../utils/conversion';
+import convert from '../utils/conversion';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 
 export const normalizeValue = (value) => {
     if (typeof value === 'undefined') {
         return 0;
     }
-    if (value === NaN) {
+    if (Number.isNaN(value)) {
         return 0;
     }
     if (typeof value === 'string') {
@@ -48,3 +50,18 @@ export const onChange = () => {
         }
     }
 }
+
+/**
+ * Wrap calculator pages with the header and footer.
+ */
+export const Wrap = (Wrapped) => () => (
+    <div>
+        <Header/>
+        <div className="calculators-page">
+            <div className="container">
+                <Wrapped />
+            </div>
+        </div>
+        <Footer/>
+    </div>
+);

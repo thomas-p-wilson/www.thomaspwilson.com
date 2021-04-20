@@ -4,9 +4,9 @@
 export const DEFAULT_SCALE = 6;
 
 export const constants = {
-	G: {
-		symbol: 'G',
-		title: 'Gravity',
-		value: 9.80665 // m/s^2
-	}
+    G: {
+        symbol: 'G',
+        title: 'Gravity',
+        value: 9.80665 // m/s^2
+    }
 };

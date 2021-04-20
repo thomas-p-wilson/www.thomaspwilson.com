@@ -1,5 +1,4 @@
 import React from 'react';
-import convert from '../../utils/conversion';
 import { getRawValue } from '../../utils/calculator';
 
 /**

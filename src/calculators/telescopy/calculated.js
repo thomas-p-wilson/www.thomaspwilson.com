@@ -1,5 +1,5 @@
 import { DEFAULT_SCALE, constants } from '../constants';
-import convert from '../../../utils/conversion';
+import convert from '../../utils/conversion';
 
 export function apertureRadius(state, decimalPlaces = DEFAULT_SCALE) {
     return state.apertureDiameter / 2;

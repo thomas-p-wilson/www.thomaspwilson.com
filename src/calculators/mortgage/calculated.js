@@ -222,7 +222,7 @@ export function calculateSchedule(terms, balance, period, termLength, frequency)
 		if (!result.terms[term - 1]) {
 			result.terms[term - 1] = { ...lastTermInfo };
 		}
-		const lastTermInfo = result.terms[term - 1];
+		lastTermInfo = result.terms[term - 1];
 		const { amount: monthlyPaymentAmount, rate } = lastTermInfo;
 		const r = rate / 12;
 		const interest = (last.balance * r) * multiplier;

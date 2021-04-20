@@ -1,16 +1,22 @@
 import React from 'react';
 import { graphql } from 'gatsby';
-
-import '../scss/style.scss';
 import Header from '../components/layout/Header';
+import ProfileCardSection from '../components/layout/ProfileCardSection';
+import SkillsSection from '../components/layout/SkillsSection';
+import ExperienceSection from '../components/layout/ExperienceSection';
+import ServicesSection from '../components/layout/ServicesSection';
+import ContactSection from '../components/layout/ContactSection';
 import Footer from '../components/layout/Footer';
-
-import Home from './Home';
+import '../scss/style.scss';
 
 const Root = () => (
   <div>
       <Header />
-      <Home />
+      <ProfileCardSection />
+      <SkillsSection />
+      <ExperienceSection />
+      <ServicesSection />
+      <ContactSection />
       <Footer />
   </div>
 );
@@ -25,4 +31,4 @@ export const query = graphql`
       }
     }
   }
-`
+`;

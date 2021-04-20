@@ -16,7 +16,7 @@ export default ({
                 { ...props }
                 data-field={ field }
                 value={ value || state[field] }
-                onChange={ onChange }>
+                onBlur={ onChange }>
             {
                 Object.keys(options)
                     .map((key) => (

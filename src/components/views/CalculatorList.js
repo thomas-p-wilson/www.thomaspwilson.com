@@ -1,156 +1,79 @@
 import React from 'react';
-import { Switch, Route, NavLink } from 'react-router-dom';
 import ProgressiveImage from '../ProgressiveImage';
 import { Link } from 'gatsby';
 
-const calculators = {
-    'Conversions': [
-        {
-            title: 'Units of Length',
-            path: 'length',
-            description: 'Convert between units of length in several systems.',
-            image: {
-                small: '/img/calculators/length-sm.jpg',
-                large: '/img/calculators/length-lg.jpg',
-                author: {
-                    handle: '@sernarial',
-                    name: 'Patricia Serna'
-                }
-            }
-        },
-        {
-            title: 'Units of Mass',
-            path: 'mass',
-            description: 'Convert between units of mass in several systems.',
-            image: {
-                small: '/img/calculators/mass-sm.jpg',
-                large: '/img/calculators/mass-lg.jpg',
-                author: {
-                    handle: '@victorfreitas',
-                    name: 'Victor Freitas'
-                }
-            }
-        }
-    ],
-    'Finance': [
-        {
-            title: 'Mortgage',
-            path: 'finance/mortgage',
-            description: 'Calculate mortgage specifics.',
-            image: {
-                small: '/img/calculators/mortgage-sm.jpg',
-                large: '/img/calculators/mortgage-lg.jpg',
-                author: {
-                    handle: '@f7photo',
-                    name: 'Michael Longmire'
-                }
-            }
-        },
-        {
-            title: 'Retirement',
-            path: 'finance/retirement',
-            description: 'Calculate savings rate and expected retirement date.',
-            image: {
-                small: '/img/calculators/retirement-sm.jpg',
-                large: '/img/calculators/retirement-lg.jpg',
-                author: {
-                    handle: '@aaronburden',
-                    name: 'Aaron Burden'
-                }
-            }
-        }
-    ],
-    'Other': [
-        {
-            title: 'Telescopy',
-            path: 'telescopy',
-            description: 'Telescope design and fabrication parameters.',
-            image: {
-                small: '/img/calculators/telescope-sm.jpg',
-                large: '/img/calculators/telescope-lg.jpg',
-                author: {
-                    handle: '@anniespratt',
-                    name: 'Annie Spratt'
-                }
-            }
-        },
-        {
-            title: 'Photovoltaic Bank Sizing',
-            path: 'photovoltaic',
-            description: 'Determine how many solar panels you need.',
-            image: {
-                small: '/img/calculators/photovoltaic-sm.jpg',
-                large: '/img/calculators/photovoltaic-lg.jpg',
-                author: {
-                    handle: '@nasa',
-                    name: 'NASA'
-                }
-            }
-        },
-        {
-            title: 'Thermal Mass Storage',
-            path: 'thermal-mass',
-            description: 'Discover how much water you need to store energy.',
-            image: {
-                small: '/img/calculators/thermal-mass-sm.jpg',
-                large: '/img/calculators/thermal-mass-lg.jpg',
-                author: {
-                    handle: '@schackowshots',
-                    name: 'Casey Schackow'
-                }
-            }
-        }
-    ]
-}
+// const calculators = {
+//     'Conversions': [
+//         {
+//             title: 'Units of Length',
+//             path: 'length',
+//             description: 'Convert between units of length in several systems.',
+//             image: {
+//                 small: '/img/calculators/length-sm.jpg',
+//                 large: '/img/calculators/length-lg.jpg',
+//                 author: {
+//                     handle: '@sernarial',
+//                     name: 'Patricia Serna'
+//                 }
+//             }
+//         },
+//         {
+//             title: 'Units of Mass',
+//             path: 'mass',
+//             description: 'Convert between units of mass in several systems.',
+//             image: {
+//                 small: '/img/calculators/mass-sm.jpg',
+//                 large: '/img/calculators/mass-lg.jpg',
+//                 author: {
+//                     handle: '@victorfreitas',
+//                     name: 'Victor Freitas'
+//                 }
+//             }
+//         }
+//     ],
+// }
 
-export default () => (
+// const calculators = {};
+
+export default ({ calculators }) => (
     <div className="calculators-page">
         <div className="container">
+            <ul className="calculator-list">
             {
-                Object.keys(calculators)
-                    .reduce((result, category) => (
-                        result
-                            .concat(<h2>{ category }</h2>)
-                            .concat
-(                                <ul className="calculator-list">
-                                    {
-                                        calculators[category].map((inner) => (
-                                            <li>
-                                                <ProgressiveImage name={ inner.title }
-                                                        smallSrc={ inner.image.small }
-                                                        largeSrc={ inner.image.large }
-                                                        aspect={ 63 }
-                                                        caption={(
-                                                            <figcaption>
-                                                                <a href={ `https://unsplash.com/${ inner.image.author.handle }?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge` }
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        title={ `Image by ${ inner.image.author.name } on Unsplash` }
-                                                                        className="btn btn-circle">
-                                                                    <span style={{ display:'inline-block', padding: '2px 3px'}}>
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" style={{ height:'12px', width:'auto', position:'relative', verticalAlign: 'middle', top:'-2px', fill: 'white' }} viewBox="0 0 32 32">
-                                                                            <title>{ `Image by ${ inner.image.author.name } on Unsplash` }</title>
-                                                                            <path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z" />
-                                                                        </svg>
-                                                                    </span>
-                                                                </a>
-                                                            </figcaption>
-                                                        )}
-                                                        wrapper={ Link }
-                                                        wrapperProps={{
-                                                            to: `${ inner.path }`
-                                                        }} />
-                                                <Link to={ `${ inner.path }` }>
-                                                    <h6>{ inner.title }</h6>
-                                                    <small>{ inner.description }</small>
-                                                </Link>
-                                            </li>
-                                        ))
-                                    }
-                                </ul>
-                            )
-                    ), [])
+                calculators.map((inner) => (
+                    <li>
+                        <ProgressiveImage name={ inner.context.meta.title }
+                                smallSrc={ inner.context.meta.image.small }
+                                largeSrc={ inner.context.meta.image.large }
+                                aspect={ 63 }
+                                caption={(
+                                    <figcaption>
+                                        <a href={ `https://unsplash.com/${ inner.context.meta.image.author.handle }?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge` }
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                title={ `Image by ${ inner.context.meta.image.author.name } on Unsplash` }
+                                                className="btn btn-circle">
+                                            <span style={{ display:'inline-block', padding: '2px 3px'}}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" style={{ height:'12px', width:'auto', position:'relative', verticalAlign: 'middle', top:'-2px', fill: 'white' }} viewBox="0 0 32 32">
+                                                    <title>{ `Image by ${ inner.context.meta.image.author.name } on Unsplash` }</title>
+                                                    <path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z" />
+                                                </svg>
+                                            </span>
+                                        </a>
+                                    </figcaption>
+                                )}
+                                wrapper={ Link }
+                                wrapperProps={{
+                                    to: `${ inner.path }`
+                                }} />
+                        <Link to={ `${ inner.path }` }>
+                            <h6>{ inner.context.meta.title }</h6>
+                            <small>{ inner.context.meta.description }</small>
+                        </Link>
+                    </li>
+                ))
             }
+            </ul>
 
             <p>This list is really small at the moment. But I have plans! Maybe it'll take a day. Maybe it'll take a year. But I have plans:</p>
             <ul>

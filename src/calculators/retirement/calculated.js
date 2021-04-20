@@ -1,5 +1,3 @@
-import memoize from 'lodash/memoize';
-
 export function yearsUntilDeath(state) {
 	return Math.floor(82.3 - state.age);
 }
@@ -32,7 +30,7 @@ export function chartData(state) {
  	const interest = Number(state.interest);
  	const inflation = Number(state.inflation);
  	const safety = Number(state.safety) || 0;
- 	const fv = expenses / interest;
+ 	// const fv = expenses / interest;
 
  	const result = {
  		unspent: [state.savings || 0],
@@ -58,7 +56,7 @@ export function chartData(state) {
     	const unspent = (Number(result.unspent[i]) + savingsRate) * (1 + interest);
     	let spent = unspent;
     	const retirementInterest = result.retirement[i] * interest;
-    	const increase = (retirementInterest - expenses) / retirementInterest;
+    	// const increase = (retirementInterest - expenses) / retirementInterest;
 
     	if (retired || (retirementInterest - expenses) / result.retirement[i] >= inflation + safety) {
     		retired = true;

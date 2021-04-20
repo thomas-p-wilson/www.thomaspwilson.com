@@ -1,0 +1,14 @@
+{
+    "title": "Retirement",
+    "path": "finance/retirement",
+    "description": "Calculate savings rate and expected retirement date.",
+    "categories": ["finance"],
+    "image": {
+        "small": "/img/calculators/retirement-sm.jpg",
+        "large": "/img/calculators/retirement-lg.jpg",
+        "author": {
+            "handle": "@aaronburden",
+            "name": "Aaron Burden"
+        }
+    }
+}

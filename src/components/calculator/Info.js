@@ -18,11 +18,13 @@ export default class Info extends React.Component {
             field
         } = this.props;
         return (
-            <a onClick={ this.onClick }
+            <button onClick={ this.onClick }
+                    onKeyUp={ this.onClick }
                     data-field={ field }
-                    className="info">
+                    className="info"
+                    tabIndex="0">
                 <i className="fa fa-info-circle" />
-            </a>
+            </button>
         );
     }
 }

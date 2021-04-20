@@ -1,18 +1,17 @@
 import React from 'react';
-import classnames from 'classnames';
 import MathJax from 'react-mathjax-preview'
-import { measures } from '../../../utils/conversion';
-import DimensionlessNumberField from '../../../components/calculator/DimensionlessNumberField';
-import Info from '../../../components/calculator/Info';
-import InfoSection from '../../../components/calculator/InfoSection';
-import MJ from '../../../components/calculator/MJ';
-import NumberField from '../../../components/calculator/NumberField';
-import SelectField from '../../../components/calculator/SelectField';
-import { hide } from '../../../utils/calculator';
+import DimensionlessNumberField from '../../components/calculator/DimensionlessNumberField';
+import Info from '../../components/calculator/Info';
+import InfoSection from '../../components/calculator/InfoSection';
+import MJ from '../../components/calculator/MJ';
+import NumberField from '../../components/calculator/NumberField';
+import SelectField from '../../components/calculator/SelectField';
+import { hide } from '../../utils/calculator';
 import * as output from './calculated.js';
-import { onChange } from '../common';
+import { onChange, Wrap } from '../common';
 
-export default class Telescopy extends React.Component {
+@Wrap
+class Telescopy extends React.Component {
     //
     // React Lifecycle
     //
@@ -422,3 +421,5 @@ export default class Telescopy extends React.Component {
         );
     }
 }
+
+export default Telescopy;
