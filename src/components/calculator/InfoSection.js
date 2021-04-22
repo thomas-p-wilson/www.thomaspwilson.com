@@ -17,10 +17,8 @@ export default class InfoSection extends React.Component {
         }
 
         if (this.props.show) {
-            console.log('Expand');
             this.expand();
         } else {
-            console.log('Collapse');
             this.collapse();
         }
     }
@@ -65,7 +63,7 @@ export default class InfoSection extends React.Component {
 
     render() {
         const { closed } = this.state;
-        const { className, ...props } = this.props;
+        const { className, show, ...props } = this.props;
         return (
             <dd { ...props } className={ classnames('info-section', className, { closed }) }
                     ref={ (ref) => { this.node = ref; } }>

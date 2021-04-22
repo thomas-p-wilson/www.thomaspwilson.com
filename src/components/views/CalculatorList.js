@@ -41,7 +41,7 @@ export default ({ calculators }) => (
             <ul className="calculator-list">
             {
                 calculators.map((inner) => (
-                    <li>
+                    <li key={ inner.context.meta.title }>
                         <ProgressiveImage name={ inner.context.meta.title }
                                 smallSrc={ inner.context.meta.image.small }
                                 largeSrc={ inner.context.meta.image.large }

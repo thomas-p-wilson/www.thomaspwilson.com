@@ -127,3 +127,131 @@ export function mass(volume) {
 export function rotation(focalLength) {
     return Math.sqrt((constants.G.value * 100) / (2 * focalLength));
 }
+
+
+export default {
+    apertureDiameter: {
+        type: 'number',
+        title: 'Aperture Diameter',
+        unit: 'length-metric-centimetre',
+        default: 60.96,
+    },
+    apertureArea: {
+        type: 'number',
+        title: 'Aperture Area',
+        unit: 'length-metric-centimetre',
+        exponent: 2,
+        calculate: apertureArea,
+        readonly: true,
+    },
+    systemFocalLength: {
+        type: 'number',
+        title: 'Focal Length',
+        unit: 'length-metric-centimetre',
+        default: 182.88, // 3x the aperture diameter (fast)
+    },
+    systemFocalRatio: {
+        type: 'number',
+        title: 'Focal Ratio',
+        calculate: systemFocalRatio,
+        readonly: true,
+    },
+
+    // Primary mirror
+    primaryType: {
+        type: 'select',
+        title: 'Type',
+        options: {
+            spherical: 'Spherical',
+            paraboloidal: 'Paraboloidal',
+        },
+        default: 'paraboloidal',
+    },
+    primaryConstruction: {
+        type: 'select',
+        title: 'Construction',
+        options: {
+            ground: 'Ground Blank',
+            meniscus: 'Meniscus',
+        },
+        default: 'ground',
+    },
+    primaryFocalLength: {
+        type: 'number',
+        title: 'Focal Length', 
+        unit: 'length-metric-centimetre',
+        default: 121.92,
+    },
+    primaryFocalRatio: {
+        type: 'number',
+        title: 'Focal Ratio',
+        calculate: primaryFocalRatio,
+    },
+    primaryEdgeThickness: {
+        type: 'number',
+        title: 'Edge Thickness',
+        unit: 'length-metric-centimetre',
+        default: 5,
+    },
+    primaryBlankVolume: {
+        type: 'number',
+        title: ({ primaryConstruction }) => ((primaryConstruction === 'meniscus' ? 'Material' : 'Blank') + ' Volume'),
+        unit: 'length-metric-centimetre',
+        exponent: 3,
+        calculate: primaryMaterialVolume,
+        readonly: true,
+    },
+    primaryBlankMass: {
+        type: 'number',
+        title: ({ primaryConstruction }) => ((primaryConstruction === 'meniscus' ? 'Material' : 'Blank') + ' Mass'),
+        unit: 'mass-metric-gram',
+        calculate: ({ apertureDiameter, primaryEdgeThickness }) => (mass(volume(apertureDiameter, primaryEdgeThickness))),
+        readonly: true,
+    },
+    primarySagitta: {
+        type: 'number',
+        title: 'Dish Sagitta',
+        calculate: primaryCenterDepth,
+        unit: 'length-metric-centimetre',
+        readonly: true,
+    },
+    primaryDishArea: {
+        type: 'number',
+        title: 'Dish Area',
+        calculate: primaryDishArea,
+        unit: 'length-metric-centimetre',
+        exponent: 2,
+        readonly: true,
+    },
+    primaryDishVolume: {
+        type: 'number',
+        title: 'Dish Volume',
+        calculate: primaryDishVolume,
+        unit: 'length-metric-centimetre',
+        exponent: 3,
+        readonly: true
+    },
+    primaryMaterialVolume: {
+        type: 'number',
+        title: 'Material Volume',
+        calculate: primaryMaterialVolume,
+        unit: 'length-metric-centimetre',
+        exponent: 3,
+        readonly: true,
+    },
+    primaryMass: {
+        type: 'number',
+        title: 'Mass',
+        calculate: (state) => (mass(primaryMaterialVolume(state))),
+        unit: 'mass-metric-gram',
+        readonly: true,
+    },
+    primaryRotation: {
+        type: 'number',
+        title: 'Cast Rotation',
+        calculate: ({ primaryFocalLength }) => (rotation(primaryFocalLength)),
+        unit: 'angle-other-rad',
+        time: 'time-metric-second',
+        readonly: true,
+    }
+};

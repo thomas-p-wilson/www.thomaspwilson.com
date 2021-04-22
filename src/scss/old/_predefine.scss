@@ -8,13 +8,27 @@ a {
     }
 }
 
-body{
+html {
+    height: 100%;
+}
+body, #___gatsby, #gatsby-focus-wrapper {
+    display: block;
+    min-height: 100vh;
+}
+#gatsby-focus-wrapper > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+body {
     line-height: 26px;
     font-size: 16px;
     font-family: $rob;
     font-weight: normal;
     color: $pfont;
 }
+
 h1,
 h2,
 h3,
@@ -46,4 +60,8 @@ button:focus{
 		padding-left: 0px;
 		padding-right: 0px;
 	}
+}
+
+.calculators-page {
+    flex-grow: 1;
 }

@@ -10,7 +10,7 @@ const MyTabsSection = () => (
 		                <h5>December 2017 – Present</h5>
 		                <h6>Incipient Industries</h6>
 		                <p>Incipient Industries is a cryptocurrency software and tooling firm that produces next-generation cryptocurrency software. We leverage high-capacity infrastructure to provide scalable, fault-tolerante solutions to industry problems. We take advantage of machine learning to tailor results to our users. We strive for privacy and security-oriented, test-driven development and continuous delivery in order to provide our customers a smooth and fast iteration cycle.</p>
-		                <ul class="tag-list brand">
+		                <ul className="tag-list brand">
 							<li className="badge badge-pill">Docker</li>
 							<li className="badge badge-pill">Python</li>
 							<li className="badge badge-pill">Linux</li>
@@ -33,7 +33,7 @@ const MyTabsSection = () => (
 							<li className="badge badge-pill">GraphQL</li>
 							<li className="badge badge-pill">Websockets</li>
 		                </ul>
-		                <div class="clearfix"></div>
+		                <div className="clearfix"></div>
 					</li>
 				</ul>
 			</div>
