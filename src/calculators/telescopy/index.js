@@ -21,7 +21,7 @@ const getField = (field, { type, unit, readonly: readOnly, options, ...config },
     }
 }
 
-const StandardField = ({ field, hide=false, withInfo=false, ...props }) => {
+const StandardField = ({ field, hide=false, withInfo=true, info=null, ...props }) => {
     const calculator = useCalculatorContext();
     if (functionOrValue(hide, calculator.state)) {
         return null;
@@ -29,12 +29,13 @@ const StandardField = ({ field, hide=false, withInfo=false, ...props }) => {
     return (
         <>
             <dt>
-                { withInfo && (<calculator.InfoButton field={field} />) }
+                { (withInfo && calculator.config[field].info) && (<calculator.InfoButton field={field} />) }
                 <span>{ functionOrValue(calculator.config[field].title, calculator.state) }</span>
             </dt>
             <dd>
                 { getField(field, { ...calculator.config[field], ...props }, calculator) }
             </dd>
+            { (withInfo && (info || calculator.config[field].info)) && (<calculator.InfoSection field={field}>{ info || calculator.config[field].info }</calculator.InfoSection>) }
         </>
     );
 };
@@ -43,8 +44,7 @@ const SystemDetailsTab = ({ onChange, onInfo, state }) => {
     const calculator = useCalculatorContext();
     return (
         <dl className="table">
-            <StandardField field="apertureDiameter" withInfo />
-            <calculator.InfoSection field="apertureDiameter">The diameter of the objective aperture determines the amount of light allowed to enter the telescope. Larger apertures allow more light to enter the telescope.</calculator.InfoSection>
+            <StandardField field="apertureDiameter" />
 
             <StandardField field="apertureArea" />
 
@@ -83,11 +83,9 @@ const PrimaryMirrorDetailsTab = ({ onChange, onInfo, state }) => {
 
             <StandardField field="primaryConstruction" />
 
-            <StandardField field="apertureDiameter" withInfo readonly />
-            <calculator.InfoSection field="apertureDiameter">The diameter of the primary reflector is equal to the system aperture diameter.</calculator.InfoSection>
+            <StandardField field="apertureDiameter" readonly info="The diameter of the primary reflector is equal to the system aperture diameter." />
 
             <StandardField field="primaryFocalLength" withInfo />
-            <calculator.InfoSection field="primaryFocalLength">The focal length of the primary mirror. Typcially twice the primary diameter.</calculator.InfoSection>
 
             <StandardField field="primaryFocalRatio" />
 
@@ -266,7 +264,7 @@ const PrimaryMirrorDetailsTab = ({ onChange, onInfo, state }) => {
     )
 }
 
-const Tabs = ({ tabs, contentProps }) => {
+const Tabs = ({ tabs }) => {
     const [currentTab, setCurrentTab] = useState(tabs[0]);
 
     return (
@@ -281,7 +279,7 @@ const Tabs = ({ tabs, contentProps }) => {
                 }
             </ul>
             <section className="App-content">
-                <currentTab.component {...contentProps} />
+                <currentTab.component />
             </section>
         </>
     );

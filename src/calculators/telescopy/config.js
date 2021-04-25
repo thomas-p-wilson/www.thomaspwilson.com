@@ -135,6 +135,7 @@ export default {
         title: 'Aperture Diameter',
         unit: 'length-metric-centimetre',
         default: 60.96,
+        info: 'The diameter of the objective aperture determines the amount of light allowed to enter the telescope. Larger apertures allow more light to enter the telescope.',
     },
     apertureArea: {
         type: 'number',
@@ -181,6 +182,7 @@ export default {
         title: 'Focal Length', 
         unit: 'length-metric-centimetre',
         default: 121.92,
+        info: 'The focal length of the primary mirror. Typcially twice the primary diameter.',
     },
     primaryFocalRatio: {
         type: 'number',
