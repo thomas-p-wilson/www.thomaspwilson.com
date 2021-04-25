@@ -1,0 +1,14 @@
+{
+    "title": "Woodgas Energy Conversions",
+    "path": "woodgas-conversions",
+    "description": "Determine approximately how much energy a given amount of woodgas produces",
+    "categories": ["other"],
+    "image": {
+        "small": "/img/calculators/syngas-converter-sm.jpg",
+        "large": "/img/calculators/syngas-converter-lg.jpg",
+        "author": {
+            "handle": "@nelly13",
+            "name": "Nelly Antoniadou"
+        }
+    }
+}
