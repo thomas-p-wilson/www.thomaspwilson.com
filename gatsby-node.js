@@ -35,10 +35,21 @@ exports.createPages = async function ({ actions, graphql }) {
     ))
     .map(({ slug, location }) => {
       const meta = require(path.join(location, 'metadata.json'))
+      let component = require.resolve(path.join(__dirname, 'src/components/calculator/StandardCalculatorPage.js'));
+      if (fs.existsSync(path.join(location, 'index.js'))) {
+        component = require.resolve(location);
+      }
+      let config;
+      if (fs.existsSync(path.join(location, 'calculator.js'))) {
+        config = require(path.join(location, 'calculator.js'));
+      }
       actions.createPage({
         path: `/calculators/${slug}`,
-        component: require.resolve(location),
-        context: { meta }
+        component,
+        context: {
+          meta,
+          config,
+        }
       })
     })
 }

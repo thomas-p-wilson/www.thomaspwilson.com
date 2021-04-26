@@ -66,6 +66,7 @@ export const biomass = (state) => (
 
 export default {
     _meta: {
+        title: 'Woodgas Energy Conversions',
         sections: {
             gas: {
                 title: 'Gasoline',
