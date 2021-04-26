@@ -1,21 +1,27 @@
-import React, { Suspense } from 'react';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
-import StandardCalculator from './StandardCalculator';
+import React from 'react';
+import Header from '../layout/Header';
+import Footer from '../layout/Footer';
+import { Calculator } from '../../components/calculator/Calculator';
+import StandardCalculatorLayout from '../../components/calculator/StandardCalculatorLayout';
 
-const StandardCalculatorPage = ({ pageContext }) => {
-    return (
-        <>
-            <Header/>
-            <div className="calculators-page">
-                <div className="container">
-                    <Suspense fallback={<div>Loading...</div>}>
-                        <StandardCalculator config={ pageContext.config.default || pageContext.config } />
-                    </Suspense>
-                </div>
+const StandardCalculatorPage = ({ config }) => (
+    <>
+        <Header/>
+        <div className="calculators-page">
+            <div className="container">
+                <Calculator config={ config }>
+                    <div className="App">
+                        <header className="App-header">
+                            <h1 className="App-title">{ config._meta.title }</h1>
+                            { config._meta.description && (<p>{config._meta.description}</p>) }
+                        </header>
+
+                        <StandardCalculatorLayout />
+                    </div>
+                </Calculator>
             </div>
-            <Footer/>
-        </>
-    );
-}
+        </div>
+        <Footer/>
+    </>
+);
 export default StandardCalculatorPage;

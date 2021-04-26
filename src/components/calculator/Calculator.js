@@ -150,6 +150,8 @@ export class Calculator extends React.Component {
   }
 
   calculate(field) {
+    console.log('Calculate field ', field);
+    console.log('  Has calculator? ', this.props.config[field])
     if (this.props.config[field] && this.props.config[field].calculate) {
       return this.props.config[field].calculate(this.state);
     }
