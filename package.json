@@ -14,7 +14,7 @@
   "dependencies": {
     "algebra.js": "^0.2.6",
     "big.js": "^5.2.2",
-    "chart.js": "^2.7.3",
+    "chart.js": "^2.9.4",
     "chartjs-plugin-annotation": "^0.5.7",
     "classnames": "^2.2.5",
     "history": "4.10.1",
