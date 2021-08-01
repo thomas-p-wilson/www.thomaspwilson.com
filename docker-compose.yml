@@ -1,10 +1,16 @@
 version: "3.6"
 
 services:
-  api:
+  web:
     image: node:14
+    restart: "no"
     ports:
       - 3000:3000
     volumes:
       - .:/srv/app
-    restart: "no"
+      - .docker/entrypoint:/entrypoint:ro
+    working_dir: /srv/app
+    environment:
+      - NODE_ENV=development
+    command: ["yarn", "webpack-dev-server", "--debug", "--output-pathinfo", "--host", "0.0.0.0", "--port", "3000", "--hot", "--content-base=public/", "--history-api-fallback", "true"]
+    entrypoint: /entrypoint
