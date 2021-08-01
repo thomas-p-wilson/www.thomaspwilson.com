@@ -6,9 +6,6 @@ const ProfileCardSection = () => (
        		<div className="banner-inner d-flex align-items-center">
 				<div className="banner_content">
 					<div className="media">
-						<div className="d-flex">
-							<img src="/assets/img/me.jpg" alt="Thomas Wilson" />
-						</div>
 						<div className="media-body">
 							<div className="about-text">
 								<h3>Thomas P. Wilson</h3>

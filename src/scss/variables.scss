@@ -1,7 +1,5 @@
-$background-color: #708090;
-$brand-color: #85DFFF;
+$primary-color: #4f757c;
 
-
-//    background-image: -moz-linear-gradient( 0deg, rgb(118,109,255) 0%, rgb(136,243,255) 100%);
-//    background-image: -webkit-linear-gradient( 0deg, rgb(118,109,255) 0%, rgb(136,243,255) 100%);
-//    background-image: -ms-linear-gradient( 0deg, rgb(118,109,255) 0%, rgb(136,243,255) 100%);
+:root {
+    --primary-color: #{$primary-color};
+}

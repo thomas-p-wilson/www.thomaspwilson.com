@@ -9,13 +9,16 @@ import ContactSection from '../components/layout/ContactSection';
 import Footer from '../components/layout/Footer';
 
 const Home = () => (
-    <div>
-        <ProfileCardSection />
-        <SkillsSection />
-        <ExperienceSection />
-        <ServicesSection />
-        <ContactSection />
-    </div>
+    <>
+        <Header />
+        <div className="content container">
+            <ProfileCardSection />
+            <SkillsSection />
+            <ExperienceSection />
+            <ServicesSection />
+            <ContactSection />
+        </div>
+    </>
 );
 
 export default Home;

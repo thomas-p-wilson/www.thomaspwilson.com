@@ -1,0 +1,92 @@
+.sidebar {
+    background-color: var(--primary-color);
+    color: rgba(255, 255, 255, 0.5);
+    padding: 2rem 1rem;
+
+    @include large-and-up {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 20%;
+        text-align: center;
+    }
+
+    /* Sidebar links */
+    a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    img.photo {
+        border-radius: 50%;
+        display: block;
+        margin: 2em auto;
+        max-width: 50%;
+    }
+
+    /* About section */
+    .sidebar-about {
+        h1 {
+            color: #fff;
+            margin-top: 0;
+            font-family: "Abril Fatface", serif;
+            font-size: 1.5rem;
+        }
+    }
+
+    .lead {
+        margin: 3em 0;
+    }
+
+    /* Sidebar nav */
+    nav {
+        display: inline-block;
+
+        .sidebar-nav {
+            display: inline-block;
+            list-style: none;
+            margin-bottom: 1rem;
+            padding: 0;
+
+            > li {
+                clear: left;
+                float: left; /* or display: inline; */
+                padding: 0;
+
+                > a {
+                    line-height: 1.75;
+
+                    &:hover,
+                    &:focus {
+                        text-decoration: underline;
+                    }
+                    &.active {
+                        font-weight: bold;
+                        position: relative;
+
+                        &:before {
+                            border: 7px solid transparent;
+                            border-left: 7px solid white;
+                            content: '';
+                            display: block;
+                            position: absolute;
+                            left: -15px;
+                            top: 1px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .colophon {
+        bottom: 0;
+        display: block;
+        justify-self: end;
+        margin: 1em;
+        margin-left: -2rem;
+        position: absolute;
+        width: 100%;
+    }
+}

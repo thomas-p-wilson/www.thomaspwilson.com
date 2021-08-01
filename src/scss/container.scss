@@ -1,0 +1,13 @@
+@import './responsive';
+
+.content {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+
+    @include large-and-up {
+        margin-left: 20%;
+        padding-left: 5em;
+        padding-right: 5em;
+    }
+}
+
