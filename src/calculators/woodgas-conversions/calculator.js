@@ -76,6 +76,9 @@ export default {
                 title: 'Woodgas/Syngas',
                 fields: ['woodgasDensity', 'woodgas', 'biomass']
             }
+        },
+        settings: {
+            scale: 2,
         }
     },
     gasoline: {

@@ -5,6 +5,7 @@ module.exports = {
       options: {
         implementation: require('sass')
       },
-    }
+    },
+    'gatsby-plugin-portal'
   ]
 }

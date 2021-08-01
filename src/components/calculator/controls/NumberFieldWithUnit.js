@@ -18,8 +18,8 @@ export default ({
     ...props
 }) => {
     const calculator = useCalculatorContext();
-    let currentUnit = display || calculator.getDisplayUnit(field, unit);
-    let currentTimeUnit = displayTime || calculator.getDisplayUnit(`${field}Time`, time);
+    let currentUnit = display || calculator.getUnit(field, unit);
+    let currentTimeUnit = displayTime || calculator.getUnit(`${field}Time`, time);
 
     return (
         <div className="input-group">
@@ -37,7 +37,7 @@ export default ({
                         unit={ unit }
                         value={ currentUnit }
                         exponent={ exponent }
-                        number={ calculator.getRawValue(field, value) }
+                        number={ calculator.getValue(field, value) }
                         disabled={ unconvertible } />
                 {
                     time ? (
@@ -45,7 +45,7 @@ export default ({
                                 currentUnit={ currentTimeUnit }
                                 unit={ time }
                                 value={ currentTimeUnit }
-                                number={ calculator.getRawValue(field, value) }
+                                number={ calculator.getValue(field, value) }
                                 disabled={ unconvertible } />
                     ) : null
                 }

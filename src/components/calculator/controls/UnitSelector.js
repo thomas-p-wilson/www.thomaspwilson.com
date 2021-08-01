@@ -24,7 +24,7 @@ export default ({ field, unit, value, exponent, ...props }) => {
         setSearch('');
     }, [setIsOpen, setSearch, isOpen]);
     const onSelect = useCallback((ev) => {
-        calculator.onChange(ev);
+        calculator.onChangeUnit(ev);
         close();
     }, [calculator, close]);
     useEffect(() => {
@@ -49,8 +49,8 @@ export default ({ field, unit, value, exponent, ...props }) => {
                 })
                 .map((symbol) => (
                     <button className="dropdown-item"
-                            data-field={ field }
-                            data-unit={ measure[system].units[symbol].id }
+                            name={ field }
+                            value={ measure[system].units[symbol].id }
                             onClick={ onSelect }
                             key={`${system}-${symbol}`}>
                         { measure[system].units[symbol].singular }{ exponentComponent }

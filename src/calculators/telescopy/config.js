@@ -17,10 +17,6 @@ export function systemFocalRatio(state, decimalPlaces = DEFAULT_SCALE) {
     return (state.systemFocalLength / state.apertureDiameter).toFixed(decimalPlaces);
 }
 
-// export function primaryFocalLength(state) {
-//     return state.apertureDiameter * 2;
-// }
-
 export function primaryFocalRatio(state, decimalPlaces = DEFAULT_SCALE) {
     return state.primaryFocalLength / state.apertureDiameter;
 }

@@ -15,9 +15,10 @@ export default ({
         <div className="input-group">
             <select className="form-control"
                     { ...props }
-                    data-field={ field }
-                    value={ value || calculator.getRawValue(field) }
-                    onBlur={ calculator.onChange }>
+                    name={ field }
+                    value={ value || calculator.getValue(field) }
+                    onBlur={ calculator.onChange }
+                    onChange={ calculator.onChange }>
                 {
                     Object.keys(options)
                         .map((key) => (

@@ -14,5 +14,6 @@ const StandardFieldList = ({ fields }) => {
         }
         </dl>
     );
-}
+};
+
 export default StandardFieldList;

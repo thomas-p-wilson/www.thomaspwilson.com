@@ -30,7 +30,7 @@ class PrimaryNavigation extends React.Component {
                             <div id="main-nav"
                                     className={ classnames('collapse navbar-collapse offset', { show: this.state.open }) }>
                                 <ul className="nav navbar-nav ml-auto">
-                                    <li className="nav-item"><Link to="/" exact className="nav-link">Home</Link></li>
+                                    <li className="nav-item"><Link to="/" className="nav-link">Home</Link></li>
                                     <li className="nav-item"><Link to="/resume" className="nav-link">Résumé</Link></li>
                                     <li className="nav-item"><Link to="/calculators" className="nav-link">Calculators</Link></li>
                                 </ul>

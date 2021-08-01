@@ -4,10 +4,8 @@
         transition: background 0.4s;
     }
 
-    @at-root {
-        .calculators-page {
-            padding-top: 74px;
-        }
+    & + * {
+        padding-top: 74px;
     }
 
 	&.navbar-fixed {

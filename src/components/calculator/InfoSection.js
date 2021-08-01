@@ -67,7 +67,7 @@ export default class InfoSection extends React.Component {
         return (
             <dd { ...props } className={ classnames('info-section', className, { closed }) }
                     ref={ (ref) => { this.node = ref; } }>
-                <p>{ this.props.children }</p>
+                { this.props.children }
             </dd>
         );
     }

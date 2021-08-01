@@ -2,26 +2,6 @@ const fs = require('fs');
 const path = require('path');
 
 exports.createPages = async function ({ actions, graphql }) {
-  // const { data } = await graphql(`
-  //   query {
-  //     allMarkdownRemark {
-  //       nodes {
-  //         fields {
-  //           slug
-  //         }
-  //       }
-  //     }
-  //   }
-  // `)
-  // data.allMarkdownRemark.forEach(node => {
-  //   const slug = node.fields.slug
-  //   actions.createPage({
-  //     path: slug,
-  //     component: require.resolve(`./src/templates/blog-post.js`),
-  //     context: { slug: slug },
-  //   })
-  // })
-
   const calculatorsDir = path.resolve(__dirname, 'src/calculators');
   fs.readdirSync(calculatorsDir)
     .map((slug) => ({

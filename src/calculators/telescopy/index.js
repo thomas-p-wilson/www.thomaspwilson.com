@@ -1,46 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MathJax from 'react-mathjax-preview'
 import MJ from '../../components/calculator/MJ';
 import config from './config.js';
 import { Wrap } from '../common';
-import classnames from 'classnames';
 import { Calculator, useCalculatorContext } from '../../components/calculator/Calculator';
-import { functionOrValue } from '../../utils/helpers';
+import Tabs from '../../components/Tabs';
+import StandardField from '../../components/calculator/StandardField';
 
-
-const getField = (field, { type, unit, readonly: readOnly, options, ...config }, calculator) => {
-    const props = { field, unit, readOnly, options };
-    if (type === 'number' && unit) {
-        return (<calculator.NumberFieldWithUnit { ...props } />);
-    }
-    if (type === 'number') {
-        return (<calculator.NumberField { ...props } />);
-    }
-    if (options) {
-        return (<calculator.SelectField { ...props } />)
-    }
-}
-
-const StandardField = ({ field, hide=false, withInfo=true, info=null, ...props }) => {
-    const calculator = useCalculatorContext();
-    if (functionOrValue(hide, calculator.state)) {
-        return null;
-    }
-    return (
-        <>
-            <dt>
-                { (withInfo && calculator.config[field].info) && (<calculator.InfoButton field={field} />) }
-                <span>{ functionOrValue(calculator.config[field].title, calculator.state) }</span>
-            </dt>
-            <dd>
-                { getField(field, { ...calculator.config[field], ...props }, calculator) }
-            </dd>
-            { (withInfo && (info || calculator.config[field].info)) && (<calculator.InfoSection field={field}>{ info || calculator.config[field].info }</calculator.InfoSection>) }
-        </>
-    );
-};
-
-const SystemDetailsTab = ({ onChange, onInfo, state }) => {
+const SystemDetailsTab = () => {
     const calculator = useCalculatorContext();
     return (
         <dl className="table">
@@ -53,29 +20,31 @@ const SystemDetailsTab = ({ onChange, onInfo, state }) => {
             <StandardField field="systemFocalRatio" withInfo />
             <calculator.InfoSection field="systemFocalRatio">
                 <table>
-                    <tr>
-                        <td>
-                            <MathJax math={ String.raw`
-                                $$
-                                N = \dfrac{f}{D}
-                                $$
-                            ` } />
-                        </td>
-                        <td>
-                            <ul>
-                                <li><MJ>$N$ = the f-number, aka f-stop, f-ratio, or focal ratio</MJ></li>
-                                <li><MJ>$f$ = focal length</MJ></li>
-                                <li><MJ>$D$ = diameter of entrance pupil (effective aperture)</MJ></li>
-                            </ul>
-                        </td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <MathJax math={ String.raw`
+                                    $$
+                                    N = \dfrac{f}{D}
+                                    $$
+                                ` } />
+                            </td>
+                            <td>
+                                <ul>
+                                    <li><MJ>$N$ = the f-number, aka f-stop, f-ratio, or focal ratio</MJ></li>
+                                    <li><MJ>$f$ = focal length</MJ></li>
+                                    <li><MJ>$D$ = diameter of entrance pupil (effective aperture)</MJ></li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </calculator.InfoSection>
         </dl>
     );
 }
 
-const PrimaryMirrorDetailsTab = ({ onChange, onInfo, state }) => {
+const PrimaryMirrorDetailsTab = () => {
     const calculator = useCalculatorContext();
     return (
         <dl className="table">
@@ -262,27 +231,6 @@ const PrimaryMirrorDetailsTab = ({ onChange, onInfo, state }) => {
             </calculator.InfoSection>
         </dl>
     )
-}
-
-const Tabs = ({ tabs }) => {
-    const [currentTab, setCurrentTab] = useState(tabs[0]);
-
-    return (
-        <>
-            <ul className="nav nav-pills justify-content-center">
-                {
-                    tabs.map((t) => (
-                        <li className="nav-item" key={t.title}>
-                            <button className={classnames('nav-link', {active: t === currentTab})} onClick={() => {setCurrentTab(t)}} href="#">{t.title}</button>
-                        </li>
-                    ))
-                }
-            </ul>
-            <section className="App-content">
-                <currentTab.component />
-            </section>
-        </>
-    );
 }
 
 const tabs = [{

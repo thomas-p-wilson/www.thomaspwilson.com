@@ -60,16 +60,6 @@ class Photovoltaic extends Component {
     render() {
         return (
             <div className="App">
-                <header className="App-header">
-                    <h1 className="App-title">Telescope Design Parameters</h1>
-                    <p>The telescope design parameters calculator is designed to aid me when I'm building telescope components. I intend to expand the feature set of this calculator as time permits and as I find the need...or desire.</p>
-                    <p>Currently, the calculator supports telescope designs with the following properties:</p>
-                    <ul>
-                        <li>Newtonian (single-mirror), Cassegrain (twin-mirror) types</li>
-                        <li>Spherical or paraboloidal mirrors (where acceptable)</li>
-                        <li>Spin casting calculation</li>
-                    </ul>
-                </header>
                 <section className="App-content">
                     <div className="row">
                         <div className="col col100">
