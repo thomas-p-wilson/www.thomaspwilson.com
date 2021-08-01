@@ -2,15 +2,6 @@
   "name": "www.thomaspwilson.com",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "lint:css": "sass-lint -c .sass-lint.yml -v",
-    "lint:js": "eslint .",
-    "lint": "npm-run-all --parallel lint:css lint:js",
-    "test": "NODE_ENV=test mocha --compilers js:babel-core/register -r chai/register-expect -R spec ./src/**/*.tests.js",
-    "start": "NODE_ENV=development webpack-dev-server --debug --output-pathinfo --host 0.0.0.0 --port 3000 --hot --content-base=public/ --history-api-fallback true",
-    "analyze": "NODE_ENV=production WEBPACK_ANALYZER=1 webpack",
-    "build": "NODE_ENV=production webpack"
-  },
   "dependencies": {
     "algebra.js": "^0.2.6",
     "big.js": "^5.2.2",
