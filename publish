@@ -1,3 +1,0 @@
-#!/bin/bash
-
-rsync -avz -e "ssh" --delete --stats --progress dist/ thowil22@daniel-carroll.dreamhost.com:/home/thowil22/thomaspwilson.com/
