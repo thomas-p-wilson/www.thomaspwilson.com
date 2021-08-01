@@ -1,0 +1,10 @@
+version: "3.6"
+
+services:
+  api:
+    image: node:14
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/srv/app
+    restart: "no"
