@@ -12,18 +12,19 @@ export default class Header extends React.Component {
     render() {
         return (
             <header className="sidebar">
-                <img src="/assets/img/me.png" alt="Thomas Wilson" className="photo" />
-
                 <nav>
                     <ul className="sidebar-nav">
                         <li>
-                            <a href="https://erthalion.info/">About Me</a>
+                            <NavLink to="/" exact>About Me</NavLink>
                         </li>
                         <li>
-                            <a href="https://erthalion.info/blog" className="active">Blog</a>
+                            <NavLink to="/blog">Blog</NavLink> (<a href="/atom.xml">RSS</a>)
                         </li>
                         <li>
-                            <a href="https://erthalion.info/atom.xml">RSS</a>
+                            <NavLink to="/cv">Résumé / CV</NavLink>
+                        </li>
+                        <li>
+                            <NavLink to="/calculators">Calculators</NavLink>
                         </li>
                     </ul>
                 </nav>

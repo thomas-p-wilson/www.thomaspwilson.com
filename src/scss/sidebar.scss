@@ -1,6 +1,10 @@
 .sidebar {
+    align-items: right;
     background-color: var(--primary-color);
     color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 2rem 1rem;
 
     @include large-and-up {
@@ -8,7 +12,7 @@
         top: 0;
         left: 0;
         bottom: 0;
-        width: 20%;
+        width: var(--sidebar-width);
         text-align: center;
     }
 
@@ -41,17 +45,14 @@
 
     /* Sidebar nav */
     nav {
-        display: inline-block;
-
         .sidebar-nav {
-            display: inline-block;
             list-style: none;
             margin-bottom: 1rem;
+            margin-right: 1rem;
             padding: 0;
+            text-align: right;
 
             > li {
-                clear: left;
-                float: left; /* or display: inline; */
                 padding: 0;
 
                 > a {
@@ -65,14 +66,14 @@
                         font-weight: bold;
                         position: relative;
 
-                        &:before {
+                        &:after {
                             border: 7px solid transparent;
-                            border-left: 7px solid white;
+                            border-right: 7px solid white;
                             content: '';
                             display: block;
                             position: absolute;
-                            left: -15px;
-                            top: 1px;
+                            right: -15px;
+                            top: 4px;
                         }
                     }
                 }
@@ -83,7 +84,6 @@
     .colophon {
         bottom: 0;
         display: block;
-        justify-self: end;
         margin: 1em;
         margin-left: -2rem;
         position: absolute;

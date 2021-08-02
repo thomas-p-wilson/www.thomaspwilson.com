@@ -1,5 +1,16 @@
+/* Colors */
 $primary-color: #4f757c;
+
+/* Fonts */
+$roboto: 'Roboto', sans-serif;
+$heebo: 'Heebo', sans-serif;
+
+/* Layout */
+$sidebar-width: 20%;
+
+@import url('https://fonts.googleapis.com/css?family=Heebo:300,400,700,900|Roboto:100,300,400,500,700');
 
 :root {
     --primary-color: #{$primary-color};
+    --sidebar-width: #{$sidebar-width};
 }

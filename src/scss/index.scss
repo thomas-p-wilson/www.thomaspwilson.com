@@ -4,4 +4,11 @@
 @import './sidebar';
 @import './container';
 @import './typography';
+@import './icons';
 @import './theme';
+
+@import './elements/accordion';
+@import './elements/badge';
+@import './elements/tag-list';
+
+@import './pages/home';
