@@ -1,5 +1,4 @@
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 import set from 'lodash/set';
 import convert from '../../utils/conversion';
 

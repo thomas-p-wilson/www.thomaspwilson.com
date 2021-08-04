@@ -1,5 +1,3 @@
-import memoize from 'lodash/memoize';
-
 export function yearsUntilDeath(state) {
 	return Math.floor(82.3 - state.age);
 }

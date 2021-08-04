@@ -1,6 +1,5 @@
 import React from 'react';
 import classnames from 'classnames';
-import transform from 'lodash/transform';
 import { getMeasure, units } from '../../utils/conversion';
 
 /**

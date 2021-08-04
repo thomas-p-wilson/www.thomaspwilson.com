@@ -1,5 +1,4 @@
 import React from 'react';
-import { Line } from 'preact-chartjs-2';
 import CheckboxField from '../../../../components/calculator/CheckboxField';
 import DimensionlessNumberField from '../../../../components/calculator/DimensionlessNumberField';
 import { onChange } from '../../common';

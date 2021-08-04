@@ -2,10 +2,7 @@ import React from 'react';
 import memoizeOne from 'memoize-one';
 import isEqual from 'lodash/isEqual';
 import classnames from 'classnames';
-import { Line } from 'preact-chartjs-2';
-import CheckboxField from '../../../../components/calculator/CheckboxField';
 import DimensionlessNumberField from '../../../../components/calculator/DimensionlessNumberField';
-import SelectField from '../../../../components/calculator/SelectField';
 import { onChange } from '../../common';
 import * as output from './calculated.js';
 
