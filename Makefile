@@ -25,11 +25,8 @@ lint:
 test:
 	NODE_ENV=test docker-compose run --rm web yarn mocha --compilers js:babel-core/register -r chai/register-expect -R spec ./src/**/*.tests.js
 
-analyze:
-	NODE_ENV=production WEBPACK_ANALYZER=1 docker-compose run --rm web yarn webpack
-
 build:
-	NODE_ENV=production docker-compose run --rm web yarn webpack
+	docker-compose run --rm -e NODE_ENV=production web yarn webpack
 
 publish:
 	rsync -avz -e "ssh" --delete --stats --progress dist/ thowil22@www.thomaspwilson.com:/home/thowil22/thomaspwilson.com/

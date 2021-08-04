@@ -1,13 +1,19 @@
 /* eslint-disable no-useless-escape */
 
 require('@babel/register');
-const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const extend = require('./webpack.config.production.js');
+const globAll = require('glob-all');
+const PurifyCSSPlugin = require('purifycss-webpack');
+const CompressionPlugin = require('compression-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const isDevelopment = process.env.NODE_ENV === 'development';
+const isProduction = !isDevelopment;
+const analyzerEnabled = !!process.env.WEBPACK_ANALYZER;
 
 const fixSetting = function (o) {
     if (!Array.isArray(o)) {
@@ -34,80 +40,88 @@ const fixBabel = function (settings) {
     }
     return result;
 }
-const babelSettings = fixBabel(JSON.parse(fs.readFileSync('.babelrc', 'utf8')));
+const babelSettings = fixBabel(require(__dirname + '/.babelrc'));
 
-const cssLoader = (url = false) => ({
-    'loader': 'css-loader',
-    'options': {
-        url,
-        'minimize': process.env.BUILD,
-        'importLoaders': 1
-    }
-});
-
-module.exports = extend({
+module.exports = {
     'entry': {
         'main': ['./src/js/index.js'],
         'index': ['./src/html/index.html']
     },
     'output': {
         'filename': 'js/[name].min.js',
-        'path': path.resolve('./dist')
+        'path': path.resolve('./dist'),
+        'publicPath': '/',
+    },
+    devServer: {
+        'host': '0.0.0.0',
+        'port': 3000,
+        'hot': true,
+        'contentBase': 'public/',
+        'historyApiFallback': true,
+        'injectClient': isDevelopment,
     },
     'node': { 'global': true },
-    'module': { 'rules': [
-        {
-            'test': /\.js$/,
-            'include': [
-                path.resolve(__dirname, 'src')
-                // path.resolve(__dirname, 'node_modules/preact-chartjs-2')
-            ],
-            'loaders': [
-                'strip-sourcemap-loader',
-                {
-                    'loader': 'babel-loader', 'query': babelSettings
-                }
-            ]
-        },
-        {
-            'test': /\.css$/,
-            'use': [
-                { loader: MiniCssExtractPlugin.loader },
-                { loader: 'css-loader', options: { sourceMap: true } },
-            ]
-        },
-        {
-            'test': /\.(sass|scss)$/,
-            'use': [
-                { loader: MiniCssExtractPlugin.loader },
-                { loader: 'css-loader', options: { sourceMap: true } },
-                {
-                    loader: 'sass-loader',
-                    options: {
-                        // data: `@import "${ path.resolve(__dirname, '../src/client/scss/shim.scss') }";`,
-                        sourceMap: true
+    'module': {
+        'rules': [
+            {
+                'test': /\.js$/,
+                'include': [
+                    path.resolve(__dirname, 'src')
+                ],
+                'loaders': [
+                    'strip-sourcemap-loader',
+                    {
+                        'loader': 'babel-loader', 'query': babelSettings
                     }
-                }
-            ]
-        },
-        {
-            'test': /\.html/,
-            'loader': 'file-loader',
-            'query': { 'name': '[name].[ext]' }
-        },
-        {
-            'test': /\.(png|jpg|gif)(\?v=\d+\.\d+\.\d+)?$/,
-            'loader': 'url-loader?limit=100000'
-        },
-        {
-            'test': /\.(eot|com|ttf|woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
-            'loader': 'url-loader?limit=10000&mimetype=application/octet-stream'
-        },
-        {
-            'test': /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-            'loader': 'url-loader?limit=10000&mimetype=image/svg+xml'
-        }
-    ] },
+                ]
+            },
+            {
+                'test': /\.css$/,
+                'use': [
+                    { loader: MiniCssExtractPlugin.loader },
+                    { loader: 'css-loader', options: { sourceMap: true, url: false } },
+                ]
+            },
+            {
+                'test': /\.(sass|scss)$/,
+                'use': [
+                    { loader: MiniCssExtractPlugin.loader },
+                    { loader: 'css-loader', options: { sourceMap: true, url: false } },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true
+                        }
+                    }
+                ]
+            },
+            {
+                'test': /\.html/,
+                'loader': 'file-loader',
+                'query': { 'name': '[name].[ext]' }
+            },
+            {
+                'test': /\.(png|jpg|gif)(\?v=\d+\.\d+\.\d+)?$/,
+                'loader': 'url-loader?limit=100000'
+            },
+            {
+                'test': /\.(eot|com|ttf|woff|woff2).*?$/,
+                'use': [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: 'fonts/',
+                        },
+                    },
+                ],
+            },
+            {
+                'test': /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+                'loader': 'url-loader?limit=10000&mimetype=image/svg+xml'
+            }
+        ]
+    },
     'resolve': {
         'extensions': ['.js', '.jsx', '.json'],
         'modules': [
@@ -118,8 +132,6 @@ module.exports = extend({
             'react': path.resolve(__dirname, './node_modules/preact/compat'),
             'react-dom': path.resolve(__dirname, './node_modules/preact/compat'),
             'preact': path.resolve(__dirname, 'node_modules/preact'),
-            'react-redux': 'preact-redux',
-            // 'create-react-context': path.resolve(__dirname, 'src/js/shim/createPreactContext.js'),
             'lodash.get': path.resolve(__dirname, 'src/js/common/shims/lodash.get.js'),
             'lodash.merge': path.resolve(__dirname, 'src/js/common/shims/lodash.merge.js'),
             'lodash.omit': path.resolve(__dirname, 'src/js/common/shims/lodash.omit.js'),
@@ -127,7 +139,6 @@ module.exports = extend({
         }
     },
     'plugins': [
-        new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en|en-ca)$/),
         new MiniCssExtractPlugin({
             filename: 'css/[name].css',
             chunkFilename: 'css/[id].css',
@@ -135,15 +146,37 @@ module.exports = extend({
         }),
         new BundleAnalyzerPlugin({
             'analyzerHost': '0.0.0.0',
-            'analyzerPort': 3000,
-            'analyzerMode': (process.env.WEBPACK_ANALYZER) ? 'server' : 'disabled'
+            'analyzerPort': 3001,
+            'analyzerMode': (isDevelopment || analyzerEnabled) ? 'server' : 'disabled',
         }),
         new DuplicatePackageCheckerPlugin(),
-        new webpack.NamedModulesPlugin()
+        new webpack.NamedModulesPlugin(),
+
+        // Production plugins
+        ...(process.env.NODE_ENV === 'production' ? [
+            new webpack.LoaderOptionsPlugin({
+                'minimize': true,
+                'debug': false
+            }),
+            new PurifyCSSPlugin({
+                'verbose': true,
+                'paths': globAll.sync([
+                    path.join(__dirname, 'dist/*.html'),
+                    path.join(__dirname, 'src/**/*.js')
+                ]),
+                'moduleExtensions': ['.js'],
+                'minimize': true
+            }),
+            new CompressionPlugin(),
+            new CopyWebpackPlugin([
+                { from: 'src/html/.htaccess', to: '.htaccess', toType: 'file' },
+                { from: 'public/assets', to: 'assets' },
+            ]),
+        ] : [])
     ],
     'externals': {
         'window': 'window',
         'location': 'location'
     },
     'devtool': 'source-map'
-});
+};
