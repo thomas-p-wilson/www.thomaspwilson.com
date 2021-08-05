@@ -1,0 +1,27 @@
+# This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
+version: 2.1
+
+orbs:
+  node: circleci/node@4.6.0
+
+jobs:
+  build:
+    docker:
+      - image: circleci/node:14
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          name: Build bundle
+          command: |
+            NODE_ENV=production STATS=static yarn webpack
+      - run:
+          name: Produce bundle size statuses
+          command: |
+            node .scripts/get-chunk-sizes.js
+      
+workflows:
+  build:
+    jobs:
+      - build

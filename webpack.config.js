@@ -13,7 +13,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isProduction = !isDevelopment;
-const analyzerEnabled = !!process.env.WEBPACK_ANALYZER;
+const stats = process.env.STATS || (isDevelopment ? 'server' : 'disabled');
 
 const fixSetting = function (o) {
     if (!Array.isArray(o)) {
@@ -143,7 +143,10 @@ module.exports = {
         new BundleAnalyzerPlugin({
             'analyzerHost': '0.0.0.0',
             'analyzerPort': 3001,
-            'analyzerMode': (isDevelopment || analyzerEnabled) ? 'server' : 'disabled',
+            'analyzerMode': stats,
+            'generateStatsFile': stats === 'static',
+            'reportFilename': 'stats.html',
+            'statsFilename': 'stats.json',
         }),
         new DuplicatePackageCheckerPlugin(),
         new webpack.NamedModulesPlugin(),
