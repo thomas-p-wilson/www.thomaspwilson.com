@@ -132,10 +132,6 @@ module.exports = {
             'react': path.resolve(__dirname, './node_modules/preact/compat'),
             'react-dom': path.resolve(__dirname, './node_modules/preact/compat'),
             'preact': path.resolve(__dirname, 'node_modules/preact'),
-            'lodash.get': path.resolve(__dirname, 'src/js/common/shims/lodash.get.js'),
-            'lodash.merge': path.resolve(__dirname, 'src/js/common/shims/lodash.merge.js'),
-            'lodash.omit': path.resolve(__dirname, 'src/js/common/shims/lodash.omit.js'),
-            'lodash.set': path.resolve(__dirname, 'src/js/common/shims/lodash.set.js')
         }
     },
     'plugins': [

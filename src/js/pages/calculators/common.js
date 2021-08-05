@@ -1,5 +1,6 @@
-import cloneDeep from 'lodash/cloneDeep';
-import set from 'lodash/set';
+// import cloneDeep from 'lodash-es/cloneDeep';
+// import set from 'lodash-es/set';
+import update from 'immutability-helper';
 import convert from '../../utils/conversion';
 
 export const normalizeValue = (value) => {
@@ -19,20 +20,28 @@ export const onChange = () => {
     return function onChange(ev) {
         let field = ev.target.getAttribute('data-field');
 
+        const change = (field, value) => {
+            this.setState((state) => (
+                update(state, {
+                    [field]: {
+                        $set: value,
+                    },
+                })
+            ));
+        }
+
         if (ev.target.type === 'checkbox') {
-            this.setState((state) => (set(cloneDeep(state), field, ev.target.checked)));
+            change(field, ev.target.checked);
             return;
         }
         if (ev.target.type === 'select-one') {
-            this.setState((state) => (set(cloneDeep(state), field, ev.target.value)));
+            change(field, ev.target.value);
             return;
         }
 
         let unit = ev.target.getAttribute('data-unit');
         if (unit) {
-            this.setState((state) => ({
-                displayUnits: { ...state.displayUnits, [field]: unit }
-            }));
+            change(`displayUnits.${field}`, unit);
             return;
         }
 
@@ -41,9 +50,9 @@ export const onChange = () => {
         let exponent = ev.target.getAttribute('data-exponent');
         let normalized = normalizeValue(ev.target.value);
         if (baseUnit !== currentUnit) {
-            this.setState((state) => (set(cloneDeep(state), field, convert(normalized, exponent || 1).from(currentUnit).to(baseUnit))));
+            change(field, convert(normalized, exponent || 1).from(currentUnit).to(baseUnit));
         } else {
-            this.setState((state) => (set(cloneDeep(state), field, normalized)));
+            change(field, normalized);
         }
     }
 }

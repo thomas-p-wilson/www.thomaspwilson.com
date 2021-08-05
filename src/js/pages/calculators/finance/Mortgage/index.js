@@ -1,6 +1,6 @@
 import React from 'react';
 import memoizeOne from 'memoize-one';
-import isEqual from 'lodash/isEqual';
+// import { isEqual } from 'lodash/es6';
 import classnames from 'classnames';
 import DimensionlessNumberField from '../../../../components/calculator/DimensionlessNumberField';
 import { onChange } from '../../common';
