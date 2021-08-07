@@ -12,6 +12,7 @@ function colorAtPoint([r1, g1, b1], [r2, g2, b2], percent) {
 
 export function useScrollableBackground(selector) {
     let sections = [];
+    let original;
 
     function scrollHandler() {
         const next = sections.find(([color, position]) => (position >= window.scrollY));
@@ -25,6 +26,7 @@ export function useScrollableBackground(selector) {
 
     useEffect(() => {
         // On mount
+        original = document.body.style.background;
         sections = Array.from(document.body.querySelectorAll(selector))
             .map((s) => ([
                 rgbToHsl(...rgbStringToNumericComponent(s.dataset.background)),
@@ -35,6 +37,7 @@ export function useScrollableBackground(selector) {
         scrollHandler();
         return () => {
             // Unmount
+            document.body.style.background = original;
             window.removeEventListener('scroll', scrollHandler);
         }
     });

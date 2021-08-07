@@ -103,65 +103,51 @@ const calculators = {
 }
 
 export default ({ match }) => (
-	<div className="calculators-page">
-		<div className="container">
-			{
-				Object.keys(calculators)
-					.reduce((result, category) => (
-						result
-							.concat(<h2>{ category }</h2>)
-							.concat(
-								<ul className="calculator-list">
-									{
-										calculators[category].map((inner) => (
-											<li>
-										        <ProgressiveImage name={ inner.title }
-										                smallSrc={ inner.image.small }
-										                largeSrc={ inner.image.large }
-										                aspect={ 63 }
-										                caption={(
-										                	<figcaption>
-										                		<a href={ `https://unsplash.com/${ inner.image.author.handle }?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge` }
-										                				target="_blank"
-										                				rel="noopener noreferrer"
-										                				title={ `Image by ${ inner.image.author.name } on Unsplash` }
-										                				className="btn btn-circle">
-												       				<span style="display:inline-block;padding:2px 3px">
-												       					<svg xmlns="http://www.w3.org/2000/svg" style="height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white" viewBox="0 0 32 32">
-												       						<title>{ `Image by ${ inner.image.author.name } on Unsplash` }</title>
-												       						<path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z" />
-											       						</svg>
-										       						</span>
-									       						</a>
-										                	</figcaption>
-									                	)}
-									                	wrapper={ Link }
-									                	wrapperProps={{
-									                		to: `${ match.path }/${ inner.path }`
-									                	}} />
-							                	<Link to={ `${ match.path }/${ inner.path }` }>
-													<h6>{ inner.title }</h6>
-													<small>{ inner.description }</small>
-												</Link>
-											</li>
-										))
-									}
-								</ul>
-							)
-					), [])
-			}
-
-			<p>This list is really small at the moment. But I have plans! Maybe it'll take a day. Maybe it'll take a year. But I have plans:</p>
-			<ul>
-				<li>Unit of measure conversions</li>
-				<li>Financial calculators</li>
-				<li>Physics calculators</li>
-				<li>Chemistry calculators</li>
-				<li>Other categories</li>
-				<li>Visualizations</li>
-				<li>Detailed explanations of how the calculations work</li>
-				<li>Android + iOS applications</li>
-			</ul>
-        </div>
+	<div className="list">
+		{
+			Object.keys(calculators)
+				.reduce((result, category) => (
+					result
+						.concat(<h2>{ category }</h2>)
+						.concat(
+							<ul className="calculator-list tiled">
+								{
+									calculators[category].map((inner) => (
+										<li className="card">
+											<ProgressiveImage name={ inner.title }
+													smallSrc={ inner.image.small }
+													largeSrc={ inner.image.large }
+													aspect={ 63 }
+													caption={(
+														<figcaption>
+															<a href={ `https://unsplash.com/${ inner.image.author.handle }?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge` }
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	title={ `Image by ${ inner.image.author.name } on Unsplash` }
+																	className="btn btn-circle">
+																<span style="display:inline-block;padding:2px 3px">
+																	<svg xmlns="http://www.w3.org/2000/svg" style="height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white" viewBox="0 0 32 32">
+																		<title>{ `Image by ${ inner.image.author.name } on Unsplash` }</title>
+																		<path d="M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z" />
+																	</svg>
+																</span>
+															</a>
+														</figcaption>
+													)}
+													wrapper={ Link }
+													wrapperProps={{
+														to: `${ match.path }/${ inner.path }`
+													}} />
+											<Link to={ `${ match.path }/${ inner.path }` }>
+												<h4>{ inner.title }</h4>
+												<small>{ inner.description }</small>
+											</Link>
+										</li>
+									))
+								}
+							</ul>
+						)
+				), [])
+		}
 	</div>
 );

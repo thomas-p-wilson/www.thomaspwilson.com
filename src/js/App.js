@@ -6,7 +6,7 @@ import Header from './components/layout/Header';
 
 import Home from './pages/Home';
 import Resume from './pages/Resume';
-const Calculators = React.lazy(() => import('./pages/Calculators'));
+const Calculator = React.lazy(() => import('./pages/Calculator'));
 
 export default () => (
     <BrowserRouter>
@@ -16,7 +16,7 @@ export default () => (
                 <Switch>
                     <Route path="/" exact component={ Home } />
                     <Route path="/cv" component={ Resume } />
-                    <Route path="/calculators" component={ Calculators } />
+                    <Route path="/calculators" component={ Calculator } />
                 </Switch>
             </Suspense>
         </main>

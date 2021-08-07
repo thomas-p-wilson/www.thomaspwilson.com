@@ -87,12 +87,24 @@ export default class UnitSelector extends React.Component {
                 }, []);
     }
 
+    renderDropdownComponent() {
+        return (
+            <div className={ classnames('dropdown-menu dropdown-menu-right', { show: this.state.open }) }
+                ref={ (ref) => { this.node = ref; } }>
+                <input type="search"  value={ this.state.search } onChange={ this.onSearch } placeholder="Search..." className="form-control" />
+                <span className="dropdown-divider" />
+                { this.renderUnits() }
+            </div>
+        )
+    }
+
     render() {
         const {
             unit,
             field,
             value,
-            number
+            number,
+            disabled,
         } = this.props;
         if (!unit) {
             return (<div />);
@@ -107,15 +119,10 @@ export default class UnitSelector extends React.Component {
                         aria-haspopup="true"
                         aria-expanded={ this.state.open }
                         onClick={ this.onToggle }
-                        disabled={ this.props.disabled }>
+                        disabled={ disabled }>
                     { obj.plural }{ obj.symbol ? ` (${ obj.symbol })` : '' }{ this.renderExponent() }
                 </button>
-                <div className={ classnames('dropdown-menu dropdown-menu-right', { show: this.state.open }) }
-                        ref={ (ref) => { this.node = ref; } }>
-                    <input type="search"  value={ this.state.search } onChange={ this.onSearch } placeholder="Search..." className="form-control" />
-                    <span className="dropdown-divider" />
-                    { this.renderUnits() }
-                </div>
+                { !disabled && this.renderDropdownComponent() }
             </React.Fragment>
         );
     }

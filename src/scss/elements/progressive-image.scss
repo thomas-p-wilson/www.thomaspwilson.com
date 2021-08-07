@@ -1,0 +1,27 @@
+.progressive-image {
+    .placeholder {
+        background-repeat: no-repeat;
+        background-size: cover;
+        display: block;
+        position: relative;
+        overflow: hidden;
+
+        img {
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: opacity 1s linear;
+
+            &.visible {
+                opacity: 1;
+            }
+        }
+        .small {
+            filter: blur(50px);
+            /* this is needed so Safari keeps sharp edges */
+            transform: scale(1);
+        }
+    }
+}

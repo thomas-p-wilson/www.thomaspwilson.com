@@ -1,0 +1,28 @@
+dl {
+	&.table {
+		align-items: center;
+		display: grid;
+		grid-template-columns: 10fr 90fr;
+
+		> dt,
+		> dd {
+			margin: 0;
+			padding: .5em;
+			vertical-align: middle;
+		}
+
+		> dt {
+			grid-column: 1;
+			text-align: right;
+		}
+
+		> dt + dd {
+			grid-column: 2;
+			padding: .5em;
+		}
+
+		> dd + dd {
+			grid-column: 1 / span 2;
+		}
+	}
+}
