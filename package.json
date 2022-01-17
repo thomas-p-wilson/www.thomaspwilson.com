@@ -1,0 +1,33 @@
+{
+  "private": true,
+  "name": "www.thomaspwilson.com",
+  "description": "Thomas Wilson's personal playground",
+  "version": "0.1.0",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "develop": "npx --node-arg '-r esm' gatsby develop -H 0.0.0.0",
+    "start": "npx --node-arg '-r esm' npm run develop",
+    "build": "npx --node-arg '-r esm' gatsby build",
+    "serve": "npx --node-arg '-r esm' gatsby serve",
+    "clean": "npx --node-arg '-r esm' gatsby clean",
+    "test": "jest ."
+  },
+  "dependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/plugin-proposal-decorators": "^7.16.7",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
+    "codecov": "^3.8.3",
+    "esm": "^3.2.25",
+    "gatsby-cli": "2.19.0",
+    "jest": "^27.4.7",
+    "react": "^17.0.2",
+    "typescript": "^4.5.4"
+  },
+  "devDependencies": {
+    "react-dom": "^17.0.2"
+  }
+}

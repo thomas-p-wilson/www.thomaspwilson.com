@@ -1,0 +1,13 @@
+{
+    "title": "Battery Storage",
+    "path": "battery-storage",
+    "description": "Battery bank configuration and storage capacity.",
+    "image": {
+        "small": "/img/calculators/battery-storage-sm.jpg",
+        "large": "/img/calculators/battery-storage-lg.jpg",
+        "author": {
+            "handle": "",
+            "name": ""
+        }
+    }
+}

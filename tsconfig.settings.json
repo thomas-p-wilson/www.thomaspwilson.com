@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "composite": true,
+
+    "target": "es2017",
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "lib": ["es2017"],
+
+		"jsx": "react",
+    "sourceMap": true,
+    "downlevelIteration": true,
+    "declaration": true,
+		"skipLibCheck": true,
+
+    "rootDir": "./packages",
+    "baseUrl": "./packages",
+    "outDir": "dist",
+    "paths": {
+      "@thomaspwilson/ui": ["components"],
+      "@thomaspwilson/react-calculator": ["calculator/src"]
+    }
+  },
+  "exclude": [
+    "dist",
+    "node_modules",
+    "**/*.spec.ts",
+    "**/*.ispec.ts"
+  ]
+}

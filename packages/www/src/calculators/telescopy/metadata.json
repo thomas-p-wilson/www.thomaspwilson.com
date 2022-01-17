@@ -1,0 +1,13 @@
+{
+    "title": "Telescopy",
+    "path": "telescopy",
+    "description": "Telescope design and fabrication parameters.",
+    "image": {
+        "small": "/img/calculators/telescope-sm.jpg",
+        "large": "/img/calculators/telescope-lg.jpg",
+        "author": {
+            "handle": "@robertosorin",
+            "name": "Roberto Sorin"
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "title": "Photovoltaic Bank Sizing",
+    "path": "photovoltaic",
+    "description": "Determine how many solar panels you need.",
+    "categories": ["other"],
+    "image": {
+        "small": "/img/calculators/photovoltaic-sm.jpg",
+        "large": "/img/calculators/photovoltaic-lg.jpg",
+        "author": {
+            "handle": "@nasa",
+            "name": "NASA"
+        }
+    }
+}

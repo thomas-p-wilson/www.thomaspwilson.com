@@ -1,0 +1,14 @@
+{
+    "title": "Mortgage",
+    "path": "finance/mortgage",
+    "description": "Calculate mortgage specifics.",
+    "categories": ["finance"],
+    "image": {
+        "small": "/img/calculators/mortgage-sm.jpg",
+        "large": "/img/calculators/mortgage-lg.jpg",
+        "author": {
+            "handle": "@f7photo",
+            "name": "Michael Longmire"
+        }
+    }
+}

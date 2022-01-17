@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "name": "@thomaspwilson/react-calculator",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "test:unit": "yarn jest .",
+    "test:coverage": "yarn codecov --disable=gcov"
+  },
+  "peerDependencies": {
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
+    "react": "^17.0.2",
+    "typescript": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "codecov": "^3.8.3",
+    "jest": "^27.4.7",
+    "ts-jest": "^27.1.3"
+  },
+  "dependencies": {
+    "decimal.js": "^10.3.1"
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "title": "Thermal Mass Storage",
+    "path": "thermal-mass",
+    "description": "Discover how much water you need to store energy.",
+    "categories": ["other"],
+    "image": {
+        "small": "/img/calculators/thermal-mass-sm.jpg",
+        "large": "/img/calculators/thermal-mass-lg.jpg",
+        "author": {
+            "handle": "@schackowshots",
+            "name": "Casey Schackow"
+        }
+    }
+}
