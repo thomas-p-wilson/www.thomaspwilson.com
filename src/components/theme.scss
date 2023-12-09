@@ -1,0 +1,61 @@
+$BRAND_DARK: #0084E6 !default;
+$BRAND: #009DFF !default;
+$BRAND_LIGHT: #009DFF99 !default;
+$INFO_DARK: #9FC2E6 !default;
+$INFO: #B8DBFF !default;
+$INFO_LIGHT: #B8DBFF80 !default;
+$WARN_DARK: #E66B00 !default;
+$WARN: #FF8400 !default;
+$WARN_LIGHT: #FF840099 !default;
+$ERROR_DARK: #BB220E !default;
+$ERROR: #D43B27 !default;
+$ERROR_LIGHT: #D43B27cc !default;
+$SUCCESS_DARK: #339637 !default;
+$SUCCESS: #4CAF50 !default;
+$SUCCESS_LIGHT: #4caf4fb2 !default;
+$TEXT: #354046 !default;
+$TEXT_LIGHT: #60696E !default;
+$TEXT_LIGHTER: #8E8E8E !default;
+$TEXT_MUTE: #BFC4C7 !default;
+$TEXT_WHITE: #FFFFFF !default;
+$GRAY_10: #354046 !default;
+$GRAY_20: #4A545A !default;
+$GRAY_30: #60696E !default;
+$GRAY_40: #777F83 !default;
+$GRAY_50: #8E9599 !default;
+$GRAY_60: #A7ACB0 !default;
+$GRAY_70: #BFC4C7 !default;
+$GRAY_80: #D9DCDE !default;
+$GRAY_90: #F3F5F6 !default;
+
+// OLD:
+// $CTA_COLOR: #1f6187;
+// $CTA_COLOR_LIGHT: #1f618785;
+// $CTA_COLOR_HOVER: #1a5475;
+// $CTA_COLOR_ALERT: #ff8400;
+// $CTA_COLOR_ALERT_HOVER: #e67802;
+// $ERROR_COLOR: rgb(255 0 0 / 50%);
+// $BLACK: #454543;
+// $WHITE: #fff;
+// $WHITE_HOVER: #fdfcfc;
+// $LIGHT_GREY: #d0d0d0;
+// $GREY: #e1e0e0;
+// $GREY_DISABLED: #ececec;
+// $BG_GREY: #f6f6f6;
+// $BG_GREY_HOVER: #dedede;
+// $BTN_HOVER: #1a5475;
+// $SIDE_BAR_ITEM_HOVER: #1a5475;
+// $DARKISH_GREEN: #1a5475;
+// $YELLOW: #fffb44;
+// $CTA_WARN: #d4ac27;
+// $CTA_WARN_HOVER: #e3c564;
+// $CTA_ERROR: #d43b27;
+// $CTA_ERROR_HOVER: #af3222;
+// $CTA_SUCCESS: #387192;
+// $CTA_GREEN: #4caf50;
+// $TEXT_MUTE: #999;
+
+%text-base {
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Angular Units",
+  "path": "angle",
+  "description": "Convert between units of angle.",
+  "image": {
+    "small": "/assets/img/calculators/angle-sm.jpg",
+    "large": "/assets/img/calculators/angle-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

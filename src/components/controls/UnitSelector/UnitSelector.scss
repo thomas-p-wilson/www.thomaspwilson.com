@@ -1,0 +1,9 @@
+.unit-selector {
+  &,
+  &:hover,
+  &:focus,
+  &:active {
+    border: 0;
+    outline: 0;
+  }
+}

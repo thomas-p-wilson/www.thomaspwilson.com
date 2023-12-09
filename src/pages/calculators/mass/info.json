@@ -1,0 +1,13 @@
+{
+  "title": "Units of Mass",
+  "path": "mass",
+  "description": "Convert between units of mass in several systems.",
+  "image": {
+    "small": "/assets/img/calculators/mass-sm.jpg",
+    "large": "/assets/img/calculators/mass-lg.jpg",
+    "author": {
+      "handle": "@victorfreitas",
+      "name": "Victor Freitas"
+    }
+  }
+}

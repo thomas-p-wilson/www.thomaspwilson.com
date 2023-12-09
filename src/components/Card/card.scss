@@ -1,0 +1,30 @@
+%card-base {
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 4px 0 rgba(0 0 0 / 10%);
+  box-sizing: border-box;
+  margin: 1rem 0;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.card {
+  @extend %card-base;
+
+  & & {
+    box-shadow: none;
+  }
+
+  &.unpadded {
+    padding: unset;
+  }
+
+  &.modal {
+    padding-top: 10px;
+  }
+
+  &.floating {
+    margin-top: 0;
+    box-shadow: 0 2px 29px -8px rgba(0 0 0 / 75%);
+  }
+}

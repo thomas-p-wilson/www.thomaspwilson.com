@@ -1,0 +1,13 @@
+{
+  "title": "Resistive Element Sizing",
+  "path": "resistive-element-sizing",
+  "description": "Determine the necessary size of a resistive heating element",
+  "image": {
+    "small": "/assets/img/calculators/resistive-element-sizing-sm.jpg",
+    "large": "/assets/img/calculators/resistive-element-sizing-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

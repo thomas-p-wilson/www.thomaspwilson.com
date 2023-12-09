@@ -1,0 +1,13 @@
+{
+  "title": "Parabolic Mirror Design",
+  "path": "parabolic-mirror",
+  "description": "Telescope mirror design and fabrication parameters.",
+  "image": {
+    "small": "/assets/img/calculators/telescope-sm.jpg",
+    "large": "/assets/img/calculators/telescope-lg.jpg",
+    "author": {
+      "handle": "@anniespratt",
+      "name": "Annie Spratt"
+    }
+  }
+}

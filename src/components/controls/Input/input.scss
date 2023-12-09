@@ -1,0 +1,28 @@
+@import '../../theme.scss';
+
+%input-base {
+  background-color: transparent;
+  border: 0;
+  box-sizing: border-box;
+  height: 40px;
+  outline: none;
+  padding: 11px 16px 12px 16px;
+  position: relative;
+  transition: border-color .3s ease-in-out;
+  width: 100%;
+
+  &::placeholder {
+    color: #454543;
+    opacity: 0.5;
+  }
+}
+
+input {
+  @extend %input-base;
+  @extend %text-base;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 11px 16px 12px 16px;
+  text-align: right;
+  width: 100%;
+}

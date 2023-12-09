@@ -1,0 +1,13 @@
+{
+  "title": "Units of Energy",
+  "path": "energy",
+  "description": "Convert between units of energy.",
+  "image": {
+    "small": "/assets/img/calculators/energy-sm.jpg",
+    "large": "/assets/img/calculators/energy-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

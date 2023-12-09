@@ -1,0 +1,9 @@
+@mixin large-and-up {
+    @at-root {
+        @media (min-width: 990px) {
+            & {
+                @content;
+            }
+        }
+    }
+}

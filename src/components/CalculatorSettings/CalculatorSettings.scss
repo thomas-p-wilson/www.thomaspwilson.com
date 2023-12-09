@@ -1,0 +1,32 @@
+@import '../theme.scss';
+
+.calculator-settings-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 1rem 0;
+
+  a {
+    padding: .5rem;
+  }
+
+  button {
+    background: none;
+    border: 1px solid $BRAND;
+    border-radius: 100px;
+    color: $BRAND;
+    margin: 0;
+    padding: .5rem 1rem;
+
+    &:active,
+    &:focus {
+      border-color: $BRAND_DARK;
+      color: $BRAND_DARK;
+      outline: none;
+    }
+  }
+}
+
+.calculator-settings-modal {
+
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Units of Length",
+  "path": "length",
+  "description": "Convert between units of length in several systems.",
+  "image": {
+    "small": "/assets/img/calculators/length-sm.jpg",
+    "large": "/assets/img/calculators/length-lg.jpg",
+    "author": {
+      "handle": "@sernarial",
+      "name": "Patricia Serna"
+    }
+  }
+}

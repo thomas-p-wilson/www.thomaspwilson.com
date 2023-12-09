@@ -1,0 +1,13 @@
+{
+  "title": "Solar Panels",
+  "path": "solar-panels",
+  "description": "Determine how many solar panels you need.",
+  "image": {
+    "small": "/assets/img/calculators/photovoltaic-sm.jpg",
+    "large": "/assets/img/calculators/photovoltaic-lg.jpg",
+    "author": {
+      "handle": "@nasa",
+      "name": "NASA"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Spin-Casting a paraboloid",
+  "path": "paraboloid-spin-casting",
+  "description": "Determine rotation needed to produce a paraboloid",
+  "image": {
+    "small": "/assets/img/calculators/spin-casting-paraboloid-sm.jpg",
+    "large": "/assets/img/calculators/spin-casting-paraboloid-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

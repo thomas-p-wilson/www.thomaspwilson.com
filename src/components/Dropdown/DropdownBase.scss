@@ -1,0 +1,42 @@
+@import '../theme.scss';
+
+.dropdown {
+  &-control {
+    // Rest
+    height: unset;
+    padding: unset;
+    display: flex;
+    position: relative;
+    flex-wrap: wrap;
+    padding-left: 16px;
+    padding-bottom: 6px;
+    padding-right: 32px;
+  }
+
+  &-content {
+    display: none;
+    max-height: 500px;
+    outline: none;
+    overflow-y: auto;
+    position: absolute !important;
+    z-index: 100;
+
+    &:after {
+      bottom: 100%;
+      right: 10%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+      border-color: rgba(255, 255, 255, 0);
+      border-bottom-color: #ffffff;
+      border-width: 10px;
+    }
+
+    &.open {
+      display: block;
+    }
+  }
+}
