@@ -1,13 +1,26 @@
-import { CalculatorContextProvider, CalculatorStateShape } from '@/components/CalculatorContext/CalculatorContext'
+import { CalculatorStateShape } from '@/components/CalculatorContext/CalculatorContext'
 import { ContextualInput } from '@/components/CalculatorControls/ContextualInput/ContextualInput';
 import { ContextualInputWithDimension } from '@/components/CalculatorControls/ContextualInputWithDimension/ContextualInputWithDimension'
-import { CalculatorSettings } from '@/components/CalculatorSettings/CalculatorSettings'
 import { ContextualPresetChooser } from '@/components/ContextualPresetChooser/ContextualPresetChooser';
 import { InputGroup } from '@/components/controls/InputGroup/InputGroup';
 import * as length from '@/units/length';
 import * as energy from '@/units/energy';
 import { decimal, pi } from '@/utils/decimal';
 import BigDecimal from 'decimal.js';
+import { Decimal } from '@/types/Decimal';
+
+// REFERENCE:
+// https://knifedogs.com/threads/heat-treat-oven-how-to-design-and-calculate-the-heating-elements.21072/
+
+/**
+ * Calculate the surface area of a cylinder. Note that the inputs should have
+ * the same unit of measure (ex metres, centimetres, etc).
+ * @param r The radius
+ * @param h The height
+ */
+const cylinderSurfaceArea = (r: Decimal, h: Decimal): Decimal => (
+  pi.times(2).times(r).times(h).add(pi.times(2).times(r.pow(2)))
+);
 
 export const resistanceWirePresets = [
   {
@@ -39,39 +52,51 @@ export const resistanceWirePresets = [
     },
   },
   {
+    // https://www.intaste.de/Kanthal-A1-resistance-wire-02mm-10mm-040-mm-26AWG
+    name: 'Kanthal A-1 18ga',
+    values: {
+      resistivity: decimal('1.8'), // Ohm/m
+      diameter: decimal('0.001'), // m
+    },
+  },
+  {
+    // https://www.intaste.de/Kanthal-A1-resistance-wire-02mm-10mm-040-mm-26AWG
     name: 'Kanthal A-1 20ga',
     values: {
-      resistivity: decimal('2.841535'),
-      diameter: decimal('0.000811784'),
+      resistivity: decimal('2.9'), // Ohm/m
+      diameter: decimal('0.0008'), // m
     },
   },
   {
+    // https://www.intaste.de/Kanthal-A1-resistance-wire-02mm-10mm-040-mm-26AWG
     name: 'Kanthal A-1 22ga',
     values: {
-      resistivity: decimal('4.533136'),
-      diameter: decimal('0.00064262'),
+      resistivity: decimal('5.1'), // Ohm/m
+      diameter: decimal('0.0006'), // m
     },
   },
   {
+    // https://www.intaste.de/Kanthal-A1-resistance-wire-02mm-10mm-040-mm-26AWG
     name: 'Kanthal A-1 24ga',
     values: {
-      resistivity: decimal('7.063648'),
-      diameter: decimal('0.00051054'),
+      resistivity: decimal('7.4'), // Ohm/m
+      diameter: decimal('0.0005'), // m
     },
   },
   {
+    // https://www.intaste.de/Kanthal-A1-resistance-wire-02mm-10mm-040-mm-26AWG
     name: 'Kanthal A-1 26ga',
     values: {
-      resistivity: decimal('11.463254'),
-      diameter: decimal('0.00040386'),
+      resistivity: decimal('11.5'), // Ohm/m
+      diameter: decimal('0.0004'), // m
     },
   },
   {
-    // https://www.masterwiresupply.com/mws-50-ft-28-gauge-kanthal-a1-round-wire/
+    // https://www.intaste.de/Kanthal-A1-resistance-wire-02mm-10mm-040-mm-26AWG
     name: 'Kanthal A-1 28ga',
     values: {
-      resistivity: decimal('17.2900268'),
-      diameter: decimal('0.00032'),
+      resistivity: decimal('20.5'), // Ohm/m
+      diameter: decimal('0.00032'), // m
     },
   },
 ]
@@ -114,6 +139,12 @@ export const ResistiveElementSizingInitialState: Partial<CalculatorStateShape> =
         return resistance.div(resistivity);
       }
     },
+    surface_area: ({ radius, length }: any) => {
+      if (radius && length) {
+        return cylinderSurfaceArea(radius, length);
+      }
+      return undefined;
+    },
     coil_diameter: ({ diameter }: any) => {
       if (diameter) {
         return diameter.times(12);
@@ -144,20 +175,18 @@ export const ResistiveElementSizingInitialState: Partial<CalculatorStateShape> =
         return turn_space.times(turns);
       }
     },
-    wire_surface_load: ({ wattage, diameter, length }: any) => {
-      if (wattage && diameter && length) {
-        const wattage_in_joules = wattage.times(3600);
-        return wattage_in_joules.div(diameter.times(pi).times(length)); // W/m^2
+    wire_surface_load: ({ wattage, radius, length }: any) => {
+      if (wattage && radius && length) {
+        const surfaceArea = cylinderSurfaceArea(radius, length);
+        return wattage.div(surfaceArea);
       }
     }
   }
 }
 
-export default () => {
+export const render = () => {
   return (
-    <CalculatorContextProvider initialState={ResistiveElementSizingInitialState}>
-      <CalculatorSettings />
-
+    <>
       <h1>Resistive Element Sizing</h1>
 
 
@@ -196,7 +225,10 @@ export default () => {
       <h3>Resistance Wire Properties</h3>
       <InputGroup>
         <label htmlFor="resistivity">Wire resistivity</label>
-        <ContextualPresetChooser choices={resistanceWirePresets} />
+        <ContextualPresetChooser
+          choices={resistanceWirePresets}
+          name="resistanceWirePreset"
+        />
         <ContextualInput
           name="resistivity"
         />
@@ -228,6 +260,14 @@ export default () => {
         label="Wire length"
         units={length}
         unit="metric-metre"
+        disabled
+      />
+      <ContextualInputWithDimension
+        name="surface_area"
+        label="Wire surface area"
+        units={length}
+        unit="metric-metre"
+        unitExponent={decimal(2)}
         disabled
       />
 
@@ -281,9 +321,9 @@ export default () => {
         units={energy}
         unit="metric-watt"
         dimensions={length}
-        dimension="metric-metre"
+        dimension="metric-centimetre"
         dimensionExponent={decimal(2)}
       />
-    </CalculatorContextProvider>
+    </>
   );
 }

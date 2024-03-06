@@ -89,7 +89,7 @@ export const NumberInput = <N extends boolean>({
 
     if (dimension && dimensions && dimension !== dimensions.reference) {
       console.log('Convert dimension: ', name, `(${result.toString()})`, ' from: ', dimensions.reference, ' to: ', dimension)
-      result = convert(dimensions.measure, result, dimensionExponent, dimensions.reference, dimension as any);
+      result = convert(dimensions.measure, result, dimensionExponent, dimensions.reference, dimension as any, true);
     }
 
     if (number) {

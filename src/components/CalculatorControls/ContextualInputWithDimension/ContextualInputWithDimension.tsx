@@ -1,9 +1,10 @@
 import { useCalculatorContext } from '@/components/CalculatorContext/CalculatorContext';
 import { Decimal } from '@/types/Decimal';
-import { useMemo } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { InputWithDimension, InputWithDimensionProps } from '@/components/controls/InputWithDimension/InputWithDimension';
 import { WithUnit } from '@/types/WithUnit';
 import { WithDimension } from '@/types/WithDimension';
+import { NamespaceContext } from '@/components/Namespace/Namespace';
 
 export type ContextualInputWithDimensionProps = WithUnit & WithDimension & {
   name: InputWithDimensionProps['name']
@@ -25,12 +26,18 @@ export const ContextualInputWithDimension = ({
   disabled,
 }: ContextualInputWithDimensionProps) => {
   const controller = useCalculatorContext();
+  const namespace = useContext(NamespaceContext);
 
   const _unit = controller.units[name] ?? unit;
   const _dimension = controller.dimensions[name] ?? dimension;
+
   const _value = useMemo(() => (
-    controller.getValue(name) ?? defaultValue
-  ), [controller.values, controller.calculations]);
+    controller.getValue(name, namespace) ?? defaultValue
+  ), [controller.getValue]);
+
+  const setValue = useCallback((name: string, value: Decimal) => {
+    controller.setValue(name, value, namespace);
+  }, [controller.setValue, namespace]);
 
   return (
     <InputWithDimension
@@ -44,7 +51,7 @@ export const ContextualInputWithDimension = ({
       dimensions={dimensions}
       dimension={_dimension}
       dimensionExponent={dimensionExponent}
-      onChange={controller.setValue}
+      onChange={setValue}
       onChangeUnit={controller.setUnit}
       onChangeDimension={controller.setDimension}
       disabled={disabled}

@@ -1,26 +1,29 @@
 import { useCallback } from 'react';
 import { useCalculatorContext } from '../CalculatorContext/CalculatorContext'
 import { PresetChooser, PresetChooserProps } from '../PresetChooser/PresetChooser';
-import Decimal from 'decimal.js';
 
 export type ContextualPresetChooserProps = {
   choices: PresetChooserProps['choices']
+  name: string
 }
 
 export const ContextualPresetChooser = ({
   choices,
+  name: _name,
 }: ContextualPresetChooserProps) => {
   const controller = useCalculatorContext();
 
-  const onSelect = useCallback((values: { [k: string]: Decimal }) => {
-    Object.keys(values).forEach((name) => {
-      console.log('Set: ', name, values[name])
-      controller.setValue(name, values[name]!)
+  const onSelect = useCallback((name: string) => {
+    controller.setValue(_name, name as any);
+    const choice = choices.find((c) => (c.name === name));
+    Object.keys(choice!.values).forEach((name) => {
+      controller.setValue(name, choice!.values[name]!)
     })
   }, []);
 
   return (
     <PresetChooser
+      choice={controller.getValue(_name) as any}
       choices={choices}
       onSelect={onSelect}
     />

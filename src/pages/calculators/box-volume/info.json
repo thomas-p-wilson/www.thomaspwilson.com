@@ -1,0 +1,13 @@
+{
+  "title": "Box Volume",
+  "path": "box-volume",
+  "description": "Determine the volume of a box",
+  "image": {
+    "small": "/assets/img/calculators/box-volume-sm.jpg",
+    "large": "/assets/img/calculators/box-volume-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

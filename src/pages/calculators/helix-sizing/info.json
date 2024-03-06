@@ -1,0 +1,13 @@
+{
+  "title": "Helix Dimensions",
+  "path": "helix-dimensions",
+  "description": "Determine the dimensions of a helix",
+  "image": {
+    "small": "/assets/img/calculators/helix-dimensions-sm.jpg",
+    "large": "/assets/img/calculators/helix-dimensions-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

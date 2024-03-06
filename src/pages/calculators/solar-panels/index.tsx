@@ -1,11 +1,10 @@
-import { CalculatorContextProvider, CalculatorStateShape } from '@/components/CalculatorContext/CalculatorContext';
+import { CalculatorStateShape } from '@/components/CalculatorContext/CalculatorContext';
 import { decimal } from '@/utils/decimal';
-import { CalculatorSettings } from '@/components/CalculatorSettings/CalculatorSettings';
 import { ContextualInputWithDimension } from '@/components/CalculatorControls/ContextualInputWithDimension/ContextualInputWithDimension';
 import * as energy from '@/units/energy';
 import * as time from '@/units/time';
 
-export const initialState: Partial<CalculatorStateShape> = {
+export const state: Partial<CalculatorStateShape> = {
   values: {
     daily_demand: decimal(30000), // Wh
     insolation: decimal(5),
@@ -42,11 +41,9 @@ export const initialState: Partial<CalculatorStateShape> = {
   }
 }
 
-export default () => {
+export const render = () => {
   return (
-    <CalculatorContextProvider initialState={initialState}>
-      <CalculatorSettings />
-
+    <>
       <h1>Sizing a bank of solar panels</h1>
       <p>Determine the approximate total capacity needed to produce energy for a given period of time.</p>
 
@@ -104,6 +101,6 @@ export default () => {
         label="Total cost"
         disabled
       />
-    </CalculatorContextProvider>
+    </>
   )
 }

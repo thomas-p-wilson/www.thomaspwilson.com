@@ -47,21 +47,5 @@ export type Unit = {
   /**
    * The amount to multiply by to get to the base unit
    */
-  multiplier?: Decimal
-  /**
-   * The amount to add/subtract to get to the base unit
-   */
-  shift?: Decimal
-  /**
-   * A function to convert from the current unit to the reference unit
-   * @param val The value in the current unit to convert
-   * @returns The value in the reference unit
-   */
-  toReference?: (val: Decimal) => Decimal
-  /**
-   * A function to convert from the reference unit to the current unit
-   * @param val The value in the reference unit to convert
-   * @returns The value in the current unit to convert
-   */
-  fromReference?: (val: Decimal) => Decimal
+  multiplier: Decimal
 }

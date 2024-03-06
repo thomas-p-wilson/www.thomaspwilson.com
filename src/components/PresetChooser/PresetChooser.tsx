@@ -9,8 +9,9 @@ export type PresetChoice = {
 };
 
 export type PresetChooserProps = {
+  choice?: string
   choices: Array<PresetChoice>
-  onSelect: (values: { [k: string]: Decimal }) => void
+  onSelect: (name: string) => void
 }
 
 export type PresetChoiceItemProps = PresetChoice & {
@@ -23,7 +24,7 @@ export const PresetChoiceItem = ({
   onSelect,
 }: PresetChoiceItemProps) => {
   const _onSelect = useCallback(() => {
-    onSelect(values);
+    onSelect(name);
   }, []);
   return (
     <li onClick={_onSelect}>
@@ -38,6 +39,7 @@ export const PresetChoiceItem = ({
 }
 
 export const PresetChooser = ({
+  choice,
   choices,
   onSelect,
 }: PresetChooserProps) => {
@@ -48,14 +50,15 @@ export const PresetChooser = ({
   const onClose = useCallback(() => {
     setOpen(false);
   }, []);
-  const _onSelect = useCallback((values: { [k: string]: Decimal }) => {
+  const _onSelect = useCallback((name: string) => {
     setOpen(false);
-    onSelect(values);
+    onSelect(name);
   }, [])
 
   return (
     <>
       <button onClick={onOpen} className="btn preset-chooser-btn">Presets</button>
+      {choice && (<abbr>{choice}</abbr>)}
       {open && (
         <PortalModal onClose={onClose} className="preset-chooser">
           <ul>

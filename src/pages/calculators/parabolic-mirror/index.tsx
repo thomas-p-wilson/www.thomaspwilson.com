@@ -1,6 +1,5 @@
-import { CalculatorContextProvider, CalculatorStateShape } from '@/components/CalculatorContext/CalculatorContext';
+import { CalculatorStateShape } from '@/components/CalculatorContext/CalculatorContext';
 import { decimal, pi } from '@/utils/decimal';
-import { CalculatorSettings } from '@/components/CalculatorSettings/CalculatorSettings';
 import { ContextualInputWithDimension } from '@/components/CalculatorControls/ContextualInputWithDimension/ContextualInputWithDimension';
 import { InputGroup } from '@/components/controls/InputGroup/InputGroup';
 import { ContextualInput } from '@/components/CalculatorControls/ContextualInput/ContextualInput';
@@ -10,7 +9,7 @@ import * as mass from '@/units/mass';
 
 // https://www.bbastrodesigns.com/sagitta.html
 
-export const SpinCastingParabolaInitialState: Partial<CalculatorStateShape> = {
+export const state: Partial<CalculatorStateShape> = {
   values: {
     diameter: decimal(0.4), // 40 cm
     focal_length: decimal(1.2), // 3x the diameter
@@ -117,11 +116,9 @@ export const SpinCastingParabolaInitialState: Partial<CalculatorStateShape> = {
   }
 }
 
-export default () => {
+export const render = () => {
   return (
-    <CalculatorContextProvider initialState={SpinCastingParabolaInitialState}>
-      <CalculatorSettings />
-
+    <>
       <h1>Paraboloidal Mirror Design</h1>
 
       <p>Supports spherical or paraboloidal mirrors, ground blank and meniscus construction.</p>
@@ -241,6 +238,6 @@ export default () => {
         units={mass}
         unit="metric-kilogram"
       />
-    </CalculatorContextProvider>
+    </>
   )
 }

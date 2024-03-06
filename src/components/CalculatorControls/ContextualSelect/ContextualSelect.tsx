@@ -23,7 +23,7 @@ export const ContextualSelect = ({
     }
 
     return result;
-  }, [controller.values]);
+  }, [controller.getValue]);
 
   return (
     <Select

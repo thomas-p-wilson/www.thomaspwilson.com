@@ -1,0 +1,11 @@
+.nested-calculator {
+  border: 1px solid lightskyblue;
+  border-radius: 8px;
+  padding: 1em;
+  background: rgb(228, 248, 255);
+
+  .input-group + .input-group {
+    border-bottom-width: 0;
+    border-top: 1px solid lightskyblue;
+  }
+}

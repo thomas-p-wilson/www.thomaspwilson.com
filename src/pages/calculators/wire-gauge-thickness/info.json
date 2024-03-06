@@ -1,0 +1,13 @@
+{
+  "title": "Wire Gauge Thickness",
+  "path": "wire-gauge-thickness",
+  "description": "Determine the wire thickness from B&S gauge",
+  "image": {
+    "small": "/assets/img/calculators/wire-gauge-thickness-sm.jpg",
+    "large": "/assets/img/calculators/wire-gauge-thickness-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

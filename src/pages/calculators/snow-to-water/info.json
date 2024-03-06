@@ -1,0 +1,13 @@
+{
+  "title": "Snow to Water",
+  "path": "snow-to-water",
+  "description": "Determine how much water is in a volume of snow",
+  "image": {
+    "small": "/assets/img/calculators/snow-to-water-sm.jpg",
+    "large": "/assets/img/calculators/snow-to-water-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

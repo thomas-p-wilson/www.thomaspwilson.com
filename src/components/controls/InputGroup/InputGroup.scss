@@ -1,5 +1,4 @@
 .input-group {
-  border-bottom: 1px solid #f0f0f0;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -10,8 +9,8 @@
   label {
     margin: 0;
   }
-}
 
-li:last-child .input-group {
-  border-bottom-width: 0;
+  & + & {
+    border-top: 1px solid #f0f0f0;
+  }
 }

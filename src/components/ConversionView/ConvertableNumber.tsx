@@ -1,10 +1,10 @@
 import { useCalculatorContext } from '@/components/CalculatorContext/CalculatorContext';
 import { Decimal } from '@/types/Decimal';
 import { MeasureFile } from '@/units/MeasureFile';
-import { convert } from '@/utils/Converter';
 import { useCallback, useMemo } from 'react';
 import { NumberInput, NumberInputProps } from '../controls/NumberInput/NumberInput';
 import { decimal } from '@/utils/decimal';
+import { convert } from '@/utils/convert';
 
 const name = 'value';
 
@@ -30,7 +30,7 @@ export const ConvertibleNumber = ({
   const controller = useCalculatorContext();
 
   const onChange = useCallback((name: string, value: Decimal) => {
-    controller.setValue(name, typeof value !== 'undefined' ? convert(measure.measure, value, decimal(1)).from(unit).to(base) : value);
+    controller.setValue(name, typeof value !== 'undefined' ? convert(measure.measure, value, decimal(1), unit, base) : value);
   }, [])
 
   const _value: Decimal | undefined = useMemo(() => {
@@ -46,7 +46,7 @@ export const ConvertibleNumber = ({
     }
 
     if (base !== unit) {
-      result = convert(measure.measure, result, decimal(1)).from(base).to(unit);
+      result = convert(measure.measure, result, decimal(1), base, unit);
     }
 
     return result;

@@ -1,0 +1,13 @@
+{
+  "title": "Cylinder Surface Area",
+  "path": "cylinder-surface-area",
+  "description": "Determine the surface area of a cylinder",
+  "image": {
+    "small": "/assets/img/calculators/cylinder-surface-area-sm.jpg",
+    "large": "/assets/img/calculators/cylinder-surface-area-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

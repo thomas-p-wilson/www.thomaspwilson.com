@@ -1,0 +1,13 @@
+{
+  "title": "Circumference",
+  "path": "circumference",
+  "description": "Determine the circumference of a circle",
+  "image": {
+    "small": "/assets/img/calculators/circumference-sm.jpg",
+    "large": "/assets/img/calculators/circumference-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

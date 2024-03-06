@@ -1,7 +1,9 @@
 import { useCalculatorContext } from '@/components/CalculatorContext/CalculatorContext';
-import { useMemo } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { NumberInput, NumberInputProps } from '@/components/controls/NumberInput/NumberInput';
 import { UnitSelectorProps } from '@/components/controls/UnitSelector/UnitSelector';
+import { NamespaceContext } from '@/components/Namespace/Namespace';
+import { Decimal } from '@/types/Decimal';
 
 export type ContextualInputProps = {
   name: NumberInputProps<any>['name']
@@ -17,10 +19,15 @@ export const ContextualInput = ({
   disabled,
 }: ContextualInputProps) => {
   const controller = useCalculatorContext();
+  const namespace = useContext(NamespaceContext);
 
   const _value = useMemo(() => (
-    controller.getValue(name)
-  ), [controller.values]);
+    controller.getValue(name, namespace)
+  ), [controller.getValue]);
+
+  const setValue = useCallback((name: string, value: Decimal) => {
+    controller.setValue(name, value, namespace);
+  }, [controller.setValue, namespace]);
 
   return (
     <NumberInput
@@ -28,7 +35,7 @@ export const ContextualInput = ({
       value={_value}
       units={units}
       unit={unit}
-      onChange={controller.setValue}
+      onChange={setValue}
       disabled={disabled}
     />
   );

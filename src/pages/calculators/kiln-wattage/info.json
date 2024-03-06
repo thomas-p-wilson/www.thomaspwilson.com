@@ -1,0 +1,13 @@
+{
+  "title": "Kiln Wattage",
+  "path": "kiln-wattage",
+  "description": "Determine the necessary wattage of a kiln",
+  "image": {
+    "small": "/assets/img/calculators/kiln-wattage-sm.jpg",
+    "large": "/assets/img/calculators/kiln-wattage-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}
