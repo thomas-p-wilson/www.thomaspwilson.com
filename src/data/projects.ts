@@ -1,12 +1,10 @@
 import { genericCalculatorSpecs } from "./calculator-specs";
 
-export type ProjectCategory = "calculators" | "save-editors" | "hobby-projects";
-
-export const categoryLabels: Record<ProjectCategory, string> = {
-  calculators: "Calculators",
-  "save-editors": "Save Editors",
-  "hobby-projects": "Hobby Projects",
-};
+// Calculators are the only project category with its own listing page under
+// this data model — Physical Projects and Gaming live in their own data
+// files (src/data/physical-projects.ts, src/data/gaming-projects.ts) since
+// they aren't calculator-shaped (no fields/formula to run).
+export type ProjectCategory = "calculators";
 
 interface BaseProject {
   id: string;
@@ -91,7 +89,4 @@ const genericCalculators: InternalProject[] = genericCalculatorSpecs.map((spec) 
   technologies: ["TypeScript"],
 }));
 
-// Room here for save-game editors (e.g. a Big Pharma save-file tool, built
-// in prior eras of this site), other hobby projects, and cards that just
-// link out to external repos/sites.
 export const projects: Project[] = [...bespokeCalculators, ...genericCalculators];

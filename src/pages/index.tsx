@@ -1,6 +1,9 @@
 import Layout from "./Layout";
 import Home from "./Home";
 import Projects from "./Projects";
+import CalculatorsList from "./projects/Calculators";
+import Physical from "./projects/Physical";
+import Gaming from "./projects/Gaming";
 import Resume from "./Resume";
 import UnitConverter from "./UnitConverter";
 import ResistiveElementSizing from "./ResistiveElementSizing";
@@ -29,6 +32,9 @@ export default function Pages() {
           <Route path="/" element={<Home />} />
           <Route path="/resume" element={<Resume />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/physical" element={<Physical />} />
+          <Route path="/projects/gaming" element={<Gaming />} />
+          <Route path="/projects/calculators" element={<CalculatorsList />} />
           <Route path="/projects/calculators/unit-converter" element={<UnitConverter />} />
           <Route path="/projects/calculators/resistive-element-sizing" element={<ResistiveElementSizing />} />
           <Route path="/projects/calculators/mortgage" element={<Mortgage />} />

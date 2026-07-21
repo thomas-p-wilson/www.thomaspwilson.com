@@ -13,11 +13,11 @@ export default function ResistiveElementSizing() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-8">
           <Link
-            to="/projects"
+            to="/projects/calculators"
             className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Projects
+            Back to Calculators
           </Link>
         </div>
 
