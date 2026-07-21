@@ -21,7 +21,7 @@ export default function Layout({ children }: LayoutProps) {
     href === "/" ? location.pathname === "/" : location.pathname.toLowerCase().startsWith(href);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex justify-between items-center py-4">
@@ -83,7 +83,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </nav>
 
-      <main className="relative">{children}</main>
+      <main className="relative flex-1">{children}</main>
 
       <footer className="bg-slate-50 border-t border-slate-200">
         <div className="max-w-6xl mx-auto px-6 py-12">
