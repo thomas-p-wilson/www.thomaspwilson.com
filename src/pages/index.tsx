@@ -4,6 +4,11 @@ import Projects from "./Projects";
 import Resume from "./Resume";
 import UnitConverter from "./UnitConverter";
 import ResistiveElementSizing from "./ResistiveElementSizing";
+import Mortgage from "./calculators/Mortgage";
+import Retirement from "./calculators/Retirement";
+import Telescope from "./calculators/Telescope";
+import CalculatorPage from "@/components/calculators/CalculatorPage";
+import { genericCalculatorSpecs } from "@/data/calculator-specs";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 export default function Pages() {
@@ -16,6 +21,16 @@ export default function Pages() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/calculators/unit-converter" element={<UnitConverter />} />
           <Route path="/projects/calculators/resistive-element-sizing" element={<ResistiveElementSizing />} />
+          <Route path="/projects/calculators/mortgage" element={<Mortgage />} />
+          <Route path="/projects/calculators/retirement" element={<Retirement />} />
+          <Route path="/projects/calculators/telescope-mirror" element={<Telescope />} />
+          {genericCalculatorSpecs.map((spec) => (
+            <Route
+              key={spec.slug}
+              path={`/projects/calculators/${spec.slug}`}
+              element={<CalculatorPage spec={spec} />}
+            />
+          ))}
         </Routes>
       </Layout>
     </Router>

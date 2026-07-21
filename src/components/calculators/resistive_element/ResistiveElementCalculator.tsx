@@ -100,10 +100,9 @@ export default function ResistiveElementCalculator({ activeField, setActiveField
 
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
 
-  const calculate = useCallback(() => {
-    setValues((prev) => {
-      const newValues = { ...prev };
-      const { voltage, wattage, resistivity, diameter, meanCoilDiameter, turnSpacing } = newValues;
+  const calculate = useCallback((prev: ResistiveElementValues): ResistiveElementValues => {
+    const newValues = { ...prev };
+    const { voltage, wattage, resistivity, diameter, meanCoilDiameter, turnSpacing } = newValues;
 
       // --- Electrical ---
       const V = parseFloat(voltage);
@@ -153,21 +152,21 @@ export default function ResistiveElementCalculator({ activeField, setActiveField
         newValues.coilLength = L_coil.toFixed(3);
       }
 
-      return newValues;
-    });
+    return newValues;
   }, []);
 
   useEffect(() => {
-    calculate();
-  }, [calculate]);
+    setValues((prev) => calculate(prev));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (field: keyof ResistiveElementValues) => (e: ChangeEvent<HTMLInputElement>) => {
-    setValues((prev) => ({ ...prev, [field]: e.target.value }));
+    setValues((prev) => calculate({ ...prev, [field]: e.target.value }));
     setActiveField(field);
   };
 
   const handlePresetSelect = (preset: WirePreset) => {
-    setValues((prev) => ({
+    setValues((prev) => calculate({
       ...prev,
       resistivity: preset.resistivity.toString(),
       diameter: preset.diameter.toString(),
