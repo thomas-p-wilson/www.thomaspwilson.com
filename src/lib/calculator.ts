@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 export interface CalculatorFieldOption {
   value: string;
   label: string;
@@ -28,6 +30,8 @@ export interface CalculatorSpec {
   calculate: (values: Record<string, string>) => Record<string, string>;
   /** Constants/sources/simplifications worth surfacing under the calculator. */
   notes?: string[];
+  /** Optional diagram rendered above the input fields, given the current values. */
+  visual?: (values: Record<string, string>) => ReactNode;
 }
 
 export const num = (values: Record<string, string>, id: string): number => parseFloat(values[id]);

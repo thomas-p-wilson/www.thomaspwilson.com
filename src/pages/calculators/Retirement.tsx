@@ -42,7 +42,7 @@ export default function Retirement() {
   const rate = savingsRatePercent(parseFloat(net), parseFloat(expenses));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12">
+    <div className="bg-gradient-to-b from-slate-50 to-white py-12">
       <div className="max-w-4xl mx-auto px-6">
         <div className="mb-8">
           <Link to="/projects" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-6">

@@ -5,7 +5,7 @@ import UnitConverterComponent from "../components/calculators/UnitConverter";
 
 export default function UnitConverter() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12">
+    <div className="bg-gradient-to-b from-slate-50 to-white py-12">
       <div className="max-w-4xl mx-auto px-6">
         <div className="mb-8">
           <Link

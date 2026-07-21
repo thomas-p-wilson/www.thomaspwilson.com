@@ -39,7 +39,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
 
 export default function Projects() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="mb-8">
           <Link

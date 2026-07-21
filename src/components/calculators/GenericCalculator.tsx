@@ -14,6 +14,13 @@ export default function GenericCalculator({ spec }: { spec: CalculatorSpec }) {
 
   return (
     <div className="space-y-6">
+      {spec.visual && (
+        <Card>
+          <CardContent className="pt-6">
+            {spec.visual(values)}
+          </CardContent>
+        </Card>
+      )}
       {spec.sections.map((section) => (
         <Card key={section.title}>
           <CardHeader>

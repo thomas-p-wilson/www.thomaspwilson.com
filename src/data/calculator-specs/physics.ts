@@ -77,7 +77,22 @@ export const centrifugalForce: CalculatorSpec = {
   },
 };
 
-const materialDensities: Record<string, number> = { iron: 7850, water: 1000 }; // kg/m^3
+// kg/m^3. Real flywheel materials — the original source (origin/2020) oddly
+// offered "water" as an option, which doesn't work as a rigid rotating body.
+const materialDensities: Record<string, number> = {
+  steel: 7850,
+  cast_iron: 7200,
+  aluminum: 2700,
+  titanium: 4500,
+  lead: 11340,
+};
+const materialOptions = [
+  { value: "steel", label: "Steel" },
+  { value: "cast_iron", label: "Cast Iron" },
+  { value: "aluminum", label: "Aluminum" },
+  { value: "titanium", label: "Titanium" },
+  { value: "lead", label: "Lead" },
+];
 
 // Ported from origin/2020's flywheel calculator, converted to SI throughout.
 export const flywheel: CalculatorSpec = {
@@ -87,10 +102,7 @@ export const flywheel: CalculatorSpec = {
   sections: [{
     title: "Flywheel",
     fields: [
-      {
-        id: "material", label: "Material", type: "select",
-        options: [{ value: "iron", label: "Iron" }, { value: "water", label: "Water" }],
-      },
+      { id: "material", label: "Material", type: "select", options: materialOptions },
       { id: "configuration", label: "Configuration", type: "select", options: inertiaConfigurationOptions },
       { id: "radius", label: "Radius", unit: "m" },
       {
@@ -105,7 +117,7 @@ export const flywheel: CalculatorSpec = {
     ],
   }],
   defaults: {
-    material: "iron", configuration: "solid_cylinder",
+    material: "steel", configuration: "solid_cylinder",
     radius: "0.2", innerRadius: "0.1", height: "0.05", angularVelocity: "100",
   },
   calculate: (values) => {

@@ -9,11 +9,21 @@ import Retirement from "./calculators/Retirement";
 import Telescope from "./calculators/Telescope";
 import CalculatorPage from "@/components/calculators/CalculatorPage";
 import { genericCalculatorSpecs } from "@/data/calculator-specs";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 export default function Pages() {
   return (
     <Router>
+      <ScrollToTop />
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
