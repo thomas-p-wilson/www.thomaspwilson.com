@@ -12,6 +12,10 @@ Decimal.set({ precision: 40, rounding: 4 });
 // unit systems are curated rather than exhaustive — the most obscure ones
 // (Mint Weights, Dutch, Scottish, Hanseatic League, full English Pre-1826
 // catalog) are left out; "area" is skipped since no prior branch ever had it.
+// Note: `bar` and `torr` intentionally use the physically correct pascal
+// multipliers even though 2019/2020/2021/2021-rework unanimously agree on
+// values that are off by 1000x — that's a shared legacy bug, not a source
+// to follow.
 
 export type Measure =
   | "length"
@@ -78,6 +82,8 @@ const units: Unit[] = [
   linear("barleycorn", "Barleycorn", "length", new Decimal(1).div(3).times(INCH_M)),
   linear("hand", "Hand", "length", new Decimal(1).div(3).times(FOOT_M)),
   linear("cubit", "Cubit", "length", new Decimal("1.5").times(FOOT_M)),
+  linear("th", "Thou", "length", "0.0000254"),
+  linear("cable", "Cable", "length", "185.2"),
 
   // ---- Mass — base unit: gram ----
   linear("mg", "Milligram", "mass", "0.001"),
@@ -95,6 +101,12 @@ const units: Unit[] = [
   linear("oz-troy", "Ounce (Troy)", "mass", "31.1034768"),
   linear("lb-troy", "Pound (Troy)", "mass", "373.2417216"),
   linear("dr-apoth", "Dram (Apothecary)", "mass", "3.8879346"),
+  linear("dr", "Dram (Avoirdupois)", "mass", "1.77184519531"),
+  linear("scr", "Scruple (Apothecary)", "mass", "1.2959782"),
+  linear("qr", "Quarter (UK)", "mass", "12700.58636"),
+  linear("qr-us", "Quarter (US)", "mass", "11339.80925"),
+  linear("cwt-short", "Hundredweight (Short, US)", "mass", "45359.237"),
+  linear("st-troy", "Stone (Troy)", "mass", "5971.8675456"),
 
   // ---- Temperature — base unit: Celsius (affine) ----
   {
@@ -146,7 +158,11 @@ const units: Unit[] = [
   linear("pint", "Pint", "volume", "0.56826125"),
   linear("quart", "Quart", "volume", "1.1365225"),
   linear("gal", "Gallon", "volume", "4.54609"),
+  linear("mm3", "Cubic Millimeter", "volume", "1e-6"),
+  linear("km3", "Cubic Kilometer", "volume", "1e12"),
   linear("ft3", "Cubic Foot", "volume", "28.3168864564566"),
+  linear("in3", "Cubic Inch", "volume", "0.0163871"),
+  linear("yd3", "Cubic Yard", "volume", "764.555"),
 
   // ---- Energy — base unit: watt-hour ----
   linear("mWh", "Milliwatt-hour", "energy", "0.001"),

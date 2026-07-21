@@ -2,7 +2,19 @@ import { motion } from "framer-motion";
 import { Calculator as CalculatorIcon, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { projectPath, projects, type Project } from "@/data/projects";
+import { projectPath, projects, type Project, type ProjectGroup } from "@/data/projects";
+
+// Display order and labels for every group besides "featured" (the Unit
+// Converter, pinned above these). Add a case here when a new calculator
+// group is introduced in src/data/calculator-specs/index.ts.
+const GROUP_ORDER: Exclude<ProjectGroup, "featured">[] = ["geometry", "physics", "materials", "energy", "financial"];
+const GROUP_LABELS: Record<Exclude<ProjectGroup, "featured">, string> = {
+  geometry: "Geometry",
+  physics: "Physics & Mechanics",
+  materials: "Materials & Electrical",
+  energy: "Energy",
+  financial: "Financial",
+};
 
 const ProjectCard = ({ project }: { project: Project }) => {
   const card = (
@@ -28,6 +40,11 @@ const ProjectCard = ({ project }: { project: Project }) => {
 };
 
 export default function CalculatorsList() {
+  const featured = projects.filter((project) => project.group === "featured");
+  const sections = GROUP_ORDER
+    .map((group) => ({ group, label: GROUP_LABELS[group], items: projects.filter((project) => project.group === group) }))
+    .filter((section) => section.items.length > 0);
+
   return (
     <div className="bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-6xl mx-auto px-6 py-12">
@@ -58,16 +75,38 @@ export default function CalculatorsList() {
           </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <ProjectCard project={project} />
-            </motion.div>
+        <div className="space-y-14">
+          {featured.length > 0 && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featured.map((project) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <ProjectCard project={project} />
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {sections.map((section) => (
+            <div key={section.group}>
+              <h2 className="text-2xl font-semibold text-slate-900 mb-6">{section.label}</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {section.items.map((project) => (
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <ProjectCard project={project} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

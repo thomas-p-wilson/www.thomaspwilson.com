@@ -14,9 +14,9 @@ export const circleGeometry: CalculatorSpec = {
   sections: [{
     title: "Circle",
     fields: [
-      { id: "radius", label: "Radius", unit: "cm" },
-      { id: "diameter", label: "Diameter", unit: "cm", readOnly: true },
-      { id: "circumference", label: "Circumference", unit: "cm", readOnly: true },
+      { id: "radius", label: "Radius", unit: "cm", measure: "length" },
+      { id: "diameter", label: "Diameter", unit: "cm", measure: "length", readOnly: true },
+      { id: "circumference", label: "Circumference", unit: "cm", measure: "length", readOnly: true },
       { id: "area", label: "Area", unit: "cm²", readOnly: true },
     ],
   }],
@@ -42,11 +42,11 @@ export const circularSegment: CalculatorSpec = {
   sections: [{
     title: "Segment",
     fields: [
-      { id: "radius", label: "Radius", unit: "cm" },
-      { id: "chord", label: "Chord Length", unit: "cm" },
-      { id: "sagitta", label: "Sagitta (Height)", unit: "cm", readOnly: true },
-      { id: "angle", label: "Central Angle", unit: "rad", readOnly: true },
-      { id: "arc", label: "Arc Length", unit: "cm", readOnly: true },
+      { id: "radius", label: "Radius", unit: "cm", measure: "length" },
+      { id: "chord", label: "Chord Length", unit: "cm", measure: "length" },
+      { id: "sagitta", label: "Sagitta (Height)", unit: "cm", measure: "length", readOnly: true },
+      { id: "angle", label: "Central Angle", unit: "rad", measure: "angle", readOnly: true },
+      { id: "arc", label: "Arc Length", unit: "cm", measure: "length", readOnly: true },
       { id: "area", label: "Area", unit: "cm²", readOnly: true },
     ],
   }],
@@ -72,10 +72,10 @@ export const sphereGeometry: CalculatorSpec = {
   sections: [{
     title: "Sphere",
     fields: [
-      { id: "radius", label: "Radius", unit: "cm" },
-      { id: "diameter", label: "Diameter", unit: "cm", readOnly: true },
+      { id: "radius", label: "Radius", unit: "cm", measure: "length" },
+      { id: "diameter", label: "Diameter", unit: "cm", measure: "length", readOnly: true },
       { id: "surfaceArea", label: "Surface Area", unit: "cm²", readOnly: true },
-      { id: "volume", label: "Volume", unit: "cm³", readOnly: true },
+      { id: "volume", label: "Volume", unit: "cm3", measure: "volume", readOnly: true },
       { id: "svRatio", label: "Surface : Volume Ratio", readOnly: true },
     ],
   }],
@@ -104,11 +104,11 @@ export const sphericalCap: CalculatorSpec = {
   sections: [{
     title: "Cap",
     fields: [
-      { id: "radius", label: "Sphere Radius", unit: "cm" },
-      { id: "sagitta", label: "Cap Height (Sagitta)", unit: "cm" },
-      { id: "chord", label: "Base Chord", unit: "cm", readOnly: true },
+      { id: "radius", label: "Sphere Radius", unit: "cm", measure: "length" },
+      { id: "sagitta", label: "Cap Height (Sagitta)", unit: "cm", measure: "length" },
+      { id: "chord", label: "Base Chord", unit: "cm", measure: "length", readOnly: true },
       { id: "area", label: "Curved Surface Area", unit: "cm²", readOnly: true },
-      { id: "volume", label: "Volume", unit: "cm³", readOnly: true },
+      { id: "volume", label: "Volume", unit: "cm3", measure: "volume", readOnly: true },
     ],
   }],
   defaults: { radius: "20", sagitta: "3" },
@@ -134,10 +134,10 @@ export const boxVolume: CalculatorSpec = {
   sections: [{
     title: "Dimensions",
     fields: [
-      { id: "length", label: "Length", unit: "m" },
-      { id: "width", label: "Width", unit: "m" },
-      { id: "depth", label: "Depth", unit: "m" },
-      { id: "volume", label: "Volume", unit: "m³", readOnly: true },
+      { id: "length", label: "Length", unit: "m", measure: "length" },
+      { id: "width", label: "Width", unit: "m", measure: "length" },
+      { id: "depth", label: "Depth", unit: "m", measure: "length" },
+      { id: "volume", label: "Volume", unit: "m3", measure: "volume", readOnly: true },
     ],
   }],
   defaults: { length: "0.5", width: "0.75", depth: "0.25" },
@@ -149,6 +149,80 @@ export const boxVolume: CalculatorSpec = {
   visual: (values) => <BoxDiagram length={num(values, "length")} width={num(values, "width")} depth={num(values, "depth")} />,
 };
 
+// New — the paraboloidal counterpart to circularSegment, needed so Telescope Mirror Design can
+// delegate its paraboloidal sagitta the same way it delegates the spherical one.
+export const parabolicSegment: CalculatorSpec = {
+  slug: "parabolic-segment",
+  title: "Parabolic Segment",
+  description: "Sagitta and area of a parabolic segment from its focal length and chord length.",
+  sections: [{
+    title: "Segment",
+    fields: [
+      { id: "focalLength", label: "Focal Length", unit: "cm", measure: "length" },
+      { id: "chord", label: "Chord Length", unit: "cm", measure: "length" },
+      { id: "sagitta", label: "Sagitta (Height)", unit: "cm", measure: "length", readOnly: true },
+      { id: "area", label: "Area", unit: "cm²", readOnly: true },
+    ],
+  }],
+  defaults: { focalLength: "20", chord: "12" },
+  calculate: (values) => {
+    const f = num(values, "focalLength");
+    const c = num(values, "chord");
+    if (isNaN(f) || isNaN(c) || f <= 0 || c <= 0) return { ...values, sagitta: "", area: "" };
+    const sagitta = ((c / 2) * (c / 2)) / (4 * f);
+    const area = (2 / 3) * c * sagitta; // Archimedes' parabolic segment area formula: (2/3) * base * height.
+    return { ...values, sagitta: sagitta.toFixed(4), area: area.toFixed(4) };
+  },
+};
+
+// New — the paraboloidal counterpart to sphericalCap, needed so Telescope Mirror Design can
+// delegate its paraboloidal dish area/volume the same way it delegates the spherical one.
+export const paraboloidalCap: CalculatorSpec = {
+  slug: "paraboloidal-cap",
+  title: "Paraboloidal Cap",
+  description: "Curved surface area and volume of a paraboloidal cap from its base radius and height (sagitta).",
+  sections: [{
+    title: "Cap",
+    fields: [
+      { id: "radius", label: "Base Radius", unit: "cm", measure: "length" },
+      { id: "sagitta", label: "Cap Height (Sagitta)", unit: "cm", measure: "length" },
+      { id: "area", label: "Curved Surface Area", unit: "cm²", readOnly: true },
+      { id: "volume", label: "Volume", unit: "cm3", measure: "volume", readOnly: true },
+    ],
+  }],
+  defaults: { radius: "15", sagitta: "2" },
+  calculate: (values) => {
+    const a = num(values, "radius");
+    const h = num(values, "sagitta");
+    if (isNaN(a) || isNaN(h) || a <= 0 || h <= 0) return { ...values, area: "", volume: "" };
+    const area = Math.PI * a * a + ((Math.PI * a) / (6 * h * h)) * (Math.pow(a * a + 4 * h * h, 1.5) - Math.pow(a, 3));
+    const volume = (Math.PI * a * a * h) / 2;
+    return { ...values, area: area.toFixed(4), volume: volume.toFixed(4) };
+  },
+};
+
+// New — cylinderSurfaceArea's volume counterpart, needed so Telescope Mirror Design can
+// delegate its starting-blank-volume calculation instead of computing π·r²·h inline.
+export const cylinderVolume: CalculatorSpec = {
+  slug: "cylinder-volume",
+  title: "Cylinder Volume",
+  description: "Volume of a solid cylinder from its radius and height.",
+  sections: [{
+    title: "Cylinder",
+    fields: [
+      { id: "radius", label: "Radius", unit: "cm", measure: "length" },
+      { id: "height", label: "Height", unit: "cm", measure: "length" },
+      { id: "volume", label: "Volume", unit: "cm3", measure: "volume", readOnly: true },
+    ],
+  }],
+  defaults: { radius: "10", height: "3" },
+  calculate: (values) => {
+    const r = num(values, "radius"), h = num(values, "height");
+    if (isNaN(r) || isNaN(h)) return values;
+    return { ...values, volume: (Math.PI * r * r * h).toFixed(4) };
+  },
+};
+
 // Ported from origin/2024's cylinder-surface-area calculator.
 export const cylinderSurfaceArea: CalculatorSpec = {
   slug: "cylinder-surface-area",
@@ -157,9 +231,9 @@ export const cylinderSurfaceArea: CalculatorSpec = {
   sections: [{
     title: "Cylinder",
     fields: [
-      { id: "radius", label: "Radius", unit: "m" },
-      { id: "height", label: "Height", unit: "m" },
-      { id: "circumference", label: "Circumference", unit: "m", readOnly: true },
+      { id: "radius", label: "Radius", unit: "m", measure: "length" },
+      { id: "height", label: "Height", unit: "m", measure: "length" },
+      { id: "circumference", label: "Circumference", unit: "m", measure: "length", readOnly: true },
       { id: "surfaceArea", label: "Surface Area", unit: "m²", readOnly: true },
     ],
   }],

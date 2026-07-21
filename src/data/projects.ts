@@ -1,4 +1,4 @@
-import { genericCalculatorSpecs } from "./calculator-specs";
+import { genericCalculatorSpecs, type CalculatorGroup } from "./calculator-specs";
 
 // Calculators are the only project category with its own listing page under
 // this data model — Physical Projects and Gaming live in their own data
@@ -6,11 +6,16 @@ import { genericCalculatorSpecs } from "./calculator-specs";
 // they aren't calculator-shaped (no fields/formula to run).
 export type ProjectCategory = "calculators";
 
+// How the calculators listing page groups its cards. "featured" is reserved
+// for the Unit Converter, pinned above the topical groups.
+export type ProjectGroup = CalculatorGroup | "featured";
+
 interface BaseProject {
   id: string;
   title: string;
   description: string;
   category: ProjectCategory;
+  group: ProjectGroup;
   technologies: string[];
 }
 
@@ -38,6 +43,7 @@ const bespokeCalculators: InternalProject[] = [
     title: "Unit Converter",
     description: "Convert between length, mass, temperature, volume, energy, power, time, frequency, pressure, and angle — including several historical/surveying units.",
     category: "calculators",
+    group: "featured",
     slug: "unit-converter",
     technologies: ["TypeScript", "decimal.js"],
   },
@@ -47,6 +53,7 @@ const bespokeCalculators: InternalProject[] = [
     title: "Resistive Element Sizing",
     description: "Calculate the physical properties of a resistive heating element from electrical targets.",
     category: "calculators",
+    group: "materials",
     slug: "resistive-element-sizing",
     technologies: ["TypeScript"],
   },
@@ -56,6 +63,7 @@ const bespokeCalculators: InternalProject[] = [
     title: "Mortgage Calculator",
     description: "Full amortization schedule with payment-frequency options and rate changes at each renewal term.",
     category: "calculators",
+    group: "financial",
     slug: "mortgage",
     technologies: ["TypeScript"],
   },
@@ -65,17 +73,9 @@ const bespokeCalculators: InternalProject[] = [
     title: "Retirement Calculator",
     description: "Projects when investment income alone can cover expenses, with an inflation-adjusted comparison chart.",
     category: "calculators",
+    group: "financial",
     slug: "retirement",
     technologies: ["TypeScript", "Recharts"],
-  },
-  {
-    kind: "internal",
-    id: "telescope-mirror",
-    title: "Telescope Mirror Design",
-    description: "Sagitta, dish geometry, and blank mass for a spherical or paraboloidal primary mirror, plus spin-casting speed.",
-    category: "calculators",
-    slug: "telescope-mirror",
-    technologies: ["TypeScript"],
   },
 ];
 
@@ -85,6 +85,7 @@ const genericCalculators: InternalProject[] = genericCalculatorSpecs.map((spec) 
   title: spec.title,
   description: spec.description,
   category: "calculators",
+  group: spec.group,
   slug: spec.slug,
   technologies: ["TypeScript"],
 }));

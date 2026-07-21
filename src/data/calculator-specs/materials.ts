@@ -10,7 +10,7 @@ export const wireGauge: CalculatorSpec = {
     title: "Wire",
     fields: [
       { id: "gauge", label: "AWG Gauge", unit: "AWG" },
-      { id: "diameter", label: "Diameter", unit: "m", readOnly: true },
+      { id: "diameter", label: "Diameter", unit: "m", measure: "length", readOnly: true },
       { id: "area", label: "Cross-sectional Area", unit: "m²", readOnly: true },
       { id: "cmil", label: "Area", unit: "cmil", readOnly: true },
     ],
@@ -39,12 +39,12 @@ export const helixSizing: CalculatorSpec = {
   sections: [{
     title: "Coil",
     fields: [
-      { id: "length", label: "Wire Length", unit: "m" },
-      { id: "coilDiameter", label: "Coil Diameter", unit: "mm" },
-      { id: "turnSpacing", label: "Turn Spacing", unit: "mm" },
-      { id: "turnCircumference", label: "Turn Circumference", unit: "mm", readOnly: true },
+      { id: "length", label: "Wire Length", unit: "m", measure: "length" },
+      { id: "coilDiameter", label: "Coil Diameter", unit: "mm", measure: "length" },
+      { id: "turnSpacing", label: "Turn Spacing", unit: "mm", measure: "length" },
+      { id: "turnCircumference", label: "Turn Circumference", unit: "mm", measure: "length", readOnly: true },
       { id: "turns", label: "Turns", readOnly: true },
-      { id: "coilLength", label: "Coil Length", unit: "mm", readOnly: true },
+      { id: "coilLength", label: "Coil Length", unit: "mm", measure: "length", readOnly: true },
     ],
   }],
   defaults: { length: "1", coilDiameter: "12", turnSpacing: "3" },
@@ -75,11 +75,11 @@ export const kilnWattage: CalculatorSpec = {
   sections: [{
     title: "Chamber",
     fields: [
-      { id: "chamberHeight", label: "Chamber Height", unit: "m" },
-      { id: "chamberDiameter", label: "Chamber Diameter", unit: "m" },
+      { id: "chamberHeight", label: "Chamber Height", unit: "m", measure: "length" },
+      { id: "chamberDiameter", label: "Chamber Diameter", unit: "m", measure: "length" },
       { id: "wattsPerUnitArea", label: "Target Power Density", unit: "W/m²" },
       { id: "chamberSurfaceArea", label: "Chamber Surface Area", unit: "m²", readOnly: true },
-      { id: "totalWattage", label: "Total Wattage", unit: "W", readOnly: true },
+      { id: "totalWattage", label: "Total Wattage", unit: "W", measure: "power", readOnly: true },
     ],
   }],
   defaults: { chamberHeight: "0.21", chamberDiameter: "0.71", wattsPerUnitArea: "8500" },
@@ -99,6 +99,31 @@ export const kilnWattage: CalculatorSpec = {
   notes: ["Reference: https://knifedogs.com/threads/heat-treat-oven-how-to-design-and-calculate-the-heating-elements.21072/"],
 };
 
+// New — generic mass-from-volume-and-density calculator, needed so Telescope Mirror Design can
+// delegate its blank/remaining mass calculations instead of computing volume × density inline.
+// Density has no dedicated Measure in lib/units.ts (only its component units do), so it's a plain
+// fixed-unit field rather than a convertible one — same treatment as kilnWattage's power density.
+export const materialMass: CalculatorSpec = {
+  slug: "material-mass",
+  title: "Mass from Volume & Density",
+  description: "Mass of a material from its volume and density.",
+  sections: [{
+    title: "Material",
+    fields: [
+      { id: "volume", label: "Volume", unit: "cm3", measure: "volume" },
+      { id: "density", label: "Density", unit: "g/cm³" },
+      { id: "mass", label: "Mass", unit: "g", measure: "mass", readOnly: true },
+    ],
+  }],
+  defaults: { volume: "100", density: "2.579" },
+  calculate: (values) => {
+    const volume = num(values, "volume");
+    const density = num(values, "density");
+    if (isNaN(volume) || isNaN(density)) return values;
+    return { ...values, mass: (volume * density).toFixed(2) };
+  },
+};
+
 // Ported from origin/2019/2021/2021-rework/2022's thermal-mass-storage
 // calculator (identical across all four branches).
 export const thermalMassStorage: CalculatorSpec = {
@@ -108,13 +133,13 @@ export const thermalMassStorage: CalculatorSpec = {
   sections: [{
     title: "Storage",
     fields: [
-      { id: "capacity", label: "Energy Capacity", unit: "J" },
-      { id: "absolutePressure", label: "Absolute Pressure", unit: "psi" },
-      { id: "depletedTemperature", label: "Depleted Temperature", unit: "K" },
-      { id: "boilingPoint", label: "Boiling Point at Pressure", unit: "K", readOnly: true },
-      { id: "massRequired", label: "Water Mass Required", unit: "g", readOnly: true },
-      { id: "volume", label: "Volume", unit: "L", readOnly: true },
-      { id: "burstPressure", label: "Vessel Pressure at Boiling Point", unit: "Pa", readOnly: true },
+      { id: "capacity", label: "Energy Capacity", unit: "J", measure: "energy" },
+      { id: "absolutePressure", label: "Absolute Pressure", unit: "psi", measure: "pressure" },
+      { id: "depletedTemperature", label: "Depleted Temperature", unit: "K", measure: "temperature" },
+      { id: "boilingPoint", label: "Boiling Point at Pressure", unit: "K", measure: "temperature", readOnly: true },
+      { id: "massRequired", label: "Water Mass Required", unit: "g", measure: "mass", readOnly: true },
+      { id: "volume", label: "Volume", unit: "L", measure: "volume", readOnly: true },
+      { id: "burstPressure", label: "Vessel Pressure at Boiling Point", unit: "Pa", measure: "pressure", readOnly: true },
     ],
   }],
   defaults: { capacity: "720000000", absolutePressure: "14.696", depletedTemperature: "308.15" },

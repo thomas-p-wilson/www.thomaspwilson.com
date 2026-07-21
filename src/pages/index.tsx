@@ -9,9 +9,10 @@ import UnitConverter from "./UnitConverter";
 import ResistiveElementSizing from "./ResistiveElementSizing";
 import Mortgage from "./calculators/Mortgage";
 import Retirement from "./calculators/Retirement";
-import Telescope from "./calculators/Telescope";
 import CalculatorPage from "@/components/calculators/CalculatorPage";
+import PhysicalProjectPage from "./projects/PhysicalProjectPage";
 import { genericCalculatorSpecs } from "@/data/calculator-specs";
+import { physicalProjects } from "@/data/physical-projects";
 import { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 
@@ -33,13 +34,19 @@ export default function Pages() {
           <Route path="/resume" element={<Resume />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/physical" element={<Physical />} />
+          {physicalProjects.map((project) => (
+            <Route
+              key={project.slug}
+              path={`/projects/physical/${project.slug}`}
+              element={<PhysicalProjectPage project={project} />}
+            />
+          ))}
           <Route path="/projects/gaming" element={<Gaming />} />
           <Route path="/projects/calculators" element={<CalculatorsList />} />
           <Route path="/projects/calculators/unit-converter" element={<UnitConverter />} />
           <Route path="/projects/calculators/resistive-element-sizing" element={<ResistiveElementSizing />} />
           <Route path="/projects/calculators/mortgage" element={<Mortgage />} />
           <Route path="/projects/calculators/retirement" element={<Retirement />} />
-          <Route path="/projects/calculators/telescope-mirror" element={<Telescope />} />
           {genericCalculatorSpecs.map((spec) => (
             <Route
               key={spec.slug}

@@ -24,12 +24,17 @@ describe("convert", () => {
     expect(convert(1, "mi", "ft").toNumber()).toBeCloseTo(5280, 0);
     expect(convert(1, "chain", "link").toNumber()).toBeCloseTo(100, 6);
     expect(convert(1, "mi", "furlong").toNumber()).toBeCloseTo(8, 6);
+    expect(convert(1000, "th", "in").toNumber()).toBeCloseTo(1, 6);
+    expect(convert(1, "cable", "m").toString()).toBe("185.2");
   });
 
   it("converts mass linearly, including troy/avoirdupois", () => {
     expect(convert(1, "kg", "g").toString()).toBe("1000");
     expect(convert(16, "oz", "lb").toNumber()).toBeCloseTo(1, 5);
     expect(convert(12, "oz-troy", "lb-troy").toNumber()).toBeCloseTo(1, 5);
+    expect(convert(16, "dr", "oz").toNumber()).toBeCloseTo(1, 5);
+    expect(convert(4, "qr", "cwt-long").toNumber()).toBeCloseTo(1, 5);
+    expect(convert(20, "cwt-short", "ton-short").toNumber()).toBeCloseTo(1, 5);
   });
 
   it("converts temperature with the correct affine shift", () => {
@@ -43,6 +48,8 @@ describe("convert", () => {
   it("converts volume", () => {
     expect(convert(1, "gal", "quart").toNumber()).toBeCloseTo(4, 5);
     expect(convert(1, "m3", "L").toString()).toBe("1000");
+    expect(convert(1, "yd3", "ft3").toNumber()).toBeCloseTo(27, 3);
+    expect(convert(1000, "mm3", "cm3").toNumber()).toBeCloseTo(1, 6);
   });
 
   it("converts energy, including Wh<->J", () => {

@@ -26,30 +26,34 @@ function MeasureSelect({ measure, onChange }: { measure: Measure; onChange: (m: 
   );
 }
 
-function SingleConversion({ measure }: { measure: Measure }) {
+type EntryProps = {
+  measure: Measure;
+  unit: string;
+  value: string;
+  onUnitChange: (unit: string) => void;
+  onValueChange: (value: string) => void;
+};
+
+function SingleConversion({ measure, unit, value, onUnitChange, onValueChange }: EntryProps) {
   const unitsForCurrentMeasure = unitsForMeasure(measure);
-  const [fromUnit, setFromUnit] = useState(unitsForCurrentMeasure[0].symbol);
   const [toUnit, setToUnit] = useState(unitsForCurrentMeasure[1]?.symbol ?? unitsForCurrentMeasure[0].symbol);
-  const [inputValue, setInputValue] = useState("1");
   const [outputValue, setOutputValue] = useState("");
 
   const recalculate = useCallback(() => {
-    if (inputValue.trim() === "" || Number.isNaN(Number(inputValue))) {
+    if (value.trim() === "" || Number.isNaN(Number(value))) {
       setOutputValue("");
       return;
     }
     try {
-      setOutputValue(convert(inputValue, fromUnit, toUnit).toDecimalPlaces(6).toString());
+      setOutputValue(convert(value, unit, toUnit).toDecimalPlaces(6).toString());
     } catch {
       setOutputValue("");
     }
-  }, [inputValue, fromUnit, toUnit]);
+  }, [value, unit, toUnit]);
 
   useEffect(() => {
     const units = unitsForMeasure(measure);
-    setFromUnit(units[0].symbol);
     setToUnit(units[1]?.symbol ?? units[0].symbol);
-    setInputValue("1");
   }, [measure]);
 
   useEffect(() => {
@@ -57,22 +61,22 @@ function SingleConversion({ measure }: { measure: Measure }) {
   }, [recalculate]);
 
   const swapUnits = () => {
-    setFromUnit(toUnit);
-    setToUnit(fromUnit);
+    onUnitChange(toUnit);
+    setToUnit(unit);
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4">
       <div className="space-y-2">
         <Label htmlFor="from-value">From</Label>
-        <Input id="from-value" type="number" value={inputValue} onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)} />
-        <Select value={fromUnit} onValueChange={setFromUnit}>
+        <Input id="from-value" type="number" value={value} onChange={(e: ChangeEvent<HTMLInputElement>) => onValueChange(e.target.value)} />
+        <Select value={unit} onValueChange={onUnitChange}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {unitsForCurrentMeasure.map((unit) => (
-              <SelectItem key={unit.symbol} value={unit.symbol}>{unit.label}</SelectItem>
+            {unitsForCurrentMeasure.map((u) => (
+              <SelectItem key={u.symbol} value={u.symbol}>{u.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -92,8 +96,8 @@ function SingleConversion({ measure }: { measure: Measure }) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {unitsForCurrentMeasure.map((unit) => (
-              <SelectItem key={unit.symbol} value={unit.symbol}>{unit.label}</SelectItem>
+            {unitsForCurrentMeasure.map((u) => (
+              <SelectItem key={u.symbol} value={u.symbol}>{u.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -102,60 +106,42 @@ function SingleConversion({ measure }: { measure: Measure }) {
   );
 }
 
-function ConvertToAll({ measure }: { measure: Measure }) {
+function ConvertToAll({ measure, unit, value, onUnitChange, onValueChange }: EntryProps) {
   const unitsForCurrentMeasure = unitsForMeasure(measure);
-  const [fromUnit, setFromUnit] = useState(unitsForCurrentMeasure[0].symbol);
-  const [inputValue, setInputValue] = useState("1");
+  const valid = value.trim() !== "" && !Number.isNaN(Number(value));
 
-  useEffect(() => {
-    setFromUnit(unitsForMeasure(measure)[0].symbol);
-    setInputValue("1");
-  }, [measure]);
-
-  const valid = inputValue.trim() !== "" && !Number.isNaN(Number(inputValue));
+  const handleChange = (unitSymbol: string, newValue: string) => {
+    onUnitChange(unitSymbol);
+    onValueChange(newValue);
+  };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="all-from-value">Value</Label>
-          <Input id="all-from-value" type="number" value={inputValue} onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="all-from-unit">Unit</Label>
-          <Select value={fromUnit} onValueChange={setFromUnit}>
-            <SelectTrigger id="all-from-unit">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {unitsForCurrentMeasure.map((unit) => (
-                <SelectItem key={unit.symbol} value={unit.symbol}>{unit.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden">
-        {unitsForCurrentMeasure.map((unit) => {
-          let result = "";
-          if (valid) {
-            try {
-              result = convert(inputValue, fromUnit, unit.symbol).toDecimalPlaces(6).toString();
-            } catch {
-              result = "";
-            }
+    <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden">
+      {unitsForCurrentMeasure.map((u) => {
+        const isSource = u.symbol === unit;
+        let displayValue = isSource ? value : "";
+        if (!isSource && valid) {
+          try {
+            displayValue = convert(value, unit, u.symbol).toDecimalPlaces(6).toString();
+          } catch {
+            displayValue = "";
           }
-          return (
-            <div key={unit.symbol} className="flex items-center justify-between px-4 py-2.5 bg-white">
-              <span className="text-sm text-slate-600">{unit.label}</span>
-              <span className={`font-mono text-sm ${unit.symbol === fromUnit ? "font-bold text-blue-600" : "text-slate-900"}`}>
-                {result || "—"}
-              </span>
-            </div>
-          );
-        })}
-      </div>
+        }
+        return (
+          <div key={u.symbol} className="flex items-center justify-between gap-4 px-4 py-2.5 bg-white">
+            <Label htmlFor={`all-value-${u.symbol}`} className="text-sm text-slate-600">
+              {u.label}
+            </Label>
+            <Input
+              id={`all-value-${u.symbol}`}
+              type="number"
+              value={displayValue}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(u.symbol, e.target.value)}
+              className={`w-40 font-mono text-sm ${isSource ? "font-bold text-blue-600" : "text-slate-900"}`}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -163,6 +149,14 @@ function ConvertToAll({ measure }: { measure: Measure }) {
 export default function UnitConverterComponent() {
   const [measure, setMeasure] = useState<Measure>("length");
   const [mode, setMode] = useState<"single" | "all">("single");
+  const [unit, setUnit] = useState(unitsForMeasure("length")[0].symbol);
+  const [value, setValue] = useState("1");
+
+  const handleMeasureChange = (m: Measure) => {
+    setMeasure(m);
+    setUnit(unitsForMeasure(m)[0].symbol);
+    setValue("1");
+  };
 
   return (
     <Card className="max-w-2xl mx-auto border-slate-200 shadow-lg">
@@ -176,8 +170,12 @@ export default function UnitConverterComponent() {
         </Tabs>
       </CardHeader>
       <CardContent className="space-y-6">
-        <MeasureSelect measure={measure} onChange={setMeasure} />
-        {mode === "single" ? <SingleConversion measure={measure} /> : <ConvertToAll measure={measure} />}
+        <MeasureSelect measure={measure} onChange={handleMeasureChange} />
+        {mode === "single" ? (
+          <SingleConversion measure={measure} unit={unit} value={value} onUnitChange={setUnit} onValueChange={setValue} />
+        ) : (
+          <ConvertToAll measure={measure} unit={unit} value={value} onUnitChange={setUnit} onValueChange={setValue} />
+        )}
       </CardContent>
     </Card>
   );
