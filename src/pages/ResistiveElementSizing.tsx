@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-import { ArrowLeft } from 'lucide-react';
-import ResistiveElementCalculator from '../components/calculators/resistive_element/ResistiveElementCalculator';
-import ResistiveElementHelp from '../components/calculators/resistive_element/ResistiveElementHelp';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { ArrowLeft } from "lucide-react";
+import ResistiveElementCalculator from "../components/calculators/resistive_element/ResistiveElementCalculator";
+import ResistiveElementHelp from "../components/calculators/resistive_element/ResistiveElementHelp";
 
 export default function ResistiveElementSizing() {
-  const [activeField, setActiveField] = useState(null);
+  const [activeField, setActiveField] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12">
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-8">
-          <Link 
+          <Link
             to={createPageUrl("Calculators")}
             className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-6"
           >
@@ -21,7 +21,7 @@ export default function ResistiveElementSizing() {
             Back to Calculators
           </Link>
         </div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

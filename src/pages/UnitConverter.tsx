@@ -1,16 +1,15 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-import { ArrowLeft } from 'lucide-react';
-import UnitConverterComponent from '../components/calculators/UnitConverter';
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { ArrowLeft } from "lucide-react";
+import UnitConverterComponent from "../components/calculators/UnitConverter";
 
 export default function UnitConverter() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12">
       <div className="max-w-4xl mx-auto px-6">
         <div className="mb-8">
-          <Link 
+          <Link
             to={createPageUrl("Calculators")}
             className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-6"
           >
@@ -18,7 +17,7 @@ export default function UnitConverter() {
             Back to Calculators
           </Link>
         </div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

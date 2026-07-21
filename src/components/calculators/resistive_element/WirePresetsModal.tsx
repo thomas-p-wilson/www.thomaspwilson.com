@@ -1,18 +1,29 @@
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
-const presets = [
-  { name: 'Kanthal A1 13ga', resistivity: 0.542, diameter: 0.0018288 }, // 1.8288mm in m
-  { name: 'Kanthal A1 15ga', resistivity: 0.863, diameter: 0.00145034 }, // 1.45034mm in m
-  { name: 'NiChrome 80 20ga', resistivity: 2.59, diameter: 0.0008128 }, // 0.8128mm in m
-  { name: 'NiChrome 80 24ga', resistivity: 6.54, diameter: 0.00051054 }, // 0.51054mm in m
-  { name: 'SS 316L 22ga', resistivity: 2.79, diameter: 0.00064262 }, // 0.64262mm in m
+export interface WirePreset {
+  name: string;
+  resistivity: number;
+  diameter: number;
+}
+
+const presets: WirePreset[] = [
+  { name: "Kanthal A1 13ga", resistivity: 0.542, diameter: 0.0018288 }, // 1.8288mm in m
+  { name: "Kanthal A1 15ga", resistivity: 0.863, diameter: 0.00145034 }, // 1.45034mm in m
+  { name: "NiChrome 80 20ga", resistivity: 2.59, diameter: 0.0008128 }, // 0.8128mm in m
+  { name: "NiChrome 80 24ga", resistivity: 6.54, diameter: 0.00051054 }, // 0.51054mm in m
+  { name: "SS 316L 22ga", resistivity: 2.79, diameter: 0.00064262 }, // 0.64262mm in m
 ];
 
-export default function WirePresetsModal({ open, onOpenChange, onSelect }) {
-  const handleSelect = (preset) => {
+interface WirePresetsModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSelect: (preset: WirePreset) => void;
+}
+
+export default function WirePresetsModal({ open, onOpenChange, onSelect }: WirePresetsModalProps) {
+  const handleSelect = (preset: WirePreset) => {
     onSelect(preset);
     onOpenChange(false);
   };

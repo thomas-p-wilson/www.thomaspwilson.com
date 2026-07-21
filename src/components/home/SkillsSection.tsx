@@ -1,46 +1,47 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Code, Server, Shield, Users } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Code, Server, Database, Users } from "lucide-react";
+
+// Sourced from real, self-written skills content recovered from this site's
+// prior branches (2022/2024), rather than the generic Base44-generated list.
+const skillCategories = [
+  {
+    icon: Code,
+    title: "Software Development",
+    description: "Full-stack development across languages, frameworks, and eras",
+    skills: ["TypeScript", "JavaScript", "Python", "Java", "PHP", "Ruby", "C/C++", "React", "Node.js"],
+    color: "blue",
+  },
+  {
+    icon: Server,
+    title: "DevOps & Infrastructure",
+    description: "Infrastructure automation and continuous delivery pipelines",
+    skills: ["Docker", "Linux", "Git", "AWS", "Terraform", "CircleCI", "Jenkins/Hudson"],
+    color: "indigo",
+  },
+  {
+    icon: Database,
+    title: "Data & Messaging",
+    description: "Relational, document, and streaming data systems",
+    skills: ["PostgreSQL", "MySQL", "MongoDB", "Elasticsearch", "Redis", "Kafka", "GraphQL"],
+    color: "purple",
+  },
+  {
+    icon: Users,
+    title: "Leadership & Practice",
+    description: "Technical leadership and engineering practice",
+    skills: ["Architecture", "Team Leadership", "TDD", "BDD", "Security Consulting"],
+    color: "emerald",
+  },
+];
+
+const colorMap: Record<string, string> = {
+  blue: "from-blue-500 to-blue-600",
+  indigo: "from-indigo-500 to-indigo-600",
+  purple: "from-purple-500 to-purple-600",
+  emerald: "from-emerald-500 to-emerald-600",
+};
 
 export default function SkillsSection() {
-  const skillCategories = [
-    {
-      icon: Code,
-      title: "Software Development",
-      description: "Full-stack development with modern frameworks and languages",
-      skills: ["JavaScript", "Python", "Java", "React", "Node.js", "Go"],
-      color: "blue"
-    },
-    {
-      icon: Server,
-      title: "DevOps & Operations",
-      description: "Infrastructure automation and continuous delivery pipelines",
-      skills: ["Docker", "Kubernetes", "Jenkins", "Terraform", "AWS", "Azure"],
-      color: "indigo"
-    },
-    {
-      icon: Shield,
-      title: "Security",
-      description: "Application security and infrastructure hardening",
-      skills: ["OWASP", "Penetration Testing", "IAM", "Compliance", "Encryption"],
-      color: "purple"
-    },
-    {
-      icon: Users,
-      title: "Consulting",
-      description: "Technical leadership and strategic technology guidance",
-      skills: ["Architecture", "Team Leadership", "Process Design", "Training"],
-      color: "emerald"
-    }
-  ];
-
-  const colorMap = {
-    blue: "from-blue-500 to-blue-600",
-    indigo: "from-indigo-500 to-indigo-600", 
-    purple: "from-purple-500 to-purple-600",
-    emerald: "from-emerald-500 to-emerald-600"
-  };
-
   return (
     <section className="py-24 bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-6xl mx-auto px-6">
@@ -75,15 +76,10 @@ export default function SkillsSection() {
               <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${colorMap[category.color]} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                 <category.icon className="w-8 h-8 text-white" />
               </div>
-              
-              <h3 className="text-2xl font-semibold text-slate-900 mb-3">
-                {category.title}
-              </h3>
-              
-              <p className="text-slate-600 mb-6 leading-relaxed">
-                {category.description}
-              </p>
-              
+
+              <h3 className="text-2xl font-semibold text-slate-900 mb-3">{category.title}</h3>
+              <p className="text-slate-600 mb-6 leading-relaxed">{category.description}</p>
+
               <div className="flex flex-wrap gap-2">
                 {category.skills.map((skill) => (
                   <span

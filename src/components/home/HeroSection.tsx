@@ -1,15 +1,13 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowDown, Code, Shield, Server, Users } from 'lucide-react';
+import { motion } from "framer-motion";
+import { ArrowDown, Code, Shield, Server, Users } from "lucide-react";
 
 export default function HeroSection() {
   const scrollToAbout = () => {
-    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-      {/* Subtle background pattern */}
       <div
         className="absolute inset-0"
         style={{
@@ -18,7 +16,7 @@ export default function HeroSection() {
           opacity: 0.5,
         }}
       ></div>
-      
+
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -31,9 +29,9 @@ export default function HeroSection() {
               Developer
             </span>
           </h1>
-          
-          <p className="text-xl md:text-2xl text-slate-600 mb-8 font-light leading-relaxed max-w-3xl">
-            Two decades of crafting robust solutions across development, DevOps, security, and operations.
+
+          <p className="text-xl md:text-2xl text-slate-600 mb-8 font-light leading-relaxed max-w-3xl mx-auto">
+            Building software professionally since 2003, with a recent focus on data privacy and security.
             <span className="block mt-2 text-slate-500">
               Passionate about building tools that solve real problems.
             </span>

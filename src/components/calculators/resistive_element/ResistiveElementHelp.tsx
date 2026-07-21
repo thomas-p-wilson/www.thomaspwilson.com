@@ -1,15 +1,25 @@
-import React from 'react';
+interface HelpSectionProps {
+  id: string;
+  activeField: string | null;
+  setActiveField: (id: string) => void;
+  children: React.ReactNode;
+}
 
-const HelpSection = ({ id, activeField, setActiveField, children }) => (
+const HelpSection = ({ id, activeField, setActiveField, children }: HelpSectionProps) => (
   <div
-    className={`p-4 rounded-lg cursor-pointer transition-all duration-300 ${id === activeField ? 'bg-blue-50 ring-2 ring-blue-200 shadow-md' : 'hover:bg-slate-50'}`}
+    className={`p-4 rounded-lg cursor-pointer transition-all duration-300 ${id === activeField ? "bg-blue-50 ring-2 ring-blue-200 shadow-md" : "hover:bg-slate-50"}`}
     onClick={() => setActiveField(id)}
   >
     {children}
   </div>
 );
 
-export default function ResistiveElementHelp({ activeField, setActiveField }) {
+interface ResistiveElementHelpProps {
+  activeField: string | null;
+  setActiveField: (id: string) => void;
+}
+
+export default function ResistiveElementHelp({ activeField, setActiveField }: ResistiveElementHelpProps) {
   return (
     <div className="space-y-6">
       <div>
