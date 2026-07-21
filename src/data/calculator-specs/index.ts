@@ -2,7 +2,7 @@ import {
   circleGeometry, circularSegment, sphereGeometry, sphericalCap, boxVolume, cylinderSurfaceArea,
   cylinderVolume, parabolicSegment, paraboloidalCap,
 } from "./geometry";
-import { idealGasLaw, centrifugalForce, flywheel, massMomentOfInertia } from "./physics";
+import { idealGasLaw, centrifugalForce, flywheel, massMomentOfInertia, spinCastRotation } from "./physics";
 import { loanPayment, effectiveInterestRate } from "./financial-simple";
 import { wireGauge, helixSizing, kilnWattage, thermalMassStorage, materialMass } from "./materials";
 import { solarPanels, woodgasConversion, chemicalStorage } from "./energy-domain";
@@ -18,7 +18,7 @@ export const genericCalculatorSpecs: (CalculatorSpec & { group: CalculatorGroup 
     circleGeometry, circularSegment, sphereGeometry, sphericalCap, boxVolume, cylinderSurfaceArea,
     parabolicSegment, paraboloidalCap, cylinderVolume, telescopeMirror,
   ]),
-  ...tag("physics", [idealGasLaw, centrifugalForce, flywheel, massMomentOfInertia]),
+  ...tag("physics", [idealGasLaw, centrifugalForce, flywheel, massMomentOfInertia, spinCastRotation]),
   ...tag("financial", [loanPayment, effectiveInterestRate]),
   ...tag("materials", [wireGauge, helixSizing, kilnWattage, thermalMassStorage, materialMass]),
   ...tag("energy", [solarPanels, woodgasConversion, chemicalStorage]),

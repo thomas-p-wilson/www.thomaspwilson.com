@@ -142,6 +142,31 @@ export const flywheel: CalculatorSpec = {
   },
 };
 
+const STANDARD_GRAVITY_M_S2 = 9.80665;
+
+// New — extracted so Telescope Mirror Design can delegate its spin-cast rotation the same way it
+// delegates sagitta/dish results to other geometry calculators, rather than duplicating the formula.
+export const spinCastRotation: CalculatorSpec = {
+  slug: "spin-cast-rotation",
+  title: "Spin-Cast Mirror Rotation",
+  description: "Rotation speed at which a spinning liquid surface settles into a paraboloid of a given focal length.",
+  sections: [{
+    title: "Spin-Casting",
+    fields: [
+      { id: "focalLength", label: "Focal Length", unit: "cm", measure: "length" },
+      { id: "rotation", label: "Rotation Speed", unit: "rad/s", measure: "frequency", readOnly: true },
+    ],
+  }],
+  defaults: { focalLength: "121.92" },
+  calculate: (values) => {
+    const f = num(values, "focalLength");
+    if (isNaN(f) || f <= 0) return { ...values, rotation: "" };
+    const rotation = Math.sqrt((STANDARD_GRAVITY_M_S2 * 100) / (2 * f)); // g in cm/s^2, to match f in cm
+    return { ...values, rotation: rotation.toFixed(3) };
+  },
+  notes: ["ω = √(g / 2f) — the equilibrium rotation speed of a liquid surface forming a paraboloidal mirror of focal length f."],
+};
+
 // Ported from origin/2020's mass-moment-of-inertia calculator.
 export const massMomentOfInertia: CalculatorSpec = {
   slug: "mass-moment-of-inertia",

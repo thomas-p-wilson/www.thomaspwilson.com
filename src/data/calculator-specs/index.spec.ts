@@ -21,7 +21,10 @@ describe("generic calculator specs", () => {
   for (const spec of genericCalculatorSpecs) {
     it(`${spec.slug}: calculates without throwing and populates every read-only field from its defaults`, () => {
       const result = spec.calculate({ ...spec.defaults });
-      const readOnlyFields = spec.sections.flatMap((s) => s.fields).filter((f) => {
+      // A field toggled off along with its whole section (e.g. an optional secondary component)
+      // is legitimately unpopulated — only fields actually visible to the user need a value.
+      const visibleSections = spec.sections.filter((s) => !s.toggle || result[s.toggle.id] === "true");
+      const readOnlyFields = visibleSections.flatMap((s) => s.fields).filter((f) => {
         const ro = typeof f.readOnly === "function" ? f.readOnly(result) : f.readOnly;
         return ro && !f.hidden?.(result);
       });
