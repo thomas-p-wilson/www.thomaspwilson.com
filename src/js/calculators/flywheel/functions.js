@@ -11,8 +11,5 @@ export function mass(material, configuration, radius, height) {
 }
 
 export function energy(configuration, inertia, rotation) {
-	console.log('configuration: ', configuration);
-	console.log('inertia: ', inertia);
-	console.log('rotation: ', rotation);
 	return getInertialConstant(configuration) * (inertia / 1000 / sq(100)) * Math.pow(rotation, 2);
 }

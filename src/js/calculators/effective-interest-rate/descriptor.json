@@ -1,0 +1,16 @@
+{
+    "id": "effective-interest-rate",
+    "title": "Effective Interest Rate",
+    "description": "Calculate the effective interest rate for a loan, annuity, etc.",
+    "version": "1.0.0",
+    "category": "finance",
+    "keywords": ["interest", "loan", "annuity", "rate"],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

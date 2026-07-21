@@ -9,7 +9,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UnusedWebpackPlugin = require('unused-webpack-plugin');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
-const CalculatorManifestPlugin = require('../src/js/webpack-plugins/calculator-manifest-plugin');
+const CalculatorManifestPlugin = require(path.resolve(__dirname, '../src/js/webpack-plugins/calculator-manifest-plugin'));
 const trimEnd = require('lodash/trimEnd');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -31,19 +31,6 @@ module.exports = {
         publicPath: '/',
         filename: 'js/[name].bundle.js',
         chunkFilename: 'js/[id].chunk.js'
-    },
-    resolve: {
-        extensions: [ '.js' ],
-        alias: {
-            '@': clientSrc,
-            '~': path.resolve(__dirname, '../node_modules/'),
-            'react': path.resolve(__dirname, '../node_modules/preact/compat'),
-            'react-dom': path.resolve(__dirname, '../node_modules/preact/compat'),
-            'lodash': path.resolve(__dirname, '../node_modules/lodash'),
-            'react-is': path.resolve(__dirname, '../node_modules/react-is'),
-            'prop-types': path.resolve(__dirname, '../node_modules/prop-types'),
-            '@babel/runtime': path.resolve(__dirname, '../node_modules/@babel/runtime')
-        }
     },
     module: {
         rules: [

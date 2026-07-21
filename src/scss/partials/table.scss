@@ -1,0 +1,35 @@
+.table {
+    background: $card-background;
+    color: #172d35;
+    width: 100%;
+
+    tbody {
+        tr {
+            td,
+            th {
+                padding: 5px;
+            }
+        }
+        tr:nth-child(even) {
+            background: #ebf0f5;
+        }
+    }
+
+    td,
+    th {
+        &.highlight-mute {
+            background: #d1ddec;
+        }
+        &.highlight {
+            background: #bacde3;
+        }
+    }
+}
+
+.rotate-90 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    transform: rotate(90deg);
+}

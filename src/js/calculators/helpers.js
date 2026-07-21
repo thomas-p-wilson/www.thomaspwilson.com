@@ -16,17 +16,21 @@ import convert, { getMeasureName } from '../converter';
  * @returns {ReactElement[]} - An array of react elements: the label, the input,
  *     and the unit selector.
  */
-export const numberField = ({ title, ...definition }, calculator) => ([
-	(
-        <label forHtml={ definition.id }>{ title }</label>
-    ),
-    (
-        <ContextNumberField definition={ definition } calculator={ calculator } />
-    ),
-    (
-        <ContextUnitSelector definition={ definition } calculator={ calculator } />
-    )
-])
+export const numberField = ({ title, ...definition }, calculator) => {
+    const result = [
+        (<label forHtml={ definition.id }>{ title }</label>),
+        (<ContextNumberField definition={ definition } calculator={ calculator } />)
+    ];
+
+    if (definition.unit) {
+        result.push(<ContextUnitSelector definition={ definition } calculator={ calculator } />);
+    }
+
+    if (definition.suffix) {
+        result.push(<div>{ definition.suffix }</div>);
+    }
+    return result;
+}
 
 /**
  *

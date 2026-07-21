@@ -1,0 +1,16 @@
+{
+    "id": "loan-payment",
+    "title": "Loan Payment",
+    "description": "Calculate the properties of an ideal gas.",
+    "version": "1.0.0",
+    "category": "maths",
+    "keywords": ["gas", "pressure", "volume"],
+    "related": [],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "description": "Initial implementation",
+            "author": ["thomas-p-wilson"]
+        }
+    ]
+}

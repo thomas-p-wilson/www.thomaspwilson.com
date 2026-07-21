@@ -6,7 +6,7 @@
     "lint:css": "sass-lint -c .sass-lint.yml -v",
     "lint:js": "eslint .",
     "lint": "npm-run-all --parallel lint:css lint:js",
-    "test": "NODE_ENV=test mocha --compilers js:babel-core/register -r chai/register-expect -R spec ./src/**/*.tests.js",
+    "test": "NODE_ENV=test mocha --require @babel/register -r chai/register-expect -R spec ./src/**/*.tests.js",
     "start": "npx webpack-dev-server || tail -f /dev/null",
     "analyze": "NODE_ENV=production WEBPACK_ANALYZER=1 webpack",
     "build": "NODE_ENV=production webpack"
@@ -72,6 +72,7 @@
     "file-loader": "4.2.0",
     "friendly-errors-webpack-plugin": "1.7.0",
     "glob-all": "3.1.0",
+    "jest": "24.9.0",
     "memoize-one": "5.1.1",
     "mini-css-extract-plugin": "0.8.0",
     "mocha": "6.2.1",

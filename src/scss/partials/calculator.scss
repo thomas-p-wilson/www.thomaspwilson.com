@@ -7,7 +7,7 @@
         align-items: center;
         display: flex;
         height: 100vh;
-        max-width: 450px;
+        max-width: 500px;
         position: relative;
 
         .calc-header {
@@ -43,7 +43,14 @@
         align-items: center;
         color: #ccc;
         display: flex;
+        flex-direction: column;
+        max-height: 100vh;
         margin-left: 15px;
+        overflow-y: scroll;
+
+        section {
+            height: 100vh;
+        }
     }
 }
 
@@ -60,11 +67,11 @@
 }
 
 .calc-box {
-	background: white;
+	background: $card-background;
 	border-radius: 3px;
 	list-style: none;
 	margin: 0;
-    max-width: 500px;
+    width: 500px;
 	padding: 0;
 
 	li {
@@ -74,7 +81,7 @@
 		padding-right: 15px;
 
         &.readonly {
-            background: #ccc;
+            background: darken($card-background, 10%);
 
             label {
 
@@ -102,6 +109,10 @@
 		    background: 0 0;
 		    border: 0;
 		    outline: 0;
+
+            &:last-child {
+                margin-right: 0;
+            }
 		}
 
         select,
@@ -135,12 +146,9 @@
     z-index: 2;
 }
 .btn-outline-secondary:hover {
-    color: 
-#fff;
-background-color:
-#6c757d;
-border-color:
-    #6c757d;
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
 }
 .btn:focus, .btn:hover {
     text-decoration: none;

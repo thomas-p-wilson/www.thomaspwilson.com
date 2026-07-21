@@ -6,6 +6,7 @@ const isProduction = !isDevelopment;
 const useCompression = !!process.env.USE_COMPRESSION || isProduction;
 const useAnalyzer = !!process.env.USE_ANALYZER;
 
+const resolvers = require('./.webpack/config.resolvers.js');
 const base = require('./.webpack/config.base.js');
 const dev = require('./.webpack/config.dev.js');
 const prod = require('./.webpack/config.prod.js');
@@ -13,6 +14,7 @@ const compress = require('./.webpack/config.compression.js');
 const analyzer = require('./.webpack/config.analyzer.js');
 
 module.exports = merge(
+	resolvers,
     base,
     isDevelopment ? dev : prod,
     useCompression ? compress : {},

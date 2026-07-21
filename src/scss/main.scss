@@ -1,6 +1,8 @@
 $start: #172D35;
 $end: lighten($start, 40%);
 
+$card-background: #fbfcfd;
+
 * {
     font-family: 'Lato', sans-serif;
 }
@@ -26,6 +28,7 @@ html {
 @import './partials/modal.scss';
 @import './partials/overlay.scss';
 @import './partials/settings.scss';
+@import './partials/table.scss';
 
 @import './pages/calculator-list.scss';
 

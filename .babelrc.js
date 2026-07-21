@@ -9,5 +9,12 @@ module.exports = {
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
         ["@babel/plugin-proposal-class-properties", { "loose": true }],
         "@babel/plugin-proposal-export-default-from"
-    ]
+    ],
+    "env": {
+        "test": {
+            "plugins": [
+                [ "babel-plugin-webpack-alias-7", { "config": "./.webpack/config.resolvers.js" } ]
+            ]
+        }
+    }
 }
