@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, Calendar, Building2, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
 import { format } from "date-fns";
 import { positions, type Position } from "@/data/positions";
 
@@ -45,7 +44,7 @@ export default function Resume() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="mb-8">
           <Link
-            to={createPageUrl("Home")}
+            to="/"
             className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />

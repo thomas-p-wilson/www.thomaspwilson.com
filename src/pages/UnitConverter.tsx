@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
 import { ArrowLeft } from "lucide-react";
 import UnitConverterComponent from "../components/calculators/UnitConverter";
 
@@ -10,11 +9,11 @@ export default function UnitConverter() {
       <div className="max-w-4xl mx-auto px-6">
         <div className="mb-8">
           <Link
-            to={createPageUrl("Calculators")}
+            to="/projects"
             className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Calculators
+            Back to Projects
           </Link>
         </div>
 

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
 import { ArrowLeft } from "lucide-react";
 import ResistiveElementCalculator from "../components/calculators/resistive_element/ResistiveElementCalculator";
 import ResistiveElementHelp from "../components/calculators/resistive_element/ResistiveElementHelp";
@@ -14,11 +13,11 @@ export default function ResistiveElementSizing() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-8">
           <Link
-            to={createPageUrl("Calculators")}
+            to="/projects"
             className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Calculators
+            Back to Projects
           </Link>
         </div>
 

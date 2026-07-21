@@ -1,32 +1,31 @@
 import { type ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import { Home, Calculator, FileText, Menu, X } from "lucide-react";
+import { Home, FolderKanban, FileText, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LayoutProps {
   children: ReactNode;
-  currentPageName: string;
 }
 
-export default function Layout({ children, currentPageName }: LayoutProps) {
+const navigation = [
+  { name: "Home", href: "/", icon: Home },
+  { name: "Resume", href: "/resume", icon: FileText },
+  { name: "Projects", href: "/projects", icon: FolderKanban },
+];
+
+export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navigation = [
-    { name: "Home", href: createPageUrl("Home"), icon: Home },
-    { name: "Resume", href: createPageUrl("Resume"), icon: FileText },
-    { name: "Calculators", href: createPageUrl("Calculators"), icon: Calculator },
-  ];
-
-  const isCalcPage = currentPageName === "UnitConverter" || currentPageName === "ResistiveElementSizing";
+  const isActive = (href: string) =>
+    href === "/" ? location.pathname === "/" : location.pathname.toLowerCase().startsWith(href);
 
   return (
     <div className="min-h-screen bg-white">
       <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex justify-between items-center py-4">
-            <Link to={createPageUrl("Home")} className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">TW</span>
               </div>
@@ -39,7 +38,7 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
                   key={item.name}
                   to={item.href}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === item.href || (item.name === "Calculators" && isCalcPage)
+                    isActive(item.href)
                       ? "bg-slate-100 text-slate-900"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
@@ -68,7 +67,7 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
                     key={item.name}
                     to={item.href}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      location.pathname === item.href || (item.name === "Calculators" && isCalcPage)
+                      isActive(item.href)
                         ? "bg-slate-100 text-slate-900"
                         : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                     }`}
