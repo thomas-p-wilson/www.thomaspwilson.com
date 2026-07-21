@@ -1,0 +1,13 @@
+{
+  "title": "Area of a Circle",
+  "path": "circle-area",
+  "description": "Determine the area of a circle",
+  "image": {
+    "small": "/assets/img/calculators/circle-area-sm.jpg",
+    "large": "/assets/img/calculators/circle-area-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

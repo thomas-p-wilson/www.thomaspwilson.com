@@ -1,42 +1,45 @@
 import { Decimal } from '@/types/Decimal';
-import { createContext, useCallback, useContext, useReducer, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useReducer, useRef, useState } from 'react';
 import BigDecimal from 'decimal.js';
 import { autovivify, get } from '@/utils/autovivify';
 
 const createProxy = (
   namespace: string[] | undefined,
-  values: ValueContainer,
-  calculated: ValueContainer,
-  calculations: ValueContainer<FieldCalculator>,
-  initialState: Partial<CalculatorStateShape> | undefined,
+  state: CalculatorStateShape,
   setCalculated: React.Dispatch<React.SetStateAction<ValueContainer<BigDecimal>>>,
-  namespaces: string[],
+  parent: any,
 ) => (
   new Proxy({}, {
     get(_target: any, name: string): any {
+      console.log('STate: ', state);
       const ns = namespace ?? [];
       const path = ns.concat(name);
-      console.group();
-      console.trace();
+      // console.log('Find for %s', path.join('.'));
 
-      if (name in namespaces && !(name in (namespace ?? []))) {
-        return createProxy(ns.concat(name), values, calculated, calculations, initialState, setCalculated, namespaces);
+      if (name === 'parent') {
+        // console.log('GET PARENT');
+        return parent;
       }
 
-      if (typeof get(values, path) !== 'undefined') {
-        console.log('  Found %s for %s in explicit values', get(values, path), path.join('.'));
-        return get(values, path);
+      if (state.namespaces.includes(name) && !namespace.includes(name)) {
+        return createProxy(ns.concat(name), state, setCalculated, this);
       }
 
-      if (typeof get(calculated, path) !== 'undefined') {
-        console.log('  Found %s for %s in calculated values', get(calculated, path), path.join('.'));
-        return get(calculated, path)
+      const explicit = get(state.values, path);
+      if (typeof explicit !== 'undefined' && explicit !== null) {
+        // console.log('  Found %s for %s in explicit values', explicit, path.join('.'));
+        return explicit;
       }
 
-      if (calculations && typeof get(calculations, path) === 'function') {
-        const value = get(calculations, path)!(createProxy(ns, values, calculated, calculations, initialState, setCalculated, namespaces));
+      if (typeof get(state.calculated, path) !== 'undefined') {
+        // console.log('  Found %s for %s in calculated values', get(state.calculated, path), path.join('.'));
+        return get(state.calculated, path)
+      }
+
+      if (state.calculations && typeof get(state.calculations, path) === 'function') {
+        const value = get(state.calculations, path)!(createProxy(ns, state, setCalculated, this));
         if (value) {
-          console.log('  Found %s for %s via calculation', value, path.join('.'));
+          // console.log('  Found %s for %s via calculation', value, path.join('.'));
           setCalculated((calculated) => (
             autovivify(calculated, path, value)
           ));
@@ -44,14 +47,13 @@ const createProxy = (
         return value;
       }
 
-      console.log('  Found nothing for %s', path.join('.'));
-      console.groupEnd();
+      // console.log('  Found nothing for %s', path.join('.'));
       return undefined;
     }
   })
 )
 
-export type FieldCalculator = (values: CalculatorStateShape['values']) => (BigDecimal | undefined)
+export type FieldCalculator = (values: CalculatorStateShape['values'] & { parent: any }) => (BigDecimal | undefined)
 
 export type ValueContainer<T = Decimal> = {
   [k: string]: T
@@ -65,6 +67,7 @@ export type Field = {
 }
 
 export type CalculatorStateShape = {
+  namespaces: string[]
   values: ValueContainer
   units: ValueContainer<string>
   dimensions: ValueContainer<string>
@@ -87,6 +90,7 @@ export type CalculatorContextController = CalculatorStateShape & {
   setSignificantDigit: (name: string, value: number, namespace?: string[]) => void
   setGlobalSignificantDigits: (value: number) => void
   registerNestedCalculator: (ns: string, initialState: CalculatorStateShape) => void
+  proxy: object
 }
 
 export const CalculatorContext = createContext<CalculatorContextController>(undefined!);
@@ -96,43 +100,66 @@ export type CalculatorContextProviderProps = {
   children: any
 }
 
-const fieldMutator = (setter: any) => (name: string, value: any) => {
-  setter((current: any) => ({
-    ...current,
-    [name]: value,
-  }));
-};
+const fieldMutator = <T,>(setter: React.Dispatch<React.SetStateAction<ValueContainer<T>>>) => (name: string, value: T, namespace: string[] | undefined) => {
+  setter((container) => (autovivify(container, (namespace ?? []).concat([name]), value)));
+}
 
 export const CalculatorContextProvider = ({
   initialState,
   children
 }: CalculatorContextProviderProps) => {
-  const [render, forceRender] = useReducer(x => x + 1, 0);
-  const state = useRef<Partial<CalculatorStateShape>>(initialState!);
-  // const [namespaces, setNamespaces] = useState<string[]>([]);
-  // const [values, setValues] = useState<ValueContainer>(initialState?.values ?? {});
-  // const [calculated, setCalculated] = useState<ValueContainer>({});
-  // const [calculations, setCalculations] = useState<ValueContainer<FieldCalculator>>(initialState?.calculations ?? {});
-  // const [units, setUnits] = useState<ValueContainer<string>>(initialState?.units ?? {});
-  // const [dimensions, setDimensions] = useState<ValueContainer<string>>(initialState?.dimensions ?? {});
-  // const [scales, setScales] = useState<ValueContainer<number>>(initialState?.scales ?? {});
-  // const [globalScale, setGlobalScale] = useState<number>(initialState?.globalScale ?? 4);
-  // const [significantDigits, setSignificantDigits] = useState<ValueContainer<number>>(initialState?.significantDigits ?? {});
-  // const [globalSignificantDigits, setGlobalSignificantDigits] = useState<number>(initialState?.globalSignificantDigits ?? 12);
+  const [render] = useReducer(x => x + 1, 0);
+  const [state, setState] = useState<CalculatorStateShape>({
+    namespaces: [],
+    values: {},
+    units: {},
+    dimensions: {},
+    scales: {},
+    globalScale: 4,
+    significantDigits: {},
+    globalSignificantDigits: 12,
+    calculations: {},
+    calculated: {},
+    ...initialState ?? {}
+  });
 
+  const valueContainerMutator = useMemo(() => <K extends keyof CalculatorStateShape,>(
+    field: K
+  ): React.Dispatch<React.SetStateAction<CalculatorStateShape[K]>> => (value) => {
+    if (typeof value === 'function') {
+      setState((state) => autovivify(state, [field], value(state[field])))
+    } else {
+      setState((state) => autovivify(state, [field], value));
+    }
+  }, []);
+
+  const setNamespaces = useMemo(() => valueContainerMutator('namespaces'), []);
+  const setValues = useMemo(() => valueContainerMutator('values'), []);
+  const setCalculated = useMemo(() => valueContainerMutator('calculated'), []);
+  const setCalculations = useMemo(() => valueContainerMutator('calculations'), []);
+  const setUnits = useMemo(() => valueContainerMutator('units'), []);
+  const setDimensions = useMemo(() => valueContainerMutator('dimensions'), []);
+  const setScales = useMemo(() => valueContainerMutator('scales'), []);
+  const setGlobalScale = useMemo(() => valueContainerMutator('globalScale'), []);
+  const setSignificantDigits = useMemo(() => valueContainerMutator('significantDigits'), []);
+  const setGlobalSignificantDigits = useMemo(() => valueContainerMutator('globalSignificantDigits'), []);
+
+  const proxy = useMemo(() => (createProxy([], state, setCalculated, undefined)), [state, setCalculated]);
   const getValue = useCallback((name: string, namespace: string[] | undefined) => {
-    return createProxy(namespace, values, calculated, calculations, initialState, setCalculated, namespaces)[name]
-  }, [values, calculated, calculations, setCalculated]);
+    return createProxy(namespace, state, setCalculated, undefined)[name]
+  }, [state, setCalculated]);
+
   const setValue = useCallback((name: string, value: Decimal, namespace: string[] | undefined) => {
     setCalculated({});
-    setValues((values) => (autovivify(values, (namespace ?? []).concat([name]), value)))
+    setValues((values) => (autovivify(values, (namespace ?? []).concat([name]), value)));
   }, [setValues, setCalculated]);
-  const setUnit = useCallback(fieldMutator(setUnits), []);
-  const setDimension = useCallback(fieldMutator(setDimensions), []);
-  const setScale = useCallback(fieldMutator(setScales), []);
-  const setSignificantDigit = useCallback(fieldMutator(setSignificantDigits), []);
+  const setUnit = useMemo(() => fieldMutator(setUnits), [setUnits, setCalculated]);
+  const setDimension = useMemo(() => fieldMutator(setDimensions), [setDimensions]);
+  const setScale = useMemo(() => fieldMutator(setScales), [setScales]);
+  const setSignificantDigit = useMemo(() => fieldMutator(setSignificantDigits), [setSignificantDigits]);
 
   const registerNestedCalculator = useCallback((ns: string, initialState: CalculatorStateShape) => {
+    console.log('Register ns ', ns, ' with state ', initialState);
     setNamespaces((namespaces) => (
       namespaces.concat([ns])
     ));
@@ -163,28 +190,32 @@ export const CalculatorContextProvider = ({
     }
   }, [setValues, setCalculated, setCalculations, setUnits, setDimensions]);
 
-  const controller: CalculatorContextController = {
+  const controller: CalculatorContextController = useMemo(() => ({
     render,
-    ...state.current,
-    values,
+    ...state,
     getValue,
     setValue,
-    units,
     setUnit,
-    dimensions,
     setDimension,
-    scales,
     setScale,
-    globalScale,
     setGlobalScale,
-    significantDigits,
     setSignificantDigit,
-    globalSignificantDigits,
     setGlobalSignificantDigits,
-    calculations,
-    calculated,
     registerNestedCalculator,
-  };
+    proxy,
+  }), [
+    render,
+    getValue,
+    setValue,
+    setUnit,
+    setDimension,
+    setScale,
+    setGlobalScale,
+    setSignificantDigit,
+    setGlobalSignificantDigits,
+    registerNestedCalculator,
+    proxy,
+  ]);
 
   return (
     <CalculatorContext.Provider value={controller}>
@@ -195,35 +226,36 @@ export const CalculatorContextProvider = ({
 
         Values:
         <pre>
-          {JSON.stringify(values, null, 2)}
+          {JSON.stringify(state.values, null, 2)}
         </pre>
         Calculated:
         <pre>
-          {JSON.stringify(calculated, null, 2)}
+          {JSON.stringify(state.calculated, null, 2)}
         </pre>
         Calculations:
         <pre>
-          {JSON.stringify(calculations, null, 2)}
+          {JSON.stringify(state.calculations, null, 2)}
         </pre>
         Units:
         <pre>
-          {JSON.stringify(units, null, 2)}
+          {JSON.stringify(state.units, null, 2)}
         </pre>
         Dimensions:
         <pre>
-          {JSON.stringify(dimensions, null, 2)}
+          {JSON.stringify(state.dimensions, null, 2)}
         </pre>
         Scales:
         <pre>
-          {JSON.stringify(scales, null, 2)}
+          {JSON.stringify(state.scales, null, 2)}
         </pre>
         Significant Digits:
         <pre>
-          {JSON.stringify(significantDigits, null, 2)}
+          {JSON.stringify(state.significantDigits, null, 2)}
         </pre>
 
-        Global Scale: {`${globalScale}`} <br/>
-        Global Significant Digits: {`${globalSignificantDigits}`}
+        Global Scale: {`${state.globalScale}`} <br/>
+        Global Significant Digits: {`${state.globalSignificantDigits}`} <br/>
+        Render: {`${render}`}
       </details>
     </CalculatorContext.Provider>
   )

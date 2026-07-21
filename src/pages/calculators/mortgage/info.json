@@ -1,0 +1,13 @@
+{
+  "title": "Mortgage Payments",
+  "path": "mortgage-payments",
+  "description": "Calculate mortgage payments based on principal, downpayment, prepayments, etc",
+  "image": {
+    "small": "/assets/img/calculators/mortgage-payments-sm.jpg",
+    "large": "/assets/img/calculators/mortgage-payments-lg.jpg",
+    "author": {
+      "handle": "",
+      "name": ""
+    }
+  }
+}

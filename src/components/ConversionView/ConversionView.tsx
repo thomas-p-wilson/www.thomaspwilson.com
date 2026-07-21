@@ -1,8 +1,6 @@
 import { InputGroup } from '@/components/controls/InputGroup/InputGroup';
-import { CalculatorContextProvider } from '@/components/CalculatorContext/CalculatorContext';
 import { MeasureFile } from '@/units/MeasureFile';
 import { ConvertibleNumber } from './ConvertableNumber';
-import { CalculatorSettings } from '../CalculatorSettings/CalculatorSettings';
 import './ConversionView.scss';
 
 export type ConversionViewProps = {
@@ -14,8 +12,7 @@ export const ConversionView = ({
   measure,
   base,
 }: ConversionViewProps) => (
-  <CalculatorContextProvider>
-    <CalculatorSettings />
+  <>
     {
       Object.keys(measure.grouped)
         .map((groupName) => (
@@ -43,5 +40,5 @@ export const ConversionView = ({
           </div>
         ))
     }
-  </CalculatorContextProvider>
+  </>
 );

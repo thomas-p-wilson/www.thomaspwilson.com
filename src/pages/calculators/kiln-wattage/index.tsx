@@ -1,11 +1,10 @@
-import { CalculatorContextProvider, CalculatorStateShape } from '@/components/CalculatorContext/CalculatorContext'
+import { CalculatorStateShape } from '@/components/CalculatorContext/CalculatorContext'
 import { ContextualInputWithDimension } from '@/components/CalculatorControls/ContextualInputWithDimension/ContextualInputWithDimension'
-import { CalculatorSettings } from '@/components/CalculatorSettings/CalculatorSettings'
 import * as length from '@/units/length';
 import * as energy from '@/units/energy';
 import { decimal, pi } from '@/utils/decimal';
 
-export const KilnWattage: Partial<CalculatorStateShape> = {
+export const state: Partial<CalculatorStateShape> = {
   values: {
     chamber_height: decimal('0.21'),
     chamber_diameter: decimal('0.71'),
@@ -36,58 +35,53 @@ export const KilnWattage: Partial<CalculatorStateShape> = {
   }
 }
 
-export default () => {
-  return (
-    <CalculatorContextProvider initialState={KilnWattage}>
-      <CalculatorSettings />
+export const render = () => (
+  <>
+    <ContextualInputWithDimension
+      name="chamber_height"
+      label="Firing chamber height"
+      units={length}
+      unit="metric-metre"
+    />
+    <ContextualInputWithDimension
+      name="chamber_diameter"
+      label="Firing chamber diameter"
+      units={length}
+      unit="metric-metre"
+    />
+    <ContextualInputWithDimension
+      name="chamber_circumference"
+      label="Firing chamber circumference"
+      units={length}
+      unit="metric-metre"
+      disabled
+    />
+    <ContextualInputWithDimension
+      name="chamber_surface_area"
+      label="Firing chamber surface area"
+      units={length}
+      unit="metric-metre"
+      unitExponent={decimal(2)}
+      disabled
+    />
 
-      <h1>Kiln Wattage</h1>
-      <ContextualInputWithDimension
-        name="chamber_height"
-        label="Firing chamber height"
-        units={length}
-        unit="metric-metre"
-      />
-      <ContextualInputWithDimension
-        name="chamber_diameter"
-        label="Firing chamber diameter"
-        units={length}
-        unit="metric-metre"
-      />
-      <ContextualInputWithDimension
-        name="chamber_circumference"
-        label="Firing chamber circumference"
-        units={length}
-        unit="metric-metre"
-        disabled
-      />
-      <ContextualInputWithDimension
-        name="chamber_surface_area"
-        label="Firing chamber surface area"
-        units={length}
-        unit="metric-metre"
-        unitExponent={decimal(2)}
-        disabled
-      />
-
-      <h2>Electrical Info</h2>
-      <ContextualInputWithDimension
-        name="watts_per_unit_area"
-        label="Watts per unit area"
-        units={energy}
-        unit="metric-watt"
-        dimensions={length}
-        dimension="metric-centimetre"
-        dimensionExponent={decimal(2)}
-        disabled
-      />
-      <ContextualInputWithDimension
-        name="total_wattage"
-        label="Total wattage"
-        units={energy}
-        unit="metric-watt"
-        disabled
-      />
-    </CalculatorContextProvider>
-  );
-}
+    <h2>Electrical Info</h2>
+    <ContextualInputWithDimension
+      name="watts_per_unit_area"
+      label="Watts per unit area"
+      units={energy}
+      unit="metric-watt"
+      dimensions={length}
+      dimension="metric-centimetre"
+      dimensionExponent={decimal(2)}
+      disabled
+    />
+    <ContextualInputWithDimension
+      name="total_wattage"
+      label="Total wattage"
+      units={energy}
+      unit="metric-watt"
+      disabled
+    />
+  </>
+);

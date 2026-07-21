@@ -6,7 +6,7 @@ import { InputGroup } from '@/components/controls/InputGroup/InputGroup';
 import * as length from '@/units/length';
 import { decimal } from '@/utils/decimal';
 
-export const ResistiveElementSizingInitialState: Partial<CalculatorStateShape> = {
+export const state: Partial<CalculatorStateShape> = {
   values: {
     length: decimal('1'),
     coil_diameter: decimal('.012'),
@@ -56,59 +56,54 @@ export const ResistiveElementSizingInitialState: Partial<CalculatorStateShape> =
   }
 }
 
-export default () => {
-  return (
-    <CalculatorContextProvider initialState={ResistiveElementSizingInitialState}>
-      <CalculatorSettings />
-
-      <h1>Helix Dimensions</h1>
-      <ContextualInputWithDimension
-        name="length"
-        label="Total wire length"
-        units={length}
-        unit="metric-metre"
+export const render = () => (
+  <>
+    <ContextualInputWithDimension
+      name="length"
+      label="Total wire length"
+      units={length}
+      unit="metric-metre"
+      disabled
+    />
+    <ContextualInputWithDimension
+      name="coil_diameter"
+      label="Coil diameter"
+      units={length}
+      unit="metric-metre"
+    />
+    <ContextualInputWithDimension
+      name="turn_space"
+      label="Turn spacing"
+      units={length}
+      unit="metric-metre"
+    />
+    <ContextualInputWithDimension
+      name="turn_circumference"
+      label="Turn circumference"
+      units={length}
+      unit="metric-metre"
+      disabled
+    />
+    <ContextualInputWithDimension
+      name="turn_length"
+      label="Turn length"
+      units={length}
+      unit="metric-metre"
+      disabled
+    />
+    <InputGroup disabled>
+      <label htmlFor="turns">Turns</label>
+      <ContextualInput
+        name="turns"
         disabled
       />
-      <ContextualInputWithDimension
-        name="coil_diameter"
-        label="Coil diameter"
-        units={length}
-        unit="metric-metre"
-      />
-      <ContextualInputWithDimension
-        name="turn_space"
-        label="Turn spacing"
-        units={length}
-        unit="metric-metre"
-      />
-      <ContextualInputWithDimension
-        name="turn_circumference"
-        label="Turn circumference"
-        units={length}
-        unit="metric-metre"
-        disabled
-      />
-      <ContextualInputWithDimension
-        name="turn_length"
-        label="Turn length"
-        units={length}
-        unit="metric-metre"
-        disabled
-      />
-      <InputGroup disabled>
-        <label htmlFor="turns">Turns</label>
-        <ContextualInput
-          name="turns"
-          disabled
-        />
-      </InputGroup>
-      <ContextualInputWithDimension
-        name="coil_length"
-        label="Coil length"
-        units={length}
-        unit="metric-metre"
-        disabled
-      />
-    </CalculatorContextProvider>
-  );
-}
+    </InputGroup>
+    <ContextualInputWithDimension
+      name="coil_length"
+      label="Coil length"
+      units={length}
+      unit="metric-metre"
+      disabled
+    />
+  </>
+);

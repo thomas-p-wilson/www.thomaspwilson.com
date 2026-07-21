@@ -1,6 +1,6 @@
 import { ConversionView } from '../../../components/ConversionView/ConversionView';
 import * as angle from '../../../units/angle';
 
-export default () => (
+export const render = () => (
   <ConversionView measure={angle} base="deg" />
 )

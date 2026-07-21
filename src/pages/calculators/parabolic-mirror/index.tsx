@@ -6,6 +6,7 @@ import { ContextualInput } from '@/components/CalculatorControls/ContextualInput
 import { ContextualSelect } from '@/components/CalculatorControls/ContextualSelect/ContextualSelect';
 import * as length from '@/units/length';
 import * as mass from '@/units/mass';
+import { NestedCalculator } from '@/components/NestedCalculator/NestedCalculator';
 
 // https://www.bbastrodesigns.com/sagitta.html
 
@@ -119,8 +120,6 @@ export const state: Partial<CalculatorStateShape> = {
 export const render = () => {
   return (
     <>
-      <h1>Paraboloidal Mirror Design</h1>
-
       <p>Supports spherical or paraboloidal mirrors, ground blank and meniscus construction.</p>
 
       <InputGroup>
@@ -161,15 +160,34 @@ export const render = () => {
         units={length}
         unit="metric-centimetre"
       />
-      <ContextualInputWithDimension
+      <NestedCalculator
+        name="circle-area"
+        title="Cross-sectional surface area of the mirror"
+        values={{
+          radius: null
+        }}
+        calculations={{
+          radius: ({ parent }) => {
+            if (parent.diameter) {
+              return parent.diameter.div(2);
+            }
+          }
+        }}
+      />
+      {/* <ContextualInputWithDimension
         name="area"
         label="Area"
         units={length}
         unit="metric-centimetre"
         unitExponent={decimal(2)}
         disabled
+      /> */}
+
+      <NestedCalculator
+        name="focal-ratio"
+        title="Focal ratio of the mirror"
       />
-      <ContextualInputWithDimension
+      {/* <ContextualInputWithDimension
         name="focal_length"
         label="Focal length"
         units={length}
@@ -183,6 +201,16 @@ export const render = () => {
         />
       </InputGroup>
       <ContextualInputWithDimension
+        name="radius_of_curvature"
+        label="Radius of curvature"
+        units={length}
+        unit="metric-centimetre"
+      /> */}
+      <NestedCalculator
+        name="cylinder-volume"
+        title="Blank volume"
+      />
+      {/* <ContextualInputWithDimension
         name="edge_thickness"
         label="Edge thickness"
         units={length}
@@ -194,15 +222,23 @@ export const render = () => {
         units={length}
         unit="metric-centimetre"
         unitExponent={decimal(3)}
+      /> */}
+      <NestedCalculator
+        name="material-mass"
+        title="Blank mass"
       />
-      <ContextualInputWithDimension
+      {/* <ContextualInputWithDimension
         name="starting_mass"
         label="Starting mass"
         units={mass}
         unit="metric-kilogram"
-      />
+      /> */}
 
-      <h3>Dish Info</h3>
+      <NestedCalculator
+        name="sagitta"
+        title="Sagitta"
+      />
+      {/* <h3>Dish Info</h3>
       <ContextualInputWithDimension
         name="sagitta"
         label="Sagitta"
@@ -222,7 +258,7 @@ export const render = () => {
         units={length}
         unit="metric-centimetre"
         unitExponent={decimal(3)}
-      />
+      /> */}
 
       <h3>Final Ground Blank Attributes</h3>
       <ContextualInputWithDimension

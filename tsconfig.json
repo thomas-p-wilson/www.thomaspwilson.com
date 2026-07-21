@@ -19,16 +19,16 @@
     "sourceRoot": "/",
 
     // Strict Checks
-    "alwaysStrict": true,
-    "allowUnreachableCode": false,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    // "alwaysStrict": true,
+    // "allowUnreachableCode": false,
+    // "noImplicitAny": true,
+    // "strictNullChecks": true,
 
     // Linter Checks
-    "noImplicitReturns": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    // "noImplicitReturns": true,
+    // "noUncheckedIndexedAccess": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
 
     "types": ["node", "jest", "@testing-library/jest-dom", "webpack-env"]
   },

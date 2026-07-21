@@ -101,7 +101,7 @@ export const resistanceWirePresets = [
   },
 ]
 
-export const ResistiveElementSizingInitialState: Partial<CalculatorStateShape> = {
+export const state: Partial<CalculatorStateShape> = {
   values: {
     voltage: new BigDecimal('230'), // V
     wattage: new BigDecimal('1000'), // W
@@ -115,6 +115,8 @@ export const ResistiveElementSizingInitialState: Partial<CalculatorStateShape> =
   },
   calculations: {
     current: ({ voltage, wattage }: any) => {
+      console.log('Voltage: ', voltage);
+      console.log('Wattage: ', wattage);
       if (voltage && wattage) {
         return wattage.div(voltage);
       }

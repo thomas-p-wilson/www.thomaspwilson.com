@@ -28,5 +28,12 @@
 }
 
 .calculator-settings-modal {
+  label {
+    display: flex;
+    justify-content: space-between;
+  }
 
+  input {
+    width: auto;
+  }
 }

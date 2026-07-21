@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { descriptors, getCalculator } from './calculators/list';
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { CalculatorContextProvider } from '@/components/CalculatorContext/CalculatorContext';
 import { CalculatorSettings } from '@/components/CalculatorSettings/CalculatorSettings';
 import './Calculator.scss';
@@ -11,7 +11,7 @@ type LoaderProps = {
 }
 
 const Loader = ({ dir, title }: LoaderProps): JSX.Element => {
-  const calculator = getCalculator(dir);
+  const calculator = useMemo(() => getCalculator(dir), []);
   const [state, setState] = useState<any>();
   useEffect(() => {
     calculator.state.then(setState);
@@ -44,7 +44,7 @@ export const Component = () => {
         <Routes>
           {
             descriptors.map((descriptor, i) => (
-              <Route path={descriptor.path} element={React.createElement(Loaders[i]!)} />
+              <Route path={descriptor.path} element={React.createElement(Loaders[i]!)} key={descriptor.dir} />
             ))
           }
         </Routes>

@@ -20,7 +20,6 @@ const cylinderSurfaceArea = (circumference: Decimal, r: Decimal, h: Decimal): De
 
 export const state: Partial<CalculatorStateShape> = {
   values: {
-    radius: decimal('.2'),
     height: decimal('1'),
   },
   calculations: {

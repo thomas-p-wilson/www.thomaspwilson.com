@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useScrollableBackground } from '../hooks/useScrollableBackground';
 
 export const Component = () => {
@@ -6,13 +6,25 @@ export const Component = () => {
 
   return (
     <div className="home">
-      <section className="splash" data-background="#ffffff">
+      <section className="masthead">
+        <img src="/public/assets/img/me.png" alt="Thomas Wilson" className="photo" />
         <div>
-          <img src="/assets/img/me.png" alt="Thomas Wilson" className="photo" />
-          <h1>Thomas P. Wilson</h1>
-          <p>Skilled and passionate developer and architect, focusing on data privacy and security.</p>
-          <p>I build and restore boats.</p>
+          <h2>Thomas P. Wilson</h2>
+          <p>Skilled and passionate craftsman with {new Date().getFullYear() - 2005} years of experience, focusing on data privacy and security.</p>
         </div>
+      </section>
+
+      <section className="about">
+        <h3>
+          <span>About me</span>
+          <nav className="pills">
+            <ul>
+              <li><NavLink to="">Professional</NavLink></li>
+              <li><NavLink to="">Personal</NavLink></li>
+            </ul>
+          </nav>
+        </h3>
+        
       </section>
 
       <section className="side-by-side bragging" data-background="#d9dbf1">
