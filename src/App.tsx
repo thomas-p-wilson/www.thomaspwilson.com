@@ -1,5 +1,5 @@
 import './App.css'
-import Pages from "@/pages/index.jsx"
+import Pages from "@/pages/index"
 import { Toaster } from "@/components/ui/toaster"
 
 function App() {
@@ -11,4 +11,4 @@ function App() {
   )
 }
 
-export default App 
+export default App
