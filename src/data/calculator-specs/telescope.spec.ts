@@ -122,7 +122,7 @@ describe("telescopeMirror", () => {
     expect(forward.secondaryMagnification).toBe(String(M));
   });
 
-  it("computes the primary's effective area after removing the Cassegrain secondary's hole", () => {
+  it("sizes a Cassegrain's primary hole from the narrowed outgoing beam, smaller than the secondary itself", () => {
     const result = telescopeMirror.calculate({
       ...base, primaryType: "paraboloidal", primaryConstruction: "ground",
       secondaryEnabled: "true", secondaryType: "cassegrain",
@@ -131,16 +131,35 @@ describe("telescopeMirror", () => {
     expect(parseFloat(result.primaryHoleDiameter)).toBeGreaterThan(0);
     // The cone has narrowed by the time it reaches the primary, so the hole is smaller than the secondary itself.
     expect(parseFloat(result.primaryHoleDiameter)).toBeLessThan(10);
-    expect(parseFloat(result.primaryEffectiveArea)).toBeLessThan(parseFloat(result.primaryDishArea));
   });
 
-  it("leaves the primary's hole/effective-area fields blank for a Newtonian secondary", () => {
+  it("computes the primary's lighted area from the secondary's full silhouette, for either type", () => {
+    const cassegrain = telescopeMirror.calculate({
+      ...base, primaryType: "paraboloidal", primaryConstruction: "ground",
+      secondaryEnabled: "true", secondaryType: "cassegrain",
+      secondaryMagnification: "5", secondaryBackFocusDistance: "20", secondaryDiameter: "10",
+    });
+    // Unlike the hole (which only has to pass the narrowed outgoing beam), the lighted area is
+    // reduced by the secondary's actual physical diameter, since that's what shadows the primary
+    // in the incoming beam.
+    const expectedCassegrain = parseFloat(cassegrain.primaryDishArea) - Math.PI * (10 / 2) ** 2;
+    expect(parseFloat(cassegrain.primaryEffectiveArea)).toBeCloseTo(expectedCassegrain, 1);
+
+    const newtonian = telescopeMirror.calculate({
+      ...base, primaryType: "paraboloidal", primaryConstruction: "ground",
+      secondaryEnabled: "true", secondaryType: "newtonian", secondaryToFocusDistance: "15",
+    });
+    // d = D * distance / f = 60.96 * 15 / 121.92 = 7.5 (same minor-axis derivation as the obstruction test above).
+    const expectedNewtonian = parseFloat(newtonian.primaryDishArea) - Math.PI * (7.5 / 2) ** 2;
+    expect(parseFloat(newtonian.primaryEffectiveArea)).toBeCloseTo(expectedNewtonian, 1);
+  });
+
+  it("leaves the primary's hole field blank for a Newtonian secondary, which has none", () => {
     const result = telescopeMirror.calculate({
       ...base, primaryType: "paraboloidal", primaryConstruction: "ground",
       secondaryEnabled: "true", secondaryType: "newtonian", secondaryToFocusDistance: "15",
     });
     expect(result.primaryHoleDiameter).toBe("");
-    expect(result.primaryEffectiveArea).toBe("");
   });
 
   it("derives the Cassegrain secondary-to-primary spacing from the back focus distance", () => {

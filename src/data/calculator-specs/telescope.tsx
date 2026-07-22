@@ -12,6 +12,7 @@ import { MirrorProfileDiagram, type MirrorElement } from "@/components/calculato
 // formulas — each result's stat tile can expand into the calculator that actually produced it.
 
 const GLASS_DENSITY_G_PER_CM3 = "2.579";
+const DEFAULT_APERTURE_DIAMETER_CM = 60.96;
 const DEG_PER_RAD = 180 / Math.PI;
 const ARCSEC_PER_RAD = 206265;
 
@@ -167,8 +168,9 @@ export const telescopeMirror: CalculatorSpec = {
           help: "The Cassegrain secondary reflects the beam back through a hole cut in the primary. This is the minimum diameter that hole needs at the primary's plane for the converging cone to pass through unvignetted — smaller than the secondary itself, since the beam has already narrowed by the time it gets there.",
         },
         {
-          id: "primaryEffectiveArea", label: "Effective Area (Hole Removed)", unit: "cm²", readOnly: true,
-          hidden: (v) => !(v.secondaryEnabled === "true" && v.secondaryType === "cassegrain"),
+          id: "primaryEffectiveArea", label: "Lighted Area (Obstruction Removed)", unit: "cm²", readOnly: true,
+          hidden: (v) => v.secondaryEnabled !== "true",
+          help: "How much of the primary's dish actually gathers light once the secondary's own silhouette is subtracted — the secondary sits in the incoming beam and shadows a same-sized patch of the primary regardless of type, so this uses its full physical diameter rather than the (Cassegrain-only) hole diameter.",
         },
       ],
     },
@@ -287,7 +289,7 @@ export const telescopeMirror: CalculatorSpec = {
     },
   ],
   defaults: {
-    apertureDiameter: "60.96",
+    apertureDiameter: String(DEFAULT_APERTURE_DIAMETER_CM),
     barlowReducerFactor: "1",
     primaryType: "paraboloidal",
     primaryConstruction: "ground",
@@ -295,7 +297,9 @@ export const telescopeMirror: CalculatorSpec = {
     primaryEdgeThickness: "5",
     secondaryEnabled: "false",
     secondaryType: "newtonian",
-    secondaryToFocusDistance: "15",
+    // Sized so the diagonal clears the focuser by a reasonable margin out of the box: half the
+    // aperture plus 5cm of clearance, in the absence of a user-supplied focuser drawtube spec.
+    secondaryToFocusDistance: String(DEFAULT_APERTURE_DIAMETER_CM / 2 + 5),
     secondarySolveFor: "magnification",
     secondaryDiameter: "10",
     secondaryMagnification: "5",
@@ -411,7 +415,6 @@ export const telescopeMirror: CalculatorSpec = {
           // scales by similar triangles: holeDiameter = secondaryDiameter * b / (distanceFromPrimary + b).
           if (secondaryDistanceFromPrimary != null) {
             primaryHoleDiameter = (secondaryDiameter * backFocusDistance) / (secondaryDistanceFromPrimary + backFocusDistance);
-            primaryEffectiveArea = dishArea - Math.PI * (primaryHoleDiameter / 2) ** 2;
           }
         }
       } else {
@@ -425,6 +428,10 @@ export const telescopeMirror: CalculatorSpec = {
       if (obstructingDiameter != null) {
         secondaryObstructionLinear = (obstructingDiameter / apertureDiameter) * 100;
         secondaryObstructionArea = (secondaryObstructionLinear * secondaryObstructionLinear) / 100;
+        // Whichever type, the secondary sits in the incoming beam and shadows a same-sized patch of
+        // the primary — distinct from (and always ≥) the Cassegrain-only hole, which only has to
+        // pass the already-narrowed outgoing beam.
+        primaryEffectiveArea = dishArea - Math.PI * (obstructingDiameter / 2) ** 2;
       }
     }
 
