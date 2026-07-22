@@ -9,6 +9,9 @@ import type { CalculatorSpec } from "@/lib/calculator";
 export default function CalculatorPage({ spec }: { spec: CalculatorSpec }) {
   const [activeHelp, setActiveHelp] = useState<string | null>(null);
   const [expandedSubCalcs, setExpandedSubCalcs] = useState<Record<string, CalculatorSpec>>({});
+  // Seeded the same way GenericCalculator seeds its own — kept in sync via onValuesChange — so
+  // CalculatorHelp can evaluate `hidden` predicates without a first-paint flash of stale defaults.
+  const [values, setValues] = useState<Record<string, string>>(() => spec.calculate({ ...spec.defaults }));
   const hasHelp = !!spec.helpIntro || spec.sections.some((s) => s.help || s.fields.some((f) => f.help));
 
   return (
@@ -44,9 +47,16 @@ export default function CalculatorPage({ spec }: { spec: CalculatorSpec }) {
               activeHelp={activeHelp}
               onActiveHelpChange={setActiveHelp}
               onExpandedSubCalcsChange={setExpandedSubCalcs}
+              onValuesChange={setValues}
               gridLayout
             />
-            <CalculatorHelp spec={spec} activeHelp={activeHelp} setActiveHelp={setActiveHelp} expandedSubCalcs={expandedSubCalcs} />
+            <CalculatorHelp
+              spec={spec}
+              activeHelp={activeHelp}
+              setActiveHelp={setActiveHelp}
+              expandedSubCalcs={expandedSubCalcs}
+              values={values}
+            />
           </motion.div>
         ) : (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>

@@ -94,7 +94,7 @@ const SubCalculatorHelp = ({
  * and later sections don't drift out of alignment with their cards.
  */
 export default function CalculatorHelp({
-  spec, activeHelp, setActiveHelp, expandedSubCalcs,
+  spec, activeHelp, setActiveHelp, expandedSubCalcs, values,
 }: {
   spec: CalculatorSpec;
   activeHelp: string | null;
@@ -103,6 +103,12 @@ export default function CalculatorHelp({
    * GenericCalculator's `onExpandedSubCalcsChange`. Only entries whose spec has its own help
    * content actually render anything here. */
   expandedSubCalcs?: Record<string, CalculatorSpec>;
+  /** Current calculator values — see GenericCalculator's `onValuesChange`. Used only to evaluate
+   * each field's `hidden` predicate, so a conditional field's help block tracks the same
+   * visibility as the field itself rather than lingering once it drops out of the card. A
+   * section's own help has no such gate: toggling a section off (e.g. Secondary Mirror) blurs its
+   * card but never removes it, so the card and its help block stay paired throughout. */
+  values: Record<string, string>;
 }) {
   return (
     <>
@@ -114,6 +120,7 @@ export default function CalculatorHelp({
       )}
       {spec.sections.map((section, sectionIndex) => {
         const fieldEntries = section.fields
+          .filter((field) => !field.hidden?.(values))
           .map((field) => {
             const subCalcSpec = expandedSubCalcs?.[field.id];
             return { field, subCalcSpec: subCalcSpec && hasHelpContent(subCalcSpec) ? subCalcSpec : undefined };

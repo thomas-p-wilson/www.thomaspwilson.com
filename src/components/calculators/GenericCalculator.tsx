@@ -93,10 +93,13 @@ interface GenericCalculatorProps {
    * what spec each resolved to — so a sibling CalculatorHelp can surface that spec's own help
    * text nested under the corresponding field, only while it's actually expanded. */
   onExpandedSubCalcsChange?: (specs: Record<string, CalculatorSpec>) => void;
+  /** Reports the current values, whenever they change, so a sibling CalculatorHelp can evaluate
+   * each field's `hidden` predicate and skip that field's help block while it isn't shown. */
+  onValuesChange?: (values: Record<string, string>) => void;
 }
 
 export default function GenericCalculator({
-  spec, initialValues, activeHelp: activeHelpProp, onActiveHelpChange, gridLayout, onExpandedSubCalcsChange,
+  spec, initialValues, activeHelp: activeHelpProp, onActiveHelpChange, gridLayout, onExpandedSubCalcsChange, onValuesChange,
 }: GenericCalculatorProps) {
   const [values, setValues] = useState<Record<string, string>>(() => spec.calculate({ ...spec.defaults, ...initialValues }));
   const [internalActiveHelp, setInternalActiveHelp] = useState<string | null>(null);
@@ -130,6 +133,10 @@ export default function GenericCalculator({
     }
     onExpandedSubCalcsChange(resolved);
   }, [expandedFields, values, spec, onExpandedSubCalcsChange]);
+
+  useEffect(() => {
+    onValuesChange?.(values);
+  }, [values, onValuesChange]);
 
   const update = (id: string, value: string) => {
     setValues((prev) => spec.calculate({ ...prev, [id]: value }));
