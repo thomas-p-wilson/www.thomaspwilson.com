@@ -8,6 +8,7 @@ import type { CalculatorSpec } from "@/lib/calculator";
 
 export default function CalculatorPage({ spec }: { spec: CalculatorSpec }) {
   const [activeHelp, setActiveHelp] = useState<string | null>(null);
+  const [expandedSubCalcs, setExpandedSubCalcs] = useState<Record<string, CalculatorSpec>>({});
   const hasHelp = !!spec.helpIntro || spec.sections.some((s) => s.help || s.fields.some((f) => f.help));
 
   return (
@@ -38,8 +39,14 @@ export default function CalculatorPage({ spec }: { spec: CalculatorSpec }) {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-x-12"
           >
-            <GenericCalculator spec={spec} activeHelp={activeHelp} onActiveHelpChange={setActiveHelp} />
-            <CalculatorHelp spec={spec} activeHelp={activeHelp} setActiveHelp={setActiveHelp} />
+            <GenericCalculator
+              spec={spec}
+              activeHelp={activeHelp}
+              onActiveHelpChange={setActiveHelp}
+              onExpandedSubCalcsChange={setExpandedSubCalcs}
+              gridLayout
+            />
+            <CalculatorHelp spec={spec} activeHelp={activeHelp} setActiveHelp={setActiveHelp} expandedSubCalcs={expandedSubCalcs} />
           </motion.div>
         ) : (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>

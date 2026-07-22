@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FocusEvent, type SyntheticEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FocusEvent, type SyntheticEvent } from "react";
 import { ChevronDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,23 +35,26 @@ function ReadOnlyStat({
   return (
     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs text-slate-500 uppercase tracking-wide">{field.label}</span>
-        {expandable && (
+        {expandable ? (
           <button
             type="button"
             onClick={onToggleExpand}
+            aria-expanded={expanded}
             aria-label={expanded ? `Collapse ${field.label}` : `Expand ${field.label}`}
-            className="text-slate-400 hover:text-slate-600 transition-colors shrink-0"
+            className="flex items-center gap-1 -m-1 p-1 rounded text-xs text-slate-500 uppercase tracking-wide hover:text-slate-700 transition-colors"
           >
-            <ChevronDown className={`w-4 h-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
+            <span>{field.label}</span>
+            <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${expanded ? "rotate-180" : ""}`} />
           </button>
+        ) : (
+          <span className="text-xs text-slate-500 uppercase tracking-wide">{field.label}</span>
         )}
       </div>
       <div className="flex items-baseline justify-between gap-2 mt-1">
         <span className="text-lg font-semibold text-slate-900">{value || "—"}</span>
         {convertible ? (
           <Select value={displayUnit} onValueChange={onUnitChange}>
-            <SelectTrigger className="h-auto w-auto gap-1 border-none bg-transparent p-0 text-xs text-slate-500 shadow-none focus:ring-0 [&>svg]:hidden">
+            <SelectTrigger className="h-auto w-auto gap-1 border-none bg-transparent p-0 text-xs text-slate-500 shadow-none focus:ring-0 [&>svg]:w-3 [&>svg]:h-3 [&>svg]:opacity-70">
               <SelectValue>{displayUnit}</SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -74,21 +77,32 @@ interface GenericCalculatorProps {
   /**
    * Controls which card or field is highlighted as correlating with a side help panel, keyed by
    * section title or field id (whichever declared the active `help`). Uncontrolled (manages its
-   * own state) when omitted — e.g. for a subCalculator's nested instance, which has no help panel
-   * of its own to coordinate with.
+   * own state) when omitted — e.g. a standalone render with no help panel of its own to coordinate
+   * with. A subCalculator's nested instance still receives this (namespaced by the parent field's
+   * id) purely so its own help correlates with the blocks CalculatorHelp nests under that field.
    */
   activeHelp?: string | null;
   onActiveHelpChange?: (key: string) => void;
+  /**
+   * Places cards onto the shared grid with a sibling CalculatorHelp column. True only for the
+   * instance CalculatorPage renders directly — a nested subCalculator instance still coordinates
+   * `activeHelp` with the parent but must never place its own cards onto the parent's grid.
+   */
+  gridLayout?: boolean;
+  /** Reports, whenever it changes, which currently-expanded fields resolved a subCalculator and
+   * what spec each resolved to — so a sibling CalculatorHelp can surface that spec's own help
+   * text nested under the corresponding field, only while it's actually expanded. */
+  onExpandedSubCalcsChange?: (specs: Record<string, CalculatorSpec>) => void;
 }
 
-export default function GenericCalculator({ spec, initialValues, activeHelp: activeHelpProp, onActiveHelpChange }: GenericCalculatorProps) {
+export default function GenericCalculator({
+  spec, initialValues, activeHelp: activeHelpProp, onActiveHelpChange, gridLayout, onExpandedSubCalcsChange,
+}: GenericCalculatorProps) {
   const [values, setValues] = useState<Record<string, string>>(() => spec.calculate({ ...spec.defaults, ...initialValues }));
   const [internalActiveHelp, setInternalActiveHelp] = useState<string | null>(null);
   const activeHelp = activeHelpProp !== undefined ? activeHelpProp : internalActiveHelp;
   const setActiveHelp = onActiveHelpChange ?? setInternalActiveHelp;
-  // Only the instance CalculatorPage coordinates with a help panel needs to place its cards onto
-  // the shared grid — a standalone render or a nested subCalculator has no sibling to align with.
-  const isGridLayout = onActiveHelpChange !== undefined;
+  const isGridLayout = !!gridLayout;
   // Per-field selected display unit, for fields with `measure` set. Falls back to the field's storage unit.
   const [displayUnits, setDisplayUnits] = useState<Record<string, string>>({});
   // While a measure-tagged field is focused, its input shows exactly what's been typed (unconverted on
@@ -103,6 +117,19 @@ export default function GenericCalculator({ spec, initialValues, activeHelp: act
     if (next.has(id)) next.delete(id); else next.add(id);
     return next;
   });
+
+  useEffect(() => {
+    if (!onExpandedSubCalcsChange) return;
+    const resolved: Record<string, CalculatorSpec> = {};
+    for (const section of spec.sections) {
+      for (const field of section.fields) {
+        if (!expandedFields.has(field.id)) continue;
+        const subCalc = field.subCalculator?.(values);
+        if (subCalc) resolved[field.id] = subCalc.spec;
+      }
+    }
+    onExpandedSubCalcsChange(resolved);
+  }, [expandedFields, values, spec, onExpandedSubCalcsChange]);
 
   const update = (id: string, value: string) => {
     setValues((prev) => spec.calculate({ ...prev, [id]: value }));
@@ -180,8 +207,11 @@ export default function GenericCalculator({ spec, initialValues, activeHelp: act
                 )}
               </div>
             </CardHeader>
-            {toggledOn && (
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            {(() => {
+              const fields = (
+                <CardContent
+                  className={`grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 ${toggledOn ? "" : "pointer-events-none select-none blur-[3px] opacity-60"}`}
+                >
                 {section.fields
                   .filter((field) => !field.hidden?.(values))
                   .map((field) => {
@@ -219,7 +249,12 @@ export default function GenericCalculator({ spec, initialValues, activeHelp: act
                           />
                           {expanded && subCalc && (
                             <div className="pl-4 border-l-2 border-slate-200">
-                              <GenericCalculator spec={subCalc.spec} initialValues={subCalc.prefill(values)} />
+                              <GenericCalculator
+                                spec={subCalc.spec}
+                                initialValues={subCalc.prefill(values)}
+                                activeHelp={activeHelp?.startsWith(`${field.id}:`) ? activeHelp.slice(field.id.length + 1) : null}
+                                onActiveHelpChange={(key) => setActiveHelp(`${field.id}:${key}`)}
+                              />
                             </div>
                           )}
                         </div>
@@ -254,6 +289,7 @@ export default function GenericCalculator({ spec, initialValues, activeHelp: act
                               onFocus={convertible ? onFieldFocus(field) : undefined}
                               onBlur={convertible ? onFieldBlur(field) : undefined}
                               onChange={onFieldChange(field)}
+                              className={convertible || field.unit ? "rounded-r-none" : undefined}
                             />
                             {convertible ? (
                               <Select value={displayUnit} onValueChange={(unit: string) => onUnitChange(field, unit)}>
@@ -278,8 +314,13 @@ export default function GenericCalculator({ spec, initialValues, activeHelp: act
                       </div>
                     );
                   })}
-              </CardContent>
-            )}
+                </CardContent>
+              );
+              // A disabled section still renders its fields (so the card shows a blurred preview of
+              // its contents instead of empty whitespace once toggled off) but a `fieldset` wrapper
+              // makes every control within genuinely inert rather than just visually faded.
+              return toggledOn ? fields : <fieldset disabled className="contents">{fields}</fieldset>;
+            })()}
           </Card>
         );
       })}

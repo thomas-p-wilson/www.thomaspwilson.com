@@ -43,7 +43,7 @@ const Field = ({ label, id, unit, value, onChange, isReadOnly = false, activeFie
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
       <div className="flex">
-        <Input id={id} type="number" value={value} onChange={onChange} readOnly={isReadOnly} className={isReadOnly ? "bg-slate-100" : ""} onFocus={() => setActiveField(id)} />
+        <Input id={id} type="number" value={value} onChange={onChange} readOnly={isReadOnly} className={`${isReadOnly ? "bg-slate-100 " : ""}${unit ? "rounded-r-none" : ""}`} onFocus={() => setActiveField(id)} />
         {unit && <span className="flex items-center justify-center px-3 bg-slate-100 border border-l-0 rounded-r-md text-sm text-slate-600">{unit}</span>}
       </div>
     </div>

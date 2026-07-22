@@ -3,6 +3,9 @@ import { GRID_PLACEMENT_CLASS, gridPos, sectionGridRow } from "./calculatorGridA
 
 const toParagraphs = (help: string | string[]) => (Array.isArray(help) ? help : [help]);
 
+const hasHelpContent = (spec: CalculatorSpec) =>
+  !!spec.helpIntro || spec.sections.some((s) => s.help || s.fields.some((f) => f.help));
+
 interface HelpBlockProps {
   title: string;
   compact?: boolean;
@@ -24,6 +27,62 @@ const HelpBlock = ({ title, compact, active, onClick, paragraphs }: HelpBlockPro
 );
 
 /**
+ * A sub-calculator's own help content, nested under the parent field whose stat tile expanded it —
+ * same shape as the top-level render below, minus the grid placement (it lives inline within the
+ * parent section's help column rather than as its own grid cell). Keys are namespaced by
+ * `namespace` (the parent field's id) to match GenericCalculator's namespacing of the nested
+ * instance's `activeHelp`, so clicking a block here and interacting with the expanded card agree
+ * on which one is "active".
+ */
+const SubCalculatorHelp = ({
+  spec, namespace, activeHelp, setActiveHelp,
+}: {
+  spec: CalculatorSpec;
+  namespace: string;
+  activeHelp: string | null;
+  setActiveHelp: (key: string) => void;
+}) => (
+  <div className="space-y-3">
+    {spec.helpIntro && <p className="text-sm text-slate-600">{spec.helpIntro}</p>}
+    {spec.sections.map((section) => {
+      const fieldsWithHelp = section.fields.filter((f) => f.help);
+      if (!section.help && fieldsWithHelp.length === 0) return null;
+      const sectionKey = `${namespace}:${section.title}`;
+      return (
+        <div key={section.title} className="space-y-3">
+          {section.help && (
+            <HelpBlock
+              title={section.title}
+              compact
+              active={activeHelp === sectionKey}
+              onClick={() => setActiveHelp(sectionKey)}
+              paragraphs={toParagraphs(section.help)}
+            />
+          )}
+          {fieldsWithHelp.length > 0 && (
+            <div className={section.help ? "pl-4 border-l-2 border-slate-200 space-y-3" : "space-y-3"}>
+              {fieldsWithHelp.map((field) => {
+                const fieldKey = `${namespace}:${field.id}`;
+                return (
+                  <HelpBlock
+                    key={field.id}
+                    title={field.label}
+                    compact
+                    active={activeHelp === fieldKey}
+                    onClick={() => setActiveHelp(fieldKey)}
+                    paragraphs={toParagraphs(field.help!)}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+);
+
+/**
  * Side panel of prose paired with a CalculatorPage's cards and fields. Correlation is by title/id
  * (the shared key with GenericCalculator's cards and field rows) via the lifted `activeHelp`
  * state: a card-level block for a section's own `help`, plus a nested block for any field within
@@ -35,11 +94,15 @@ const HelpBlock = ({ title, compact, active, onClick, paragraphs }: HelpBlockPro
  * and later sections don't drift out of alignment with their cards.
  */
 export default function CalculatorHelp({
-  spec, activeHelp, setActiveHelp,
+  spec, activeHelp, setActiveHelp, expandedSubCalcs,
 }: {
   spec: CalculatorSpec;
   activeHelp: string | null;
   setActiveHelp: (key: string) => void;
+  /** Specs resolved from currently-expanded stat tiles' subCalculators, keyed by field id — see
+   * GenericCalculator's `onExpandedSubCalcsChange`. Only entries whose spec has its own help
+   * content actually render anything here. */
+  expandedSubCalcs?: Record<string, CalculatorSpec>;
 }) {
   return (
     <>
@@ -50,8 +113,13 @@ export default function CalculatorHelp({
         </div>
       )}
       {spec.sections.map((section, sectionIndex) => {
-        const fieldsWithHelp = section.fields.filter((f) => f.help);
-        if (!section.help && fieldsWithHelp.length === 0) return null;
+        const fieldEntries = section.fields
+          .map((field) => {
+            const subCalcSpec = expandedSubCalcs?.[field.id];
+            return { field, subCalcSpec: subCalcSpec && hasHelpContent(subCalcSpec) ? subCalcSpec : undefined };
+          })
+          .filter((entry) => entry.field.help || entry.subCalcSpec);
+        if (!section.help && fieldEntries.length === 0) return null;
         return (
           <div
             key={section.title}
@@ -66,17 +134,30 @@ export default function CalculatorHelp({
                 paragraphs={toParagraphs(section.help)}
               />
             )}
-            {fieldsWithHelp.length > 0 && (
+            {fieldEntries.length > 0 && (
               <div className={section.help ? "pl-4 border-l-2 border-slate-200 space-y-3" : "space-y-3"}>
-                {fieldsWithHelp.map((field) => (
-                  <HelpBlock
-                    key={field.id}
-                    title={field.label}
-                    compact
-                    active={activeHelp === field.id}
-                    onClick={() => setActiveHelp(field.id)}
-                    paragraphs={toParagraphs(field.help!)}
-                  />
+                {fieldEntries.map(({ field, subCalcSpec }) => (
+                  <div key={field.id} className="space-y-3">
+                    {field.help && (
+                      <HelpBlock
+                        title={field.label}
+                        compact
+                        active={activeHelp === field.id}
+                        onClick={() => setActiveHelp(field.id)}
+                        paragraphs={toParagraphs(field.help!)}
+                      />
+                    )}
+                    {subCalcSpec && (
+                      <div className={field.help ? "pl-4 border-l-2 border-slate-200" : ""}>
+                        <SubCalculatorHelp
+                          spec={subCalcSpec}
+                          namespace={field.id}
+                          activeHelp={activeHelp}
+                          setActiveHelp={setActiveHelp}
+                        />
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
