@@ -20,7 +20,9 @@ export type TraitId =
   | "mutationResistance"
   | "size"
   | "thermalTolerance"
-  | "pigment";
+  | "pigment"
+  | "foraging"
+  | "energyStorage";
 
 /**
  * A seed gene family: a consensus motif in the *translated symbol* alphabet

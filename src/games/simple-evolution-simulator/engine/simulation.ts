@@ -22,7 +22,7 @@ const MUTATION_RESISTANCE_MAX_DAMPING = 0.85;
 // copy or maintain — without this, genome length is free to drift (up or
 // down) with no selection pressure either way, and settles at whatever the
 // active gene set's motifs happen to need rather than evolving toward it.
-const GENOME_MAINTENANCE_COST_PER_BASE = 0.001;
+const GENOME_MAINTENANCE_COST_PER_BASE = 0.0002;
 const REPLICATION_COST_PER_BASE = 0.02;
 const ENERGY_STORAGE_BASE_CAP = 20;
 
@@ -109,7 +109,7 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     const x = wrap(centerX + randomInt(rng, 5) - 2, state.width);
     const y = wrap(centerY + randomInt(rng, 5) - 2, state.height);
     if (state.grid[cellIndex(state, x, y)]) continue;
-    const genome = createSeedGenome(rng);
+    const genome = createSeedGenome(rng, state.environment);
     const id = nextOrganismId(state);
     const organism = createOrganism({
       id, genome, x, y, energy: INITIAL_ENERGY, generation: 0, parentIds: [], birthTick: 0,

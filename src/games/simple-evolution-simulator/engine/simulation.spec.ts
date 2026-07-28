@@ -61,6 +61,12 @@ describe("step", () => {
     }
   });
 
+  it("does not go extinct over a long run (genome-length costs must stay affordable)", () => {
+    const state = createSimulation(baseOptions());
+    for (let i = 0; i < 3000; i++) step(state);
+    expect(state.stats.population).toBeGreaterThan(0);
+  });
+
   it("the lineage archive keeps dead organisms with a recorded death tick", () => {
     const state = createSimulation({ ...baseOptions(), environment: { temperature: 0.9, foodRegenRate: 0 } });
     for (let i = 0; i < 200; i++) step(state);

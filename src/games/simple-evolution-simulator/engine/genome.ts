@@ -7,11 +7,11 @@
 //
 // Genomes are modeled as single-stranded RNA (bases A/C/G/U) to match the
 // "early RNA world" framing — no double-stranded DNA in this first pass.
-import { BASES, symbolToCodon } from "./codonTable";
+import { BASES, SYMBOL_ALPHABET, symbolToCodon } from "./codonTable";
 import { GENE_TABLE } from "./genes";
 import type { Rng } from "./rng";
 import { randomInt } from "./rng";
-import type { Base, Genome, MutationConfig } from "./types";
+import type { Base, EnvironmentConfig, GeneDefinition, Genome, MutationConfig } from "./types";
 
 /** Keeps genomes from mutating down to nothing or ballooning without bound. */
 export const MIN_GENOME_LENGTH = 30;
@@ -110,19 +110,72 @@ export function mutate(genome: Genome, config: MutationConfig, rng: Rng): Genome
   return result;
 }
 
+/** How closely a given mismatch count against `def.motif` expresses `target`. */
+function expressedValueForMismatches(def: GeneDefinition, mismatches: number): number {
+  const strength = (def.motif.length - mismatches) / def.motif.length;
+  const active = strength >= def.activationThreshold;
+  if (!active) return def.baseline;
+  const normalized = Math.min(1, Math.max(0, (strength - def.activationThreshold) / (1 - def.activationThreshold)));
+  return def.mapValue(normalized);
+}
+
+/**
+ * Builds a codon sequence for `def`'s motif with just enough intentional
+ * mismatches that decoding it lands the expressed trait as close to `target`
+ * as this motif's resolution allows. Used to give the primordial organism a
+ * thermal tolerance adapted to whatever starting temperature the world was
+ * configured with, rather than always starting from the same fixed baseline
+ * regardless of environment — life should begin suited to the planet it
+ * arose on, even before any real evolution has happened.
+ */
+export function buildAdaptedMotif(def: GeneDefinition, target: number, rng: Rng): Genome {
+  const motifLen = def.motif.length;
+  let bestMismatches = motifLen;
+  let bestDiff = Infinity;
+  for (let mismatches = 0; mismatches <= motifLen; mismatches++) {
+    const diff = Math.abs(expressedValueForMismatches(def, mismatches) - target);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      bestMismatches = mismatches;
+    }
+  }
+
+  const mismatchPositions = new Set<number>();
+  while (mismatchPositions.size < bestMismatches) mismatchPositions.add(randomInt(rng, motifLen));
+
+  let out = "";
+  for (let i = 0; i < motifLen; i++) {
+    const original = def.motif[i];
+    if (!mismatchPositions.has(i)) {
+      out += symbolToCodon(original);
+      continue;
+    }
+    let replacement = original;
+    while (replacement === original) replacement = SYMBOL_ALPHABET[randomInt(rng, SYMBOL_ALPHABET.length)];
+    out += symbolToCodon(replacement);
+  }
+  return out;
+}
+
 /** Gene ids the primordial seed organism starts with fully activated. */
 const SEED_ACTIVE_GENES = ["replication-rate", "membrane-stability", "metabolism-efficiency"];
+
+/** Gene ids seeded adapted to the world's starting environment rather than fixed or silent. */
+const SEED_ENVIRONMENT_ADAPTED_GENES = ["thermal-tolerance"];
 
 /**
  * Builds the genome for the very first organism: exact copies of a small
  * handful of "minimal viable replicator" motifs (replication, membrane,
- * metabolism), joined by short random linkers, plus a random tail. Every
- * other seed gene (motility, mutation resistance, size, thermal tolerance,
- * pigment) starts silent and has to emerge from mutation/duplication over
+ * metabolism), joined by short random linkers, plus a random tail. Thermal
+ * tolerance is seeded adapted to `environment`'s starting temperature (see
+ * `buildAdaptedMotif`) rather than left silent, since a planet's earliest
+ * life forming in-place should already suit its own temperature. Every other
+ * seed gene (motility, mutation resistance, size, pigment, foraging, energy
+ * storage) starts silent and has to emerge from mutation/duplication over
  * subsequent generations — that's deliberate: it's the "simple replicator
  * evolving into a cell" arc the game is telling.
  */
-export function createSeedGenome(rng: Rng): Genome {
+export function createSeedGenome(rng: Rng, environment?: EnvironmentConfig): Genome {
   // Reading frame matters: translate() always reads codons starting at
   // position 0, so every random "linker" segment here is deliberately a
   // multiple of 3 bases — otherwise it would shift the frame and the motifs
@@ -131,9 +184,13 @@ export function createSeedGenome(rng: Rng): Genome {
 
   let genome = randomGenome(3 * (2 + randomInt(rng, 3)), rng);
   for (const def of GENE_TABLE) {
-    if (!SEED_ACTIVE_GENES.includes(def.id)) continue;
-    for (const symbol of def.motif) genome += symbolToCodon(symbol);
-    genome += randomGenome(linkerLength(), rng);
+    if (SEED_ACTIVE_GENES.includes(def.id)) {
+      for (const symbol of def.motif) genome += symbolToCodon(symbol);
+      genome += randomGenome(linkerLength(), rng);
+    } else if (environment && SEED_ENVIRONMENT_ADAPTED_GENES.includes(def.id)) {
+      genome += buildAdaptedMotif(def, environment.temperature, rng);
+      genome += randomGenome(linkerLength(), rng);
+    }
   }
   genome += randomGenome(3 * (8 + randomInt(rng, 10)), rng);
   return genome;

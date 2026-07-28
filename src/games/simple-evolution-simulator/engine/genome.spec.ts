@@ -4,6 +4,7 @@ import {
   MAX_GENOME_LENGTH, MIN_GENOME_LENGTH, createSeedGenome, deleteMutate, duplicateSegment, insertMutate,
   mutate, pointMutate, randomGenome, scaleMutationConfig,
 } from "./genome";
+import { decode } from "./phenotype";
 import { createRng } from "./rng";
 
 const isValidGenome = (genome: string) => [...genome].every((b) => (BASES as string[]).includes(b));
@@ -128,5 +129,20 @@ describe("createSeedGenome", () => {
     const genome = createSeedGenome(createRng(1));
     expect(isValidGenome(genome)).toBe(true);
     expect(genome.length).toBeGreaterThanOrEqual(MIN_GENOME_LENGTH);
+  });
+
+  it("without an environment, thermal tolerance is left at its neutral baseline", () => {
+    const genome = createSeedGenome(createRng(1));
+    expect(decode(genome).traits.thermalTolerance).toBe(0.5);
+  });
+
+  it("adapts thermal tolerance toward a hot starting environment", () => {
+    const genome = createSeedGenome(createRng(1), { temperature: 1, foodRegenRate: 0.15 });
+    expect(decode(genome).traits.thermalTolerance).toBeGreaterThan(0.9);
+  });
+
+  it("adapts thermal tolerance toward a cold starting environment", () => {
+    const genome = createSeedGenome(createRng(1), { temperature: 0, foodRegenRate: 0.15 });
+    expect(decode(genome).traits.thermalTolerance).toBeLessThan(0.3);
   });
 });
