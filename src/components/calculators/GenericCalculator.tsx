@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { CalculatorField, CalculatorSpec } from "@/lib/calculator";
 import { convert, unitsForMeasure } from "@/lib/units";
 import { GRID_PLACEMENT_CLASS, gridPos, sectionGridRow } from "./calculatorGridAlignment";
+import { FunEnergyFact } from "./FunEnergyFact";
 
 /** Converts `value` from `from` to `to`, falling back to `value` unchanged if either unit can't be parsed. */
 function tryConvert(value: string, from: string, to: string): string {
@@ -217,7 +218,7 @@ export default function GenericCalculator({
             {(() => {
               const fields = (
                 <CardContent
-                  className={`grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 ${toggledOn ? "" : "pointer-events-none select-none blur-[3px] opacity-60"}`}
+                  className={`grid grid-cols-1 ${section.oneColumn ? "" : "md:grid-cols-2"} gap-x-6 gap-y-4 ${toggledOn ? "" : "pointer-events-none select-none blur-[3px] opacity-60"}`}
                 >
                 {section.fields
                   .filter((field) => !field.hidden?.(values))
@@ -254,6 +255,12 @@ export default function GenericCalculator({
                             expanded={expanded}
                             onToggleExpand={() => toggleExpand(field.id)}
                           />
+                          {field.funFact && (
+                            <FunEnergyFact
+                              kWh={parseFloat(values[field.id])}
+                              fuelKey={typeof field.funFact === "function" ? field.funFact(values) : undefined}
+                            />
+                          )}
                           {expanded && subCalc && (
                             <div className="pl-4 border-l-2 border-slate-200">
                               <GenericCalculator

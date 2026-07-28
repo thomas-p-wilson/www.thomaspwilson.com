@@ -2,11 +2,14 @@ import {
   circleGeometry, circularSegment, sphereGeometry, sphericalCap, boxVolume, cylinderSurfaceArea,
   cylinderVolume, parabolicSegment, paraboloidalCap,
 } from "./geometry";
-import { idealGasLaw, centrifugalForce, flywheel, massMomentOfInertia, spinCastRotation } from "./physics";
+import { idealGasLaw, centrifugalForce, flywheel, massMomentOfInertia, spinCastRotation, weightFromMass } from "./physics";
 import { loanPayment, effectiveInterestRate } from "./financial-simple";
 import { wireGauge, helixSizing, kilnWattage, thermalMassStorage, materialMass } from "./materials";
-import { solarPanels, woodgasConversion, chemicalStorage } from "./energy-domain";
+import { solarPanels, chemicalStorage } from "./energy-domain";
 import { telescopeMirror } from "./telescope";
+import { tensionCalculator } from "./tension";
+import { fuelEquivalence } from "./fuel-equivalence";
+import { energyConversionChain } from "./energy-conversion-chain";
 import type { CalculatorSpec } from "@/lib/calculator";
 
 export type CalculatorGroup = "geometry" | "physics" | "materials" | "energy" | "financial";
@@ -18,8 +21,10 @@ export const genericCalculatorSpecs: (CalculatorSpec & { group: CalculatorGroup 
     circleGeometry, circularSegment, sphereGeometry, sphericalCap, boxVolume, cylinderSurfaceArea,
     parabolicSegment, paraboloidalCap, cylinderVolume, telescopeMirror,
   ]),
-  ...tag("physics", [idealGasLaw, centrifugalForce, flywheel, massMomentOfInertia, spinCastRotation]),
+  ...tag("physics", [
+    idealGasLaw, centrifugalForce, flywheel, massMomentOfInertia, spinCastRotation, weightFromMass, tensionCalculator,
+  ]),
   ...tag("financial", [loanPayment, effectiveInterestRate]),
   ...tag("materials", [wireGauge, helixSizing, kilnWattage, thermalMassStorage, materialMass]),
-  ...tag("energy", [solarPanels, woodgasConversion, chemicalStorage]),
+  ...tag("energy", [solarPanels, fuelEquivalence, energyConversionChain, chemicalStorage]),
 ];

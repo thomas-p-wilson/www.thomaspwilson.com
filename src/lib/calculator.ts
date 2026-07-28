@@ -37,6 +37,15 @@ export interface CalculatorField {
    */
   subCalculator?: (values: Record<string, string>) => CalculatorSubCalculator | undefined;
   /**
+   * Shows a shuffleable "how much is that, really?" comparison beneath this field's stat tile, e.g.
+   * "≈ 70 km behind the wheel of a Toyota Prius". Only meaningful on a readOnly field whose value is
+   * stored in kWh (see src/data/energy-equivalents.ts) — the comparisons are calibrated against it.
+   * A function narrows the comparisons to whichever fuel key it returns (e.g. the source fuel this
+   * energy came from), so a diesel total doesn't surface a Prius; `true` draws from the full list
+   * unfiltered, for energy whose source fuel isn't known (e.g. post-conversion-chain output).
+   */
+  funFact?: boolean | ((values: Record<string, string>) => string | undefined);
+  /**
    * One or more paragraphs of prose explaining this specific field, shown in the side help panel
    * keyed to the field's `id`. Takes precedence over the section's own `help` when both are
    * present: interacting with this field highlights just its own block instead of the whole card.
@@ -55,6 +64,12 @@ export interface CalculatorSectionToggle {
 export interface CalculatorSectionSpec {
   title: string;
   fields: CalculatorField[];
+  /**
+   * Stacks this section's fields one per line instead of the default two-column grid. Reserve for
+   * sections where most fields are mutually exclusive (shown/hidden by `hidden`) — the two-column
+   * grid reads as broken there, leaving an empty cell beside whichever single field is visible.
+   */
+  oneColumn?: boolean;
   /**
    * When set, the section header gets a right-aligned checkbox and the section's fields render
    * only while it's checked — for optional sub-assemblies (e.g. a secondary mirror) rather than

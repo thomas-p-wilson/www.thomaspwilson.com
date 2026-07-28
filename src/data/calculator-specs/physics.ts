@@ -2,7 +2,7 @@ import type { CalculatorSpec } from "@/lib/calculator";
 import { num } from "@/lib/calculator";
 import { inertiaConfigurationOptions, inertiaConfigurations } from "./inertia-configurations";
 
-const IDEAL_GAS_CONSTANT = 8.31446261815324; // J/(K*mol)
+export const IDEAL_GAS_CONSTANT = 8.31446261815324; // J/(K*mol)
 
 // Ported from origin/2020's ideal-gas-law calculator. The original let
 // whichever field you filled in last drive the rest; simplified to an
@@ -144,6 +144,32 @@ export const flywheel: CalculatorSpec = {
 
 const STANDARD_GRAVITY_M_S2 = 9.80665;
 
+// New — extracted so the Tension calculator can delegate its Weight tile the same way Telescope
+// delegates sagitta/dish/mass results to other calculators, instead of duplicating W = m*g inline.
+// No "acceleration" Measure exists in lib/units.ts, so gravity is a plain fixed unit — same
+// treatment as kilnWattage's power density; weight's "force" Measure was added alongside this spec.
+export const weightFromMass: CalculatorSpec = {
+  slug: "weight-from-mass",
+  title: "Weight from Mass & Gravity",
+  description: "Weight (gravitational force) of an object from its mass and the local gravitational acceleration.",
+  sections: [{
+    title: "Object",
+    fields: [
+      { id: "mass", label: "Mass", unit: "kg", measure: "mass" },
+      { id: "gravity", label: "Gravitational Acceleration", unit: "m/s²" },
+      { id: "weight", label: "Weight", unit: "N", measure: "force", readOnly: true },
+    ],
+  }],
+  defaults: { mass: "1", gravity: String(STANDARD_GRAVITY_M_S2) },
+  calculate: (values) => {
+    const mass = num(values, "mass");
+    const gravity = num(values, "gravity");
+    if (isNaN(mass) || isNaN(gravity)) return values;
+    return { ...values, weight: (mass * gravity).toFixed(3) };
+  },
+  notes: [`W = m × g. Standard gravity on Earth is ${STANDARD_GRAVITY_M_S2} m/s².`],
+};
+
 // New — extracted so Telescope Mirror Design can delegate its spin-cast rotation the same way it
 // delegates sagitta/dish results to other geometry calculators, rather than duplicating the formula.
 export const spinCastRotation: CalculatorSpec = {
@@ -172,19 +198,30 @@ export const massMomentOfInertia: CalculatorSpec = {
   slug: "mass-moment-of-inertia",
   title: "Mass Moment of Inertia",
   description: "Moment of inertia about the axis of symmetry (Z-axis) for common solid/hollow shapes.",
+  helpIntro: "Moment of inertia (a.k.a. rotational inertia) measures how much an object resists a change in its spin rate — the rotational counterpart to mass in F = ma. It depends on more than just how much mass there is: mass farther from the spin axis contributes far more than mass close to it (each bit's contribution scales with the square of its distance from the axis), so a hollow shape has a higher moment of inertia than a solid one of the same mass and outer radius.",
   sections: [{
     title: "Body",
+    oneColumn: true,
+    help: "Every shape here is symmetric about the Z-axis — the axis it spins around — so its moment of inertia comes down to just mass and how that mass is distributed between the axis and the outer radius.",
     fields: [
-      { id: "configuration", label: "Configuration", type: "select", options: inertiaConfigurationOptions },
+      {
+        id: "configuration", label: "Configuration", type: "select", options: inertiaConfigurationOptions,
+        help: "Solid shapes spread their mass evenly out to the radius. Thin-wall shapes concentrate it all at the radius, like a ring or a shell, which is why they have a higher moment of inertia than a solid shape of the same mass and radius. A hollow cylinder sits in between, with mass spread between an inner and outer radius.",
+      },
       { id: "mass", label: "Mass", unit: "kg", measure: "mass" },
       {
         id: "radius", label: "Radius", unit: "m", measure: "length",
+        help: "Distance from the spin axis to the object's outer edge (for a hollow cylinder, its outer radius).",
       },
       {
         id: "innerRadius", label: "Inner Radius", unit: "m", measure: "length",
         hidden: (v) => inertiaConfigurations[v.configuration]?.needsInnerOuterRadius !== true,
+        help: "The hollow cylinder's bore radius, from the axis to the inside surface.",
       },
-      { id: "inertia", label: "Moment of Inertia (Z-axis)", unit: "kg·m²", readOnly: true },
+      {
+        id: "inertia", label: "Moment of Inertia (Z-axis)", unit: "kg·m²", readOnly: true,
+        help: "Feeds directly into rotational dynamics the same way mass feeds into linear dynamics: torque τ = I·α (vs. F = m·a), and stored kinetic energy KE = ½·I·ω² (vs. ½·m·v²).",
+      },
     ],
   }],
   defaults: { configuration: "solid_cylinder", mass: "5", radius: "0.2", innerRadius: "0.1" },

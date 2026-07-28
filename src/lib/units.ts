@@ -27,7 +27,8 @@ export type Measure =
   | "time"
   | "frequency"
   | "pressure"
-  | "angle";
+  | "angle"
+  | "force";
 
 interface LinearUnit {
   kind: "linear";
@@ -174,6 +175,7 @@ const units: Unit[] = [
   linear("kJ", "Kilojoule", "energy", new Decimal(1).dividedBy("3.6")),
   linear("MJ", "Megajoule", "energy", new Decimal(1).dividedBy("0.0036")),
   linear("GJ", "Gigajoule", "energy", new Decimal(1).dividedBy("0.0000036")),
+  linear("BTU", "British Thermal Unit", "energy", "0.29307107017"),
 
   // ---- Power — base unit: watt ----
   linear("mW", "Milliwatt", "power", "0.001"),
@@ -219,6 +221,16 @@ const units: Unit[] = [
   linear("arcmin", "Arcminute", "angle", new Decimal(1).dividedBy(60)),
   linear("arcsec", "Arcsecond", "angle", new Decimal(1).dividedBy(3600)),
   linear("rot", "Rotation", "angle", 360),
+
+  // ---- Force — base unit: newton ----
+  linear("mN", "Millinewton", "force", "0.001"),
+  linear("N", "Newton", "force", 1),
+  linear("kN", "Kilonewton", "force", 1000),
+  linear("dyn", "Dyne", "force", "1e-5"),
+  linear("gf", "Gram-force", "force", "0.00980665"),
+  linear("kgf", "Kilogram-force", "force", "9.80665"),
+  linear("lbf", "Pound-force", "force", "4.4482216152605"),
+  linear("ozf", "Ounce-force", "force", new Decimal("4.4482216152605").dividedBy(16)),
 ];
 
 const unitsBySymbol = new Map(units.map((u) => [u.symbol, u]));
@@ -228,7 +240,7 @@ export function unitsForMeasure(measure: Measure): Unit[] {
 }
 
 export const measures: Measure[] = [
-  "length", "mass", "temperature", "volume", "energy", "power", "time", "frequency", "pressure", "angle",
+  "length", "mass", "temperature", "volume", "energy", "power", "time", "frequency", "pressure", "angle", "force",
 ];
 
 export function convert(value: Decimal.Value, fromSymbol: string, toSymbol: string): Decimal {

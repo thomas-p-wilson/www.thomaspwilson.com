@@ -57,6 +57,11 @@ describe("convert", () => {
     expect(convert(1, "Wh", "J").toNumber()).toBeCloseTo(3600, 5);
   });
 
+  it("converts energy to/from BTU", () => {
+    expect(convert(1, "kWh", "BTU").toNumber()).toBeCloseTo(3412.14, 1);
+    expect(convert(3412.14, "BTU", "kWh").toNumber()).toBeCloseTo(1, 4);
+  });
+
   it("converts power", () => {
     expect(convert(1, "kW", "W").toString()).toBe("1000");
   });
@@ -79,5 +84,12 @@ describe("convert", () => {
   it("converts angle using the correct (non-inverted) multipliers", () => {
     expect(convert(180, "deg", "rad").toNumber()).toBeCloseTo(Math.PI, 5);
     expect(convert(1, "rot", "deg").toString()).toBe("360");
+  });
+
+  it("converts force, including kilogram-force/pound-force", () => {
+    expect(convert(1, "kN", "N").toString()).toBe("1000");
+    expect(convert(1, "kgf", "N").toNumber()).toBeCloseTo(9.80665, 5);
+    expect(convert(1, "lbf", "N").toNumber()).toBeCloseTo(4.4482216152605, 6);
+    expect(convert(16, "ozf", "lbf").toNumber()).toBeCloseTo(1, 5);
   });
 });
