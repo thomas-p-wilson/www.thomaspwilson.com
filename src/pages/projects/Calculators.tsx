@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { Calculator as CalculatorIcon, ArrowLeft } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { projectPath, projects, type Project, type ProjectGroup } from "@/data/projects";
 
@@ -19,16 +18,8 @@ const GROUP_LABELS: Record<Exclude<ProjectGroup, "featured">, string> = {
 const ProjectCard = ({ project }: { project: Project }) => {
   const card = (
     <div className="p-6 rounded-2xl border border-blue-200 bg-blue-50/50 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-500 mb-4">
-        <CalculatorIcon className="w-6 h-6 text-white" />
-      </div>
       <h3 className="text-xl font-semibold text-slate-900 mb-2">{project.title}</h3>
       <p className="text-slate-600 mb-4 flex-grow">{project.description}</p>
-      <div className="flex flex-wrap gap-2 mt-auto">
-        {project.technologies.map((tech) => (
-          <Badge key={tech} variant="outline" className="text-xs">{tech}</Badge>
-        ))}
-      </div>
     </div>
   );
 
