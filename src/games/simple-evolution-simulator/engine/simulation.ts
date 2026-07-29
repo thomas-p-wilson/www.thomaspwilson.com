@@ -9,6 +9,7 @@
 // engine/colony.ts) are a purely relational structure layered on top: bonds
 // between still-fully-independent organisms, recomputed fresh every tick
 // from actual Moore-adjacent pairs, never a shared body/genome/energy pool.
+import { generateBiomeOffsetField, localTemperature } from "./biome";
 import { areCompatible, computeColonies, type ColonyGraph } from "./colony";
 import { createSeedGenome, mutate, scaleMutationConfig } from "./genome";
 import { createOrganism, reproduce } from "./organism";
@@ -109,6 +110,11 @@ export interface SimulationState {
   grid: (string | null)[];
   /** Grid cell -> available food energy. */
   food: Float32Array;
+  /** Grid cell -> fixed offset from environment.temperature (see
+   * engine/biome.ts). Generated once at creation and never touched again;
+   * combine with the live environment.temperature via getLocalTemperature to
+   * get a cell's actual local temperature (see todos/planetary-biomes.md). */
+  biomeOffset: Float32Array;
   environment: EnvironmentConfig;
   mutation: MutationConfig;
   /** All-time archive, including dead organisms, for lineage/ancestry views. */
@@ -157,6 +163,12 @@ function wrap(value: number, max: number): number {
   return ((value % max) + max) % max;
 }
 
+/** A cell's actual local temperature — the live baseline plus this cell's
+ * fixed spatial offset (see engine/biome.ts). */
+function cellTemperature(state: SimulationState, x: number, y: number): number {
+  return localTemperature(state.environment.temperature, state.biomeOffset, cellIndex(state, x, y));
+}
+
 function nextOrganismId(state: SimulationState): string {
   state.nextId += 1;
   return `org-${state.nextId}`;
@@ -171,6 +183,7 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     organisms: new Map(),
     grid: new Array(options.width * options.height).fill(null),
     food: new Float32Array(options.width * options.height),
+    biomeOffset: new Float32Array(options.width * options.height),
     environment: { ...options.environment },
     mutation: { ...options.mutation },
     lineage: new Map(),
@@ -185,6 +198,7 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
   for (let i = 0; i < state.food.length; i++) {
     state.food[i] = rng() * FOOD_MAX_PER_CELL;
   }
+  state.biomeOffset = generateBiomeOffsetField(state.width, state.height, rng);
 
   const seedCount = options.initialPopulation ?? 4;
   const centerX = Math.floor(state.width / 2);
@@ -193,7 +207,11 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     const x = wrap(centerX + randomInt(rng, 5) - 2, state.width);
     const y = wrap(centerY + randomInt(rng, 5) - 2, state.height);
     if (state.grid[cellIndex(state, x, y)]) continue;
-    const genome = createSeedGenome(rng, state.environment);
+    // Seeded adapted to *this* site's local temperature, not the world's flat
+    // baseline — a planet's earliest life should start out suited to the
+    // actual patch of ground it arose on (see todos/planetary-biomes.md).
+    const localEnvironment = { ...state.environment, temperature: cellTemperature(state, x, y) };
+    const genome = createSeedGenome(rng, localEnvironment);
     const id = nextOrganismId(state);
     const organism = createOrganism({
       id, genome, x, y, energy: INITIAL_ENERGY, generation: 0, parentIds: [], birthTick: 0,
@@ -336,7 +354,7 @@ function feedAndAge(state: SimulationState, organism: Organism): void {
   organism.energy += bite;
 
   const sizeCost = BASE_METABOLIC_COST * (0.6 + organism.phenotype.traits.size * 0.5);
-  const thermalMismatch = Math.abs(state.environment.temperature - organism.phenotype.traits.thermalTolerance);
+  const thermalMismatch = Math.abs(cellTemperature(state, organism.x, organism.y) - organism.phenotype.traits.thermalTolerance);
   const thermalCost = thermalMismatch * THERMAL_PENALTY_FACTOR;
   const maintenanceCost = GENOME_MAINTENANCE_COST_PER_BASE * organism.genome.length;
 
@@ -617,4 +635,10 @@ export function getColonySize(state: SimulationState, organismId: string): numbe
  * see `SimulationState.bonds`. */
 export function getColonyBonds(state: SimulationState): Array<[string, string]> {
   return state.bonds;
+}
+
+/** A given grid cell's actual local temperature — the world's live baseline
+ * plus that cell's fixed spatial biome offset (see engine/biome.ts). */
+export function getLocalTemperature(state: SimulationState, x: number, y: number): number {
+  return cellTemperature(state, x, y);
 }

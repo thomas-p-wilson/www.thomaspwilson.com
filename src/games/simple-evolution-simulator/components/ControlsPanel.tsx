@@ -87,7 +87,8 @@ export default function ControlsPanel({
           </div>
           <Slider value={[temperature]} min={0} max={1} step={0.01} onValueChange={(values: number[]) => onTemperatureChange(values[0])} />
           <p className="text-[11px] text-slate-500 mt-1">
-            Organisms whose thermal-tolerance gene doesn't match this niche burn energy faster.
+            Sets the planet's baseline; local regions vary warmer/cooler around it (see the world's background
+            tint). Organisms whose thermal-tolerance gene doesn't match their local niche burn energy faster.
           </p>
         </div>
 

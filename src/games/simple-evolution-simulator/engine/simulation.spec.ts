@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_MUTATION_CONFIG, MAX_GENOME_LENGTH, MIN_GENOME_LENGTH, randomGenome } from "./genome";
 import { createOrganism } from "./organism";
+import { decode } from "./phenotype";
 import {
-  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getOrganisms, step,
+  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getLocalTemperature,
+  getOrganisms, step,
 } from "./simulation";
 import { createRng } from "./rng";
 import { GENE_TABLE } from "./genes";
@@ -43,6 +45,31 @@ describe("createSimulation", () => {
     const a = createSimulation(baseOptions());
     const b = createSimulation(baseOptions());
     expect(getOrganisms(a).map((o) => o.genome)).toEqual(getOrganisms(b).map((o) => o.genome));
+  });
+
+  it("generates a per-cell biome temperature field sized to the grid", () => {
+    const state = createSimulation(baseOptions());
+    expect(state.biomeOffset.length).toBe(state.width * state.height);
+  });
+
+  it("seeds each primordial organism adapted to its own cell's local temperature, not the flat global baseline", () => {
+    // Seed 6 is picked because this world's biome field happens to run
+    // meaningfully colder than the flat baseline right where organisms seed
+    // — a seed where local and global temperature land nearly identical
+    // near the cluster wouldn't distinguish the two, though the underlying
+    // mechanism (see createSimulation's seed loop) is identical either way.
+    const state = createSimulation({ ...baseOptions(), seed: 6 });
+    expect(state.organisms.size).toBeGreaterThan(0);
+    for (const organism of state.organisms.values()) {
+      const localTemp = getLocalTemperature(state, organism.x, organism.y);
+      const thermalTolerance = decode(organism.genome).traits.thermalTolerance;
+      // buildAdaptedMotif (and decode's own best-window search over the rest
+      // of the genome) can only land within this motif's discrete
+      // resolution, not exactly on target — see genome.spec.ts's hot/cold
+      // adaptation tests for the same tolerance in isolation.
+      expect(Math.abs(thermalTolerance - localTemp)).toBeLessThan(0.15);
+      expect(Math.abs(thermalTolerance - localTemp)).toBeLessThan(Math.abs(thermalTolerance - state.environment.temperature));
+    }
   });
 });
 
@@ -112,6 +139,47 @@ describe("step", () => {
     for (const organism of state.organisms.values()) {
       expect(cellTraits.has(organism.id)).toBe(true);
     }
+  });
+});
+
+describe("planetary biomes (per-cell local temperature)", () => {
+  it("thermal-mismatch cost is driven by a cell's local temperature, not the world's flat baseline", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
+    const genome = randomGenome(60, createRng(9));
+
+    function buildOrganism(id: string, x: number, y: number): Organism {
+      const o = createOrganism({ id, genome, x, y, energy: 500, generation: 0, parentIds: [], birthTick: 0 });
+      o.phenotype = { ...o.phenotype, traits: { ...o.phenotype.traits, energyStorage: 50, motility: 0, thermalTolerance: 0.5 } };
+      return o;
+    }
+    const matched = buildOrganism("matched", 5, 5);
+    const mismatched = buildOrganism("mismatched", 15, 12);
+    state.organisms.set(matched.id, matched);
+    state.organisms.set(mismatched.id, mismatched);
+    state.grid[5 * state.width + 5] = matched.id;
+    state.grid[12 * state.width + 15] = mismatched.id;
+
+    // Directly control the biome field (same technique forceSurfaceProtein
+    // uses for colony compatibility): matched's cell reads exactly at its
+    // thermalTolerance (zero mismatch), mismatched's cell reads far from it,
+    // regardless of what the real random field would have put there.
+    state.biomeOffset.fill(0);
+    state.biomeOffset[12 * state.width + 15] = 0.45;
+
+    const matchedEnergyBefore = matched.energy;
+    const mismatchedEnergyBefore = mismatched.energy;
+    step(state);
+    const matchedLoss = matchedEnergyBefore - state.organisms.get("matched")!.energy;
+    const mismatchedLoss = mismatchedEnergyBefore - state.organisms.get("mismatched")!.energy;
+
+    expect(mismatchedLoss).toBeGreaterThan(matchedLoss);
+  });
+
+  it("getLocalTemperature reflects the baseline plus that cell's fixed offset, clamped to [0, 1]", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0, environment: { temperature: 0.9, foodRegenRate: 0 } });
+    state.biomeOffset.fill(0);
+    state.biomeOffset[0] = 0.3; // cell (0, 0)
+    expect(getLocalTemperature(state, 0, 0)).toBe(1); // 0.9 + 0.3 clamps to 1
   });
 });
 

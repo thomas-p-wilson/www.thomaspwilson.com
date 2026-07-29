@@ -181,7 +181,10 @@ export interface LineageRecord {
 }
 
 export interface EnvironmentConfig {
-  /** Normalized 0..1 "world temperature" — organisms have a preferred niche. */
+  /** Normalized 0..1 planetary *baseline* temperature — organisms have a
+   * preferred niche. A cell's actual local temperature also varies
+   * spatially around this baseline (see engine/biome.ts's per-cell
+   * `SimulationState.biomeOffset` and todos/planetary-biomes.md). */
   temperature: number;
   /** How much food regenerates per cell per tick. */
   foodRegenRate: number;

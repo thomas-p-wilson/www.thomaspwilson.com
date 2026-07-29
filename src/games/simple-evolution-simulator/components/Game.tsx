@@ -126,6 +126,8 @@ export default function Game() {
               organisms={organisms}
               cellTraits={cellTraits}
               bonds={bonds}
+              biomeOffset={sim?.biomeOffset ?? null}
+              baseTemperature={sim?.environment.temperature ?? temperature}
               width={WORLD_SIZE_PRESETS[worldSizeIndex].width}
               height={WORLD_SIZE_PRESETS[worldSizeIndex].height}
               selectedId={selectedId}
@@ -136,7 +138,9 @@ export default function Game() {
             Click any organism to inspect it. Brighter rings mark organisms with several active genes — simple
             replicators well on their way to being cells. Thin lines connect bonded colony-mates — independent
             organisms whose surface proteins recognize each other; darker, denser organisms have differentiated
-            under Structural Reinforcement from sitting deep inside a colony.
+            under Structural Reinforcement from sitting deep inside a colony. Background shading shows each
+            region's local temperature — cooler blue, warmer red — fixed for this planet, shifting uniformly
+            with the Temperature control.
           </p>
         </div>
 

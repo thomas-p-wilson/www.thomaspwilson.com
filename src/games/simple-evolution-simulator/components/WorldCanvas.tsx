@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Organism, TraitId } from "../engine/types";
+import { biomeCellColor } from "./biomeColor";
 import { cellStyle } from "./organismColor";
 
 interface WorldCanvasProps {
@@ -11,11 +12,22 @@ interface WorldCanvasProps {
    * engine/simulation.ts's getColonyBonds(). Drawn as connecting lines so
    * colony membership reads visually. */
   bonds: Array<[string, string]>;
+  /** Grid cell -> fixed offset from `baseTemperature` (see
+   * engine/biome.ts's `SimulationState.biomeOffset`), or null before a
+   * simulation exists. Combined with `baseTemperature` to tint the
+   * background per cell so spatial biome variation reads visually. */
+  biomeOffset: Float32Array | null;
+  /** The world's live baseline temperature (see engine's EnvironmentConfig) —
+   * combined with `biomeOffset` per cell, rather than baked into it, so the
+   * live temperature control still shifts every cell uniformly. */
+  baseTemperature: number;
   width: number;
   height: number;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 }
+
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
 const GRID_LINE_COLOR = "rgba(148, 163, 184, 0.12)";
 const BACKGROUND_COLOR = "#0b1120";
@@ -27,7 +39,7 @@ const MIN_CELL_SIZE = 6;
 const MAX_CELL_SIZE = 28;
 
 export default function WorldCanvas({
-  organisms, cellTraits, bonds, width, height, selectedId, onSelect,
+  organisms, cellTraits, bonds, biomeOffset, baseTemperature, width, height, selectedId, onSelect,
 }: WorldCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -72,8 +84,18 @@ export default function WorldCanvas({
     }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, cssWidth, cssHeight);
+    if (biomeOffset) {
+      for (let gy = 0; gy < height; gy++) {
+        for (let gx = 0; gx < width; gx++) {
+          const temperature = clamp01(baseTemperature + biomeOffset[gy * width + gx]);
+          ctx.fillStyle = biomeCellColor(temperature);
+          ctx.fillRect(gx * cellSize, gy * cellSize, cellSize, cellSize);
+        }
+      }
+    } else {
+      ctx.fillStyle = BACKGROUND_COLOR;
+      ctx.fillRect(0, 0, cssWidth, cssHeight);
+    }
 
     ctx.strokeStyle = GRID_LINE_COLOR;
     ctx.lineWidth = 1;
@@ -132,7 +154,7 @@ export default function WorldCanvas({
         ctx.stroke();
       }
     }
-  }, [organisms, cellTraits, bonds, byId, width, height, cellSize, selectedId]);
+  }, [organisms, cellTraits, bonds, biomeOffset, baseTemperature, byId, width, height, cellSize, selectedId]);
 
   function handleClick(event: React.MouseEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current;
