@@ -51,26 +51,26 @@ const ENERGY_STORAGE_BASE_CAP = 20;
 //      outweigh the cost of being bonded.
 //   2. Structural Reinforcement's own density-scaling (see its
 //      resolveStrength in genes.ts) had to become far more generous at low
-//      density, because being bonded is a *large* cost: a bonded organism is
-//      sessile (see moveOrganism below) and loses foraging entirely, capped
-//      at whatever its own single cell regenerates — and a small, common
-//      colony (e.g. a bonded pair, colony-neighbor density 1/8) could never
-//      reach a high enough structuralIntegrity to compensate under a linear
-//      density scaling; a 4th-root curve was needed to give even a pair a
-//      real, non-token benefit.
+//      density, because being bonded was, at the time, a *large* cost: every
+//      colony of 2+ was unconditionally sessile and lost foraging entirely
+//      (a since-reverted blanket simplification — see moveColony below and
+//      todos/multicellular-motility.md), capped at whatever its own single
+//      cell regenerated — and a small, common colony (e.g. a bonded pair,
+//      colony-neighbor density 1/8) could never reach a high enough
+//      structuralIntegrity to compensate under a linear density scaling; a
+//      4th-root curve was needed to give even a pair a real, non-token
+//      benefit.
 // With both changes and this reduction ceiling, bonded pairs in an 8000-tick
-// empirical run survive roughly 2-3x longer (~25-40 ticks vs ~10-20) and
-// measurably drain energy slower than an identical solo organism (see the
+// empirical run (back when colonies were still unconditionally sessile)
+// survived roughly 2-3x longer (~25-40 ticks vs ~10-20) and measurably
+// drained energy slower than an identical solo organism (see the
 // "Structural Reinforcement gives a densely-embedded colony member a real
-// energy-cost payoff" test in simulation.spec.ts). Pairs specifically are
-// still usually not indefinitely sustainable in this environment's default
-// food scarcity — colony density has to climb well above a pair's 1/8 before
-// upkeep can drop below the sessile regen-capped income floor, so a
-// still-forming colony is genuinely fragile until it either grows past its
-// first couple of members or its density-scaling motif has drifted close to
-// its own consensus (both real, first-pass-honest simplifications, not bugs
-// papered over — see todos/adhesion-compatibility-tuning.md for the adjacent,
-// still-open tuning question).
+// energy-cost payoff" test in simulation.spec.ts). That specific "still
+// usually not indefinitely sustainable" framing predates moveColony: now
+// that colonies can move and forage collectively instead of being foraging-
+// locked, the actual survival dynamics of a small colony are worth
+// re-measuring rather than assumed unchanged — this reduction ceiling itself
+// hasn't been re-tuned against the new movement model yet.
 const STRUCTURAL_REINFORCEMENT_COST_REDUCTION = 0.95;
 // First-pass tuning choice: fully-expressed Growth Suppression
 // (growthSuppression == 1) cuts an organism's effective replication rate by
@@ -257,8 +257,8 @@ function freeNeighbor(state: SimulationState, x: number, y: number): { x: number
  * (movement gating, regulatory context, cost/reproduction payoffs below) is
  * necessarily a one-tick-old snapshot. That lag is consistent across every
  * consumer and avoids a circular dependency (colonies depend on final
- * positions, which depend on movement, which — for sessile colony
- * members — depends on colonies).
+ * positions, which depend on movement, which — for colony members moving as
+ * a group, see moveColony — depends on knowing colony membership).
  */
 function colonySizeOf(state: SimulationState, organismId: string): number {
   const root = state.colonies.colonyOf.get(organismId);
@@ -372,20 +372,10 @@ function bestFoodNeighbor(state: SimulationState, x: number, y: number): { x: nu
   return best;
 }
 
+/** Movement for a solo organism (colony size 1 per last tick's snapshot —
+ * see colonySizeOf). Colony members of size 2+ move together instead, via
+ * moveColony below. */
 function moveOrganism(state: SimulationState, organism: Organism): void {
-  // An organism currently bonded into a colony of 2+ (per last tick's
-  // snapshot — see colonySizeOf) is sessile. Design choice, documented here
-  // rather than derived from anything deeper: letting colony members keep
-  // moving independently would make colonies flicker apart and reform almost
-  // every tick as members wander off (bonds are recomputed fresh from
-  // adjacency each tick, so a member that walks away simply un-bonds), which
-  // defeats the point of colonies being a real, legible, persistent
-  // structure — and correctly animating a *moving, connected* cluster as a
-  // rigid unit on a grid is a much harder problem this pass doesn't need to
-  // solve. Sessility is a consequence of currently being bonded, not a fixed
-  // per-lineage trait: a solo organism (including one whose colony just
-  // dissolved) moves normally again next tick.
-  if (colonySizeOf(state, organism.id) > 1) return;
   if (state.rng() >= organism.phenotype.traits.motility) return;
   const useForaging = state.rng() < organism.phenotype.traits.foraging;
   const target = useForaging
@@ -396,6 +386,96 @@ function moveOrganism(state: SimulationState, organism: Organism): void {
   organism.x = target.x;
   organism.y = target.y;
   state.grid[cellIndex(state, organism.x, organism.y)] = organism.id;
+}
+
+/**
+ * Whether translating every member of a colony by the same (dx, dy) offset
+ * is collision-free: every member's target cell must be either empty or
+ * occupied by a fellow member of *this same colony* (who is also moving this
+ * tick, so will have vacated it) — occupied by any other organism blocks the
+ * whole colony's move in that direction. Translating a set of distinct grid
+ * cells by one shared offset can never make two members collide with each
+ * other (a uniform shift is injective), so member-vs-member collisions
+ * within the colony being moved never need to be checked — only outsiders.
+ */
+function colonyMoveIsValid(state: SimulationState, members: Organism[], root: string, dx: number, dy: number): boolean {
+  for (const member of members) {
+    const tx = wrap(member.x + dx, state.width);
+    const ty = wrap(member.y + dy, state.height);
+    const occupant = state.grid[cellIndex(state, tx, ty)];
+    if (occupant && state.colonies.colonyOf.get(occupant) !== root) return false;
+  }
+  return true;
+}
+
+/** Translates every member of a colony by (dx, dy) at once: clears every
+ * member's current cell first, then places all of them at their targets —
+ * a two-phase apply so member-to-member "chain slides" (one member's target
+ * is another member's current cell) resolve correctly regardless of
+ * iteration order. Only called after `colonyMoveIsValid` confirms the whole
+ * translated footprint is collision-free against outsiders. */
+function applyColonyMove(state: SimulationState, members: Organism[], dx: number, dy: number): void {
+  const targets = members.map((member) => ({
+    member,
+    tx: wrap(member.x + dx, state.width),
+    ty: wrap(member.y + dy, state.height),
+  }));
+  for (const { member } of targets) state.grid[cellIndex(state, member.x, member.y)] = null;
+  for (const { member, tx, ty } of targets) {
+    member.x = tx;
+    member.y = ty;
+    state.grid[cellIndex(state, tx, ty)] = member.id;
+  }
+}
+
+/**
+ * Moves an entire colony (2+ members) as one rigid, connected unit — the
+ * real fix for the previous pass's blanket "colony size >= 2 -> sessile"
+ * simplification (see todos/multicellular-motility.md: that was scientifically
+ * wrong as a permanent choice, since most real multicellular life is motile,
+ * not sessile). Motility stays exactly the evolvable trait it always was;
+ * what's new is combining every member's contribution into one collective
+ * decision instead of a hard structural cutoff.
+ *
+ * First-pass combination rule, deliberately the simplest option that still
+ * ties movement to real evolved traits (see the todo for the richer,
+ * deferred alternative — per-member "mover cell" division of labor, analogous
+ * to Growth Suppression's interior/surface split): average motility across
+ * members gates *whether* the colony moves at all this tick; average
+ * foraging decides *how* it picks a direction (bias toward whichever valid
+ * offset's translated footprint sits on the most total food, vs. a uniform
+ * random valid offset) — the same two-trait decision solo movement already
+ * makes, just aggregated across the group instead of read from one organism.
+ */
+function moveColony(state: SimulationState, root: string): void {
+  const members = Array.from(state.organisms.values()).filter((o) => state.colonies.colonyOf.get(o.id) === root);
+  if (members.length <= 1) return; // colony dissolved this tick (deaths) - nothing left to move as a group
+
+  const avgMotility = members.reduce((sum, m) => sum + m.phenotype.traits.motility, 0) / members.length;
+  if (state.rng() >= avgMotility) return;
+
+  const validOffsets = NEIGHBOR_OFFSETS.filter(([dx, dy]) => colonyMoveIsValid(state, members, root, dx, dy));
+  if (validOffsets.length === 0) return;
+
+  const avgForaging = members.reduce((sum, m) => sum + m.phenotype.traits.foraging, 0) / members.length;
+  const useForaging = state.rng() < avgForaging;
+
+  let [dx, dy] = validOffsets[randomInt(state.rng, validOffsets.length)];
+  if (useForaging) {
+    let bestFood = -Infinity;
+    for (const [odx, ody] of validOffsets) {
+      const food = members.reduce(
+        (sum, m) => sum + state.food[cellIndex(state, wrap(m.x + odx, state.width), wrap(m.y + ody, state.height))],
+        0,
+      );
+      if (food > bestFood) {
+        bestFood = food;
+        [dx, dy] = [odx, ody];
+      }
+    }
+  }
+
+  applyColonyMove(state, members, dx, dy);
 }
 
 /**
@@ -483,6 +563,11 @@ export function step(state: SimulationState): void {
   // Snapshot ids up front: organisms born this tick shouldn't act this tick,
   // and organisms that died mid-iteration are simply skipped.
   const ids = Array.from(state.organisms.keys());
+  // A colony's move is decided once for the whole group, the first time any
+  // of its members comes up in this loop — not once per member — so later
+  // colony-mates encountered this same tick just skip movement (already
+  // moved as part of the group).
+  const movedColonies = new Set<string>();
   for (const id of ids) {
     const organism = state.organisms.get(id);
     if (!organism) continue;
@@ -493,7 +578,15 @@ export function step(state: SimulationState): void {
       continue;
     }
 
-    moveOrganism(state, organism);
+    const root = state.colonies.colonyOf.get(organism.id);
+    if (root && colonySizeOf(state, organism.id) > 1) {
+      if (!movedColonies.has(root)) {
+        movedColonies.add(root);
+        moveColony(state, root);
+      }
+    } else {
+      moveOrganism(state, organism);
+    }
     maybeReproduce(state, organism);
   }
 

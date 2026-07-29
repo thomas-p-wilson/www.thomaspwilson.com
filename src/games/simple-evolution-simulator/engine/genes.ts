@@ -172,15 +172,16 @@ export const GENE_TABLE: GeneDefinition[] = [
       "rising — at steep diminishing returns, a 4th-root curve, see resolveStrength below — toward a colony's " +
       "deeply-embedded interior. Mechanically, this directly reduces upkeep (see engine/simulation.ts's " +
       "feedAndAge) — the real fitness payoff that gives clustering a reason to persist instead of being cosmetic. " +
-      "This gene is sessile-only in practice: a bonded organism can no longer move to forage (see " +
-      "engine/simulation.ts's moveOrganism), which is a real, substantial cost — a first attempt at a linear " +
-      "density scaling (matching the previous, now-reverted clonal-body pass, where a grown body's interior cell " +
-      "could easily reach density 1.0) left a bonded *pair* (the smallest, most common, and most fragile colony) " +
-      "with only a token 0.125-strength contribution, too weak to ever outweigh lost foraging in an empirical " +
-      "long run — every bonded pair starved within ~10-20 ticks regardless of how the cost-reduction magnitude " +
-      "was tuned. The 4th-root curve and low activation threshold below are the retuned fix: a pair now gets a " +
-      "real, non-token share of the benefit immediately (roughly 2-3x longer survival empirically), with more " +
-      "members still adding further benefit at a diminishing rate rather than linearly — see " +
+      "When this gene was tuned, colonies were still unconditionally sessile and foraging-locked (a since-reverted " +
+      "blanket simplification — see engine/simulation.ts's moveColony and todos/multicellular-motility.md), which " +
+      "made bonding a real, substantial cost. A first attempt at a linear density scaling (matching the previous, " +
+      "now-reverted clonal-body pass, where a grown body's interior cell could easily reach density 1.0) left a " +
+      "bonded *pair* (the smallest, most common, and most fragile colony) with only a token 0.125-strength " +
+      "contribution, too weak to ever outweigh lost foraging in an empirical long run — every bonded pair starved " +
+      "within ~10-20 ticks regardless of how the cost-reduction magnitude was tuned. The 4th-root curve and low " +
+      "activation threshold below are the retuned fix: a pair now gets a real, non-token share of the benefit " +
+      "immediately (roughly 2-3x longer survival empirically, under the sessile model that tuning ran against), " +
+      "with more members still adding further benefit at a diminishing rate rather than linearly — see " +
       "STRUCTURAL_REINFORCEMENT_COST_REDUCTION's doc comment in simulation.ts for the full empirical story, and " +
       "todos/adhesion-compatibility-tuning.md for the adjacent, still-open question of the bonding threshold " +
       "itself.",

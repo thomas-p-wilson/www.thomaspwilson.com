@@ -234,16 +234,18 @@ describe("colony bonding (aggregative multicellularity)", () => {
     expect(getColonySize(state, "b")).toBe(1);
   });
 
-  it("a bonded (colony size >= 2) organism is sessile, even with motility forced high", () => {
+  it("a bonded (colony size >= 2) pair moves together as a rigid group, even though sessility used to be a hard cutoff", () => {
     const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
     const a = createOrganism({ id: "a", genome: randomGenome(60, createRng(1)), x: 5, y: 5, energy: 60, generation: 0, parentIds: [], birthTick: 0 });
     const b = createOrganism({ id: "b", genome: randomGenome(60, createRng(2)), x: 6, y: 5, energy: 60, generation: 0, parentIds: [], birthTick: 0 });
     // energyStorage is overridden too — its baseline (0.8) caps energy at just
     // 16 (ENERGY_STORAGE_BASE_CAP * 0.8), which would otherwise immediately
     // clamp our starting energy down and starve the organisms well before 50
-    // ticks are up; this test is about movement, not energy budgeting.
+    // ticks are up; replicationRate is forced to 0 so a third, unplanned-for
+    // colony member can't spawn mid-test. This test is about movement, not
+    // energy budgeting or reproduction.
     for (const o of [a, b]) {
-      o.phenotype = { ...o.phenotype, traits: { ...o.phenotype.traits, motility: 0, energyStorage: 5 } };
+      o.phenotype = { ...o.phenotype, traits: { ...o.phenotype.traits, motility: 0, energyStorage: 5, replicationRate: 0 } };
       forceSurfaceProtein(o, "012345");
     }
     state.organisms.set(a.id, a);
@@ -253,26 +255,32 @@ describe("colony bonding (aggregative multicellularity)", () => {
 
     // Let the bond form undisturbed first (motility 0) — colonies are only
     // computed at the *end* of a tick, so forcing motility high from the very
-    // first step (before these two organisms' first-ever colony refresh) It
+    // first step (before these two organisms' first-ever colony refresh)
     // could let them wander apart before adjacency is ever recognized, which
-    // would defeat the point of this test (sessility *preventing* movement,
-    // not "they happened to never get the chance to move").
+    // would defeat the point of this test.
     step(state);
     expect(getColonySize(state, "a")).toBe(2);
 
-    // Now flip motility high and confirm the already-bonded pair stays put.
+    // Now flip motility high and confirm the bonded pair actually moves
+    // (the old model made any colony of 2+ permanently sessile), while
+    // staying bonded and preserving their relative adjacency every tick —
+    // proof they're moving together as one rigid unit, not independently.
     for (const id of ["a", "b"]) {
       const o = state.organisms.get(id)!;
       o.phenotype = { ...o.phenotype, traits: { ...o.phenotype.traits, motility: 1 } };
     }
-    for (let i = 0; i < 50; i++) step(state);
-
-    const afterA = state.organisms.get("a");
-    const afterB = state.organisms.get("b");
-    expect(afterA).toBeDefined();
-    expect(afterB).toBeDefined();
-    expect(afterA).toMatchObject({ x: 5, y: 5 });
-    expect(afterB).toMatchObject({ x: 6, y: 5 });
+    const wrap = (v: number, max: number) => ((v % max) + max) % max;
+    let everMoved = false;
+    for (let i = 0; i < 50; i++) {
+      step(state);
+      expect(getColonySize(state, "a")).toBe(2);
+      const curA = state.organisms.get("a")!;
+      const curB = state.organisms.get("b")!;
+      expect(wrap(curB.x - curA.x, state.width)).toBe(1);
+      expect(wrap(curB.y - curA.y, state.height)).toBe(0);
+      if (curA.x !== 5 || curA.y !== 5) everMoved = true;
+    }
+    expect(everMoved).toBe(true);
   });
 
   it("a solo organism (no compatible neighbor) still moves normally with motility forced high", () => {
@@ -292,6 +300,48 @@ describe("colony bonding (aggregative multicellularity)", () => {
       }
     }
     expect(moved).toBe(true);
+  });
+
+  it("a bonded pair surrounded on every side by incompatible outsiders stays put — group movement never overlaps another organism", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
+    const a = createOrganism({ id: "a", genome: randomGenome(60, createRng(1)), x: 5, y: 5, energy: 60, generation: 0, parentIds: [], birthTick: 0 });
+    const b = createOrganism({ id: "b", genome: randomGenome(60, createRng(2)), x: 6, y: 5, energy: 60, generation: 0, parentIds: [], birthTick: 0 });
+    for (const o of [a, b]) {
+      o.phenotype = { ...o.phenotype, traits: { ...o.phenotype.traits, motility: 1, energyStorage: 5, replicationRate: 0 } };
+      forceSurfaceProtein(o, "012345");
+    }
+    state.organisms.set(a.id, a);
+    state.organisms.set(b.id, b);
+    state.grid[5 * state.width + 5] = a.id;
+    state.grid[5 * state.width + 6] = b.id;
+
+    // Fill every cell either organism could possibly translate onto (their
+    // Moore neighborhoods' union) with mutually-incompatible, non-motile
+    // outsiders — blocking the bonded pair's group move in all 8 directions.
+    let outsiderId = 0;
+    for (let x = 4; x <= 7; x++) {
+      for (let y = 4; y <= 6; y++) {
+        if ((x === 5 && y === 5) || (x === 6 && y === 5)) continue;
+        const outsider = createOrganism({
+          id: `outsider-${outsiderId++}`, genome: randomGenome(60, createRng(100 + outsiderId)),
+          x, y, energy: 60, generation: 0, parentIds: [], birthTick: 0,
+        });
+        outsider.phenotype = { ...outsider.phenotype, traits: { ...outsider.phenotype.traits, motility: 0, replicationRate: 0 } };
+        state.organisms.set(outsider.id, outsider);
+        state.grid[y * state.width + x] = outsider.id;
+      }
+    }
+
+    step(state); // let the a-b bond register
+    expect(getColonySize(state, "a")).toBe(2);
+
+    for (let i = 0; i < 20; i++) {
+      step(state);
+      const curA = state.organisms.get("a")!;
+      const curB = state.organisms.get("b")!;
+      expect(curA).toMatchObject({ x: 5, y: 5 });
+      expect(curB).toMatchObject({ x: 6, y: 5 });
+    }
   });
 
   it("Structural Reinforcement gives a densely-embedded colony member a real energy-cost payoff over an identical solo organism", () => {
