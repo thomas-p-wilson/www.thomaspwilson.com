@@ -2,6 +2,7 @@ import { Dna, GitBranch, Pause, Play, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import type { SimulationStats } from "../engine/simulation";
+import type { WorldSizePreset } from "../engine/worldSize";
 
 interface ControlsPanelProps {
   running: boolean;
@@ -12,6 +13,9 @@ interface ControlsPanelProps {
   onMutationMultiplierChange: (value: number) => void;
   temperature: number;
   onTemperatureChange: (value: number) => void;
+  worldSizeIndex: number;
+  worldSizePresets: WorldSizePreset[];
+  onWorldSizeChange: (index: number) => void;
   stats: SimulationStats;
   tick: number;
   onOpenGenomeViewer: () => void;
@@ -28,8 +32,10 @@ const StatTile = ({ label, value }: { label: string; value: string | number }) =
 
 export default function ControlsPanel({
   running, onToggleRunning, speed, onSpeedChange, mutationMultiplier, onMutationMultiplierChange,
-  temperature, onTemperatureChange, stats, tick, onOpenGenomeViewer, onOpenLineageTree, onReset,
+  temperature, onTemperatureChange, worldSizeIndex, worldSizePresets, onWorldSizeChange,
+  stats, tick, onOpenGenomeViewer, onOpenLineageTree, onReset,
 }: ControlsPanelProps) {
+  const worldSize = worldSizePresets[worldSizeIndex];
   return (
     <div className="space-y-5 text-slate-200">
       <div className="flex items-center gap-2">
@@ -82,6 +88,26 @@ export default function ControlsPanel({
           <Slider value={[temperature]} min={0} max={1} step={0.01} onValueChange={(values: number[]) => onTemperatureChange(values[0])} />
           <p className="text-[11px] text-slate-500 mt-1">
             Organisms whose thermal-tolerance gene doesn't match this niche burn energy faster.
+          </p>
+        </div>
+
+        <div>
+          <div className="flex justify-between text-xs mb-1">
+            <span>World size</span>
+            <span className="text-slate-400">
+              {worldSize.label} ({worldSize.width}&times;{worldSize.height})
+            </span>
+          </div>
+          <Slider
+            value={[worldSizeIndex]}
+            min={0}
+            max={worldSizePresets.length - 1}
+            step={1}
+            onValueChange={(values: number[]) => onWorldSizeChange(values[0])}
+          />
+          <p className="text-[11px] text-slate-500 mt-1">
+            Sets the grid's population cap ({worldSize.width * worldSize.height} cells). Changing this starts a
+            fresh simulation.
           </p>
         </div>
       </div>

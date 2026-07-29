@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Organism, TraitId } from "../engine/types";
 import { cellStyle } from "./organismColor";
 
@@ -15,22 +15,45 @@ interface WorldCanvasProps {
   height: number;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
-  cellSize?: number;
 }
 
 const GRID_LINE_COLOR = "rgba(148, 163, 184, 0.12)";
 const BACKGROUND_COLOR = "#0b1120";
 const BOND_LINE_COLOR = "rgba(250, 204, 21, 0.4)";
+// The cell's pixel size is derived from the container's available space so
+// the grid always fills its card, clamped so a small world doesn't render
+// as giant blobs and a huge one doesn't shrink to specks.
+const MIN_CELL_SIZE = 6;
+const MAX_CELL_SIZE = 28;
 
 export default function WorldCanvas({
-  organisms, cellTraits, bonds, width, height, selectedId, onSelect, cellSize = 14,
+  organisms, cellTraits, bonds, width, height, selectedId, onSelect,
 }: WorldCanvasProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   // O(1) lookups, rebuilt whenever the population snapshot changes (cheap:
   // population is bounded by grid size).
   const byCell = useMemo(() => new Map(organisms.map((o) => [`${o.x},${o.y}`, o] as const)), [organisms]);
   const byId = useMemo(() => new Map(organisms.map((o) => [o.id, o] as const)), [organisms]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width: w, height: h } = entry.contentRect;
+      setContainerSize({ width: w, height: h });
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  const cellSize = useMemo(() => {
+    if (!containerSize.width || !containerSize.height) return MIN_CELL_SIZE;
+    const fit = Math.min(containerSize.width / width, containerSize.height / height);
+    return Math.max(MIN_CELL_SIZE, Math.min(MAX_CELL_SIZE, Math.floor(fit)));
+  }, [containerSize, width, height]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -122,12 +145,14 @@ export default function WorldCanvas({
   }
 
   return (
-    <canvas
-      ref={canvasRef}
-      onClick={handleClick}
-      className="rounded-lg cursor-pointer max-w-full"
-      role="img"
-      aria-label="2D world grid of evolving organisms"
-    />
+    <div ref={containerRef} className="w-full h-full flex items-center justify-center">
+      <canvas
+        ref={canvasRef}
+        onClick={handleClick}
+        className="rounded-lg cursor-pointer max-w-full"
+        role="img"
+        aria-label="2D world grid of evolving organisms"
+      />
+    </div>
   );
 }

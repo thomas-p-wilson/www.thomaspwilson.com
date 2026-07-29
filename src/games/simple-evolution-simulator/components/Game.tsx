@@ -5,6 +5,7 @@ import {
   createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getOrganisms, step,
   type SimulationState,
 } from "../engine/simulation";
+import { DEFAULT_WORLD_SIZE_INDEX, WORLD_SIZE_PRESETS, type WorldSizePreset } from "../engine/worldSize";
 import ControlsPanel from "./ControlsPanel";
 import GenomeViewer from "./GenomeViewer";
 import IntroSequence from "./IntroSequence";
@@ -12,9 +13,6 @@ import LineageTree from "./LineageTree";
 import OrganismInspector from "./OrganismInspector";
 import WorldCanvas from "./WorldCanvas";
 
-const WORLD_WIDTH = 34;
-const WORLD_HEIGHT = 22;
-const CELL_SIZE = 14;
 const BASE_TICKS_PER_SECOND = 8;
 const MAX_STEPS_PER_FRAME = 20;
 
@@ -26,6 +24,7 @@ export default function Game() {
   const [speed, setSpeed] = useState(1);
   const [mutationMultiplier, setMutationMultiplier] = useState(1);
   const [temperature, setTemperature] = useState(0.5);
+  const [worldSizeIndex, setWorldSizeIndex] = useState(DEFAULT_WORLD_SIZE_INDEX);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [genomeOpen, setGenomeOpen] = useState(false);
   const [genomeFocusIndex, setGenomeFocusIndex] = useState<number | undefined>(undefined);
@@ -39,10 +38,10 @@ export default function Game() {
     setGenomeOpen(true);
   }
 
-  function startNewSimulation() {
+  function startNewSimulation(size: WorldSizePreset = WORLD_SIZE_PRESETS[worldSizeIndex]) {
     simRef.current = createSimulation({
-      width: WORLD_WIDTH,
-      height: WORLD_HEIGHT,
+      width: size.width,
+      height: size.height,
       seed: Math.floor(Math.random() * 2 ** 31),
       environment: { temperature, foodRegenRate: 0.18 },
       mutation: scaleMutationConfig(DEFAULT_MUTATION_CONFIG, mutationMultiplier),
@@ -58,6 +57,14 @@ export default function Game() {
 
   function handleReset() {
     startNewSimulation();
+  }
+
+  // World dimensions are baked into the simulation's grid array at creation
+  // (see engine/worldSize.ts) — changing them can't happen live, so this
+  // always starts a fresh simulation at the new size, same as Reset.
+  function handleWorldSizeChange(index: number) {
+    setWorldSizeIndex(index);
+    startNewSimulation(WORLD_SIZE_PRESETS[index]);
   }
 
   // Main tick loop. Speed changes intentionally restart the accumulator
@@ -114,14 +121,13 @@ export default function Game() {
     <div className="h-screen w-screen bg-slate-950 p-4 pt-16 md:p-6 md:pt-16 overflow-auto">
       <div className="flex flex-col lg:flex-row gap-6 h-full">
         <div className="flex-1 flex flex-col items-center justify-center gap-3 min-h-0">
-          <div className="w-full h-full overflow-auto rounded-lg border border-slate-800 bg-slate-900/40 p-2 flex items-center justify-center">
+          <div className="w-full h-full rounded-lg border border-slate-800 bg-slate-900/40 p-2">
             <WorldCanvas
               organisms={organisms}
               cellTraits={cellTraits}
               bonds={bonds}
-              width={WORLD_WIDTH}
-              height={WORLD_HEIGHT}
-              cellSize={CELL_SIZE}
+              width={WORLD_SIZE_PRESETS[worldSizeIndex].width}
+              height={WORLD_SIZE_PRESETS[worldSizeIndex].height}
               selectedId={selectedId}
               onSelect={setSelectedId}
             />
@@ -145,6 +151,9 @@ export default function Game() {
               onMutationMultiplierChange={setMutationMultiplier}
               temperature={temperature}
               onTemperatureChange={setTemperature}
+              worldSizeIndex={worldSizeIndex}
+              worldSizePresets={WORLD_SIZE_PRESETS}
+              onWorldSizeChange={handleWorldSizeChange}
               stats={sim?.stats ?? {
                 population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
               }}
