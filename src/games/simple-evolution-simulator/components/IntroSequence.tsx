@@ -55,7 +55,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
   const isLast = index === STEPS.length - 1;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[520px] text-center px-6">
+    <div className="flex flex-col items-center justify-center h-screen text-center px-6">
       <div className="relative w-full max-w-md h-56 mb-8">
         <IntroVisual variant={step.variant} dots={step.dots} keyProp={index} />
       </div>

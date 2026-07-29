@@ -111,10 +111,10 @@ export default function Game() {
   const selectedColonySize = sim && selectedOrganism ? getColonySize(sim, selectedOrganism.id) : 1;
 
   return (
-    <div className="rounded-2xl bg-slate-950 border border-slate-800 p-4 md:p-6">
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex-1 flex flex-col items-center gap-3">
-          <div className="w-full overflow-auto rounded-lg border border-slate-800 bg-slate-900/40 p-2 flex justify-center">
+    <div className="h-screen w-screen bg-slate-950 p-4 pt-16 md:p-6 md:pt-16 overflow-auto">
+      <div className="flex flex-col lg:flex-row gap-6 h-full">
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 min-h-0">
+          <div className="w-full h-full overflow-auto rounded-lg border border-slate-800 bg-slate-900/40 p-2 flex items-center justify-center">
             <WorldCanvas
               organisms={organisms}
               cellTraits={cellTraits}

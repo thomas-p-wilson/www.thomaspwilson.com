@@ -13,12 +13,20 @@ const navigation = [
   { name: "Projects", href: "/projects", icon: FolderKanban },
 ];
 
+// Routes listed here render full-window, with no site nav or footer — for
+// pages like games that want the entire browser viewport to themselves.
+const FULL_WINDOW_ROUTES = ["/projects/gaming/simple-evolution-simulator"];
+
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (href: string) =>
     href === "/" ? location.pathname === "/" : location.pathname.toLowerCase().startsWith(href);
+
+  if (FULL_WINDOW_ROUTES.includes(location.pathname)) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
