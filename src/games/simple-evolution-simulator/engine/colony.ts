@@ -30,13 +30,28 @@ export const SURFACE_PROTEIN_GENE_ID = "surface-protein";
 
 /**
  * Minimum Hamming similarity between two organisms' realized surface-protein
- * sequences for them to bond. First-pass tuning choice, not a carefully
- * derived constant — see todos/adhesion-compatibility-tuning.md for why this
- * particular number, what it would take to tune it properly at scale, and
- * whether it should eventually be evolvable per lineage instead of a single
- * fixed global threshold (both deliberately deferred past this pass). At a
- * 6-symbol motif, 0.75 permits at most one symbol mismatch (5/6 ≈ 0.83 passes,
- * 4/6 ≈ 0.67 doesn't) — a fairly strict, kin-recognition-like bar.
+ * sequences for them to bond. At a 6-symbol motif, 0.75 permits at most one
+ * symbol mismatch (5/6 ≈ 0.83 passes, 4/6 ≈ 0.67 doesn't) — a fairly strict,
+ * kin-recognition-like bar.
+ *
+ * Empirically tuned (see todos/adhesion-compatibility-tuning.md for the full
+ * writeup): swept every distinct discrete tier this threshold can land on for
+ * a 6-symbol motif — exact-match-only (1.0), ≤1 mismatch (0.75, here), ≤2
+ * (0.6), and ≤4 (0.3) — across 3 seeds, 12000 ticks each, default
+ * environment/mutation config. Surface-protein expression itself evolves
+ * readily (5-13 concurrent expressers out of a ~250-population world isn't
+ * unusual), and bonding *does* happen at every tier tested — but colony size
+ * never exceeded 3 members and colonies never persisted for long, regardless
+ * of how loose or strict this threshold was. In other words: threshold
+ * strictness, across its whole meaningful range, isn't what's actually
+ * capping colony size or stability here — something else is (see
+ * todos/multicellular-motility.md: a forming colony immediately losing all
+ * foraging to sessility is the leading suspect, tackled next). Kept at 0.75
+ * — the biologically-motivated middle tier — rather than loosened, since
+ * loosening bought nothing empirically; revisit only if colony growth is
+ * later unblocked and *then* shows real sensitivity to this number. Whether
+ * it should eventually be evolvable per lineage instead of a fixed global
+ * constant is still an open, deliberately deferred question.
  */
 export const COLONY_COMPATIBILITY_THRESHOLD = 0.75;
 
