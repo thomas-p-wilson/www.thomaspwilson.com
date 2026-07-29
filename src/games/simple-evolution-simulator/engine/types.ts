@@ -22,6 +22,7 @@ export type TraitId =
   | "thermalTolerance"
   | "pigment"
   | "foraging"
+  | "thermotaxis"
   | "energyStorage"
   | "surfaceProtein"
   | "structuralIntegrity"

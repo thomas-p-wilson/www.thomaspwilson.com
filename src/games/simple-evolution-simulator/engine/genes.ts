@@ -122,6 +122,22 @@ export const GENE_TABLE: GeneDefinition[] = [
     kind: "static",
   },
   {
+    id: "thermotaxis",
+    label: "Thermotaxis",
+    description:
+      "Bias movement toward the free neighbor closest to this organism's own thermalTolerance, in competition " +
+      "with foraging for the same per-tick movement-direction decision (see engine/simulation.ts's moveOrganism). " +
+      "Unlike foraging, a thermal-seeking move is never taken into a cell that's a worse thermal fit than the " +
+      "current one — an organism would rather stay put than relocate somewhere it likes less (see " +
+      "todos/thermal-preference-movement.md).",
+    trait: "thermotaxis",
+    motif: "356653",
+    activationThreshold: 0.6,
+    baseline: 0.05,
+    mapValue: (s) => 0.15 + clamp01(s) * 0.7,
+    kind: "static",
+  },
+  {
     id: "energy-storage",
     label: "Energy Storage",
     description: "Raises the energy cap an organism can bank, buffering it against famine.",

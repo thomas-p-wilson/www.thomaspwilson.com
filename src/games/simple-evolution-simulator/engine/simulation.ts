@@ -390,15 +390,58 @@ function bestFoodNeighbor(state: SimulationState, x: number, y: number): { x: nu
   return best;
 }
 
+/**
+ * Best free neighbor by thermal fit against `tolerance` — but only if it's a
+ * real improvement over staying put. Unlike bestFoodNeighbor, this never
+ * hands back a cell that's a worse thermal fit than the organism's current
+ * one: thermal-seeking exists specifically so an organism doesn't wander
+ * into (or stay in) a worse-suited spot, so "no free neighbor beats staying"
+ * has to mean "don't move" rather than "move to the least-bad option" (see
+ * todos/thermal-preference-movement.md).
+ */
+function bestThermalNeighbor(
+  state: SimulationState,
+  x: number,
+  y: number,
+  tolerance: number,
+): { x: number; y: number } | null {
+  let bestMismatch = Math.abs(cellTemperature(state, x, y) - tolerance);
+  let best: { x: number; y: number } | null = null;
+  for (const [dx, dy] of NEIGHBOR_OFFSETS) {
+    const nx = wrap(x + dx, state.width);
+    const ny = wrap(y + dy, state.height);
+    if (state.grid[cellIndex(state, nx, ny)]) continue;
+    const mismatch = Math.abs(cellTemperature(state, nx, ny) - tolerance);
+    if (mismatch < bestMismatch) {
+      bestMismatch = mismatch;
+      best = { x: nx, y: ny };
+    }
+  }
+  return best;
+}
+
 /** Movement for a solo organism (colony size 1 per last tick's snapshot —
  * see colonySizeOf). Colony members of size 2+ move together instead, via
- * moveColony below. */
+ * moveColony below.
+ *
+ * Thermotaxis and foraging compete for the same single per-tick direction
+ * choice via one shared roll (partitioning [0, 1) by trait value) rather than
+ * two independent rolls — two independent decisions would let whichever ran
+ * last silently override the other, making the loser's trait meaningless.
+ * Whatever's left over after both traits' shares is plain random movement,
+ * exactly like before thermotaxis existed. */
 function moveOrganism(state: SimulationState, organism: Organism): void {
   if (state.rng() >= organism.phenotype.traits.motility) return;
-  const useForaging = state.rng() < organism.phenotype.traits.foraging;
-  const target = useForaging
-    ? bestFoodNeighbor(state, organism.x, organism.y)
-    : freeNeighbor(state, organism.x, organism.y);
+  const { thermotaxis, foraging, thermalTolerance } = organism.phenotype.traits;
+  const roll = state.rng();
+  let target: { x: number; y: number } | null;
+  if (roll < thermotaxis) {
+    target = bestThermalNeighbor(state, organism.x, organism.y, thermalTolerance);
+  } else if (roll < thermotaxis + foraging) {
+    target = bestFoodNeighbor(state, organism.x, organism.y);
+  } else {
+    target = freeNeighbor(state, organism.x, organism.y);
+  }
   if (!target) return;
   state.grid[cellIndex(state, organism.x, organism.y)] = null;
   organism.x = target.x;
@@ -460,10 +503,19 @@ function applyColonyMove(state: SimulationState, members: Organism[], dx: number
  * deferred alternative — per-member "mover cell" division of labor, analogous
  * to Growth Suppression's interior/surface split): average motility across
  * members gates *whether* the colony moves at all this tick; average
- * foraging decides *how* it picks a direction (bias toward whichever valid
- * offset's translated footprint sits on the most total food, vs. a uniform
- * random valid offset) — the same two-trait decision solo movement already
- * makes, just aggregated across the group instead of read from one organism.
+ * thermotaxis and average foraging then compete (via the same shared-roll
+ * partition solo moveOrganism uses) for *how* it picks a direction among the
+ * colony's valid offsets — bias toward whichever offset's translated
+ * footprint sits on the most total food, or whichever most reduces the
+ * footprint's total thermal mismatch (each member scored against its own
+ * thermalTolerance), vs. a uniform random valid offset the rest of the time —
+ * the same trait-driven decision solo movement already makes, just aggregated
+ * across the group instead of read from one organism.
+ *
+ * Thermal-seeking, colony or solo, never relocates into a worse-fit spot (see
+ * bestThermalNeighbor): if no valid offset improves on the footprint's
+ * current total mismatch, the colony simply doesn't move this tick, exactly
+ * like a solo organism whose only free neighbors are all worse than staying.
  */
 function moveColony(state: SimulationState, root: string): void {
   const members = Array.from(state.organisms.values()).filter((o) => state.colonies.colonyOf.get(o.id) === root);
@@ -475,11 +527,30 @@ function moveColony(state: SimulationState, root: string): void {
   const validOffsets = NEIGHBOR_OFFSETS.filter(([dx, dy]) => colonyMoveIsValid(state, members, root, dx, dy));
   if (validOffsets.length === 0) return;
 
+  const totalMismatch = (ox: number, oy: number): number =>
+    members.reduce((sum, m) => {
+      const temp = cellTemperature(state, wrap(m.x + ox, state.width), wrap(m.y + oy, state.height));
+      return sum + Math.abs(temp - m.phenotype.traits.thermalTolerance);
+    }, 0);
+
+  const avgThermotaxis = members.reduce((sum, m) => sum + m.phenotype.traits.thermotaxis, 0) / members.length;
   const avgForaging = members.reduce((sum, m) => sum + m.phenotype.traits.foraging, 0) / members.length;
-  const useForaging = state.rng() < avgForaging;
+  const roll = state.rng();
 
   let [dx, dy] = validOffsets[randomInt(state.rng, validOffsets.length)];
-  if (useForaging) {
+  if (roll < avgThermotaxis) {
+    let bestMismatch = totalMismatch(0, 0);
+    let best: [number, number] | null = null;
+    for (const [odx, ody] of validOffsets) {
+      const mismatch = totalMismatch(odx, ody);
+      if (mismatch < bestMismatch) {
+        bestMismatch = mismatch;
+        best = [odx, ody];
+      }
+    }
+    if (!best) return;
+    [dx, dy] = best;
+  } else if (roll < avgThermotaxis + avgForaging) {
     let bestFood = -Infinity;
     for (const [odx, ody] of validOffsets) {
       const food = members.reduce(

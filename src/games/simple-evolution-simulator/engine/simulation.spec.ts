@@ -183,6 +183,86 @@ describe("planetary biomes (per-cell local temperature)", () => {
   });
 });
 
+describe("thermotaxis (thermal-seeking movement)", () => {
+  it("a solo organism with thermotaxis forced on moves toward the free neighbor closest to its thermalTolerance", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0, environment: { temperature: 0.5, foodRegenRate: 0 } });
+    const a = createOrganism({ id: "a", genome: randomGenome(60, createRng(1)), x: 10, y: 10, energy: 60, generation: 0, parentIds: [], birthTick: 0 });
+    a.phenotype = {
+      ...a.phenotype,
+      traits: { ...a.phenotype.traits, motility: 1, thermotaxis: 1, foraging: 0, thermalTolerance: 0.5, energyStorage: 5 },
+    };
+    state.organisms.set(a.id, a);
+    state.grid[10 * state.width + 10] = a.id;
+
+    // Every cell mismatched by 0.4 (temp 0.9 vs. tolerance 0.5) except (11, 10),
+    // which reads exactly at the organism's tolerance (temp 0.5, mismatch 0).
+    state.biomeOffset.fill(0.4);
+    state.biomeOffset[10 * state.width + 11] = 0;
+
+    step(state);
+    const moved = state.organisms.get("a")!;
+    expect(moved).toMatchObject({ x: 11, y: 10 });
+  });
+
+  it("never relocates into a worse thermal fit — stays put when every free neighbor is worse than the current cell", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0, environment: { temperature: 0.5, foodRegenRate: 0 } });
+    const a = createOrganism({ id: "a", genome: randomGenome(60, createRng(1)), x: 10, y: 10, energy: 60, generation: 0, parentIds: [], birthTick: 0 });
+    a.phenotype = {
+      ...a.phenotype,
+      traits: { ...a.phenotype.traits, motility: 1, thermotaxis: 1, foraging: 0, thermalTolerance: 0.5, energyStorage: 5 },
+    };
+    state.organisms.set(a.id, a);
+    state.grid[10 * state.width + 10] = a.id;
+
+    // The organism's own cell reads exactly at its tolerance (mismatch 0);
+    // every neighboring cell is mismatched by 0.4 — strictly worse.
+    state.biomeOffset.fill(0.4);
+    state.biomeOffset[10 * state.width + 10] = 0;
+
+    for (let i = 0; i < 10; i++) {
+      step(state);
+      expect(state.organisms.get("a")).toMatchObject({ x: 10, y: 10 });
+    }
+  });
+
+  it("a bonded pair with thermotaxis forced on moves the whole footprint toward better combined thermal fit", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0, environment: { temperature: 0.5, foodRegenRate: 0 } });
+    const a = createOrganism({ id: "a", genome: randomGenome(60, createRng(1)), x: 10, y: 10, energy: 60, generation: 0, parentIds: [], birthTick: 0 });
+    const b = createOrganism({ id: "b", genome: randomGenome(60, createRng(2)), x: 11, y: 10, energy: 60, generation: 0, parentIds: [], birthTick: 0 });
+    for (const o of [a, b]) {
+      o.phenotype = {
+        ...o.phenotype,
+        traits: { ...o.phenotype.traits, motility: 0, foraging: 0, thermalTolerance: 0.5, energyStorage: 5, replicationRate: 0 },
+      };
+      forceSurfaceProtein(o, "012345");
+    }
+    state.organisms.set(a.id, a);
+    state.organisms.set(b.id, b);
+    state.grid[10 * state.width + 10] = a.id;
+    state.grid[10 * state.width + 11] = b.id;
+
+    step(state); // motility 0 so nothing moves yet; just registers the a-b bond
+    expect(getColonySize(state, "a")).toBe(2);
+
+    // Everywhere is mismatched by 0.4 except the pair's shifted-right
+    // footprint (11, 10) and (12, 10) — b's current cell and one past it —
+    // which both read exactly at tolerance (mismatch 0). Shifting right by
+    // (1, 0) is therefore the uniquely best offset; every other valid offset
+    // leaves the footprint at its current, worse total mismatch.
+    state.biomeOffset.fill(0.4);
+    state.biomeOffset[10 * state.width + 11] = 0;
+    state.biomeOffset[10 * state.width + 12] = 0;
+    for (const o of [a, b]) {
+      o.phenotype = { ...o.phenotype, traits: { ...o.phenotype.traits, motility: 1, thermotaxis: 1 } };
+    }
+
+    step(state);
+    expect(state.organisms.get("a")).toMatchObject({ x: 11, y: 10 });
+    expect(state.organisms.get("b")).toMatchObject({ x: 12, y: 10 });
+    expect(getColonySize(state, "a")).toBe(2);
+  });
+});
+
 describe("colony bonding (aggregative multicellularity)", () => {
   it("two adjacent organisms with active, matching surface-protein sequences bond into a colony", () => {
     const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });

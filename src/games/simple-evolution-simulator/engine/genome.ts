@@ -170,10 +170,10 @@ const SEED_ENVIRONMENT_ADAPTED_GENES = ["thermal-tolerance"];
  * tolerance is seeded adapted to `environment`'s starting temperature (see
  * `buildAdaptedMotif`) rather than left silent, since a planet's earliest
  * life forming in-place should already suit its own temperature. Every other
- * seed gene (motility, mutation resistance, size, pigment, foraging, energy
- * storage) starts silent and has to emerge from mutation/duplication over
- * subsequent generations — that's deliberate: it's the "simple replicator
- * evolving into a cell" arc the game is telling.
+ * seed gene (motility, mutation resistance, size, pigment, foraging,
+ * thermotaxis, energy storage) starts silent and has to emerge from
+ * mutation/duplication over subsequent generations — that's deliberate: it's
+ * the "simple replicator evolving into a cell" arc the game is telling.
  */
 export function createSeedGenome(rng: Rng, environment?: EnvironmentConfig): Genome {
   // Reading frame matters: translate() always reads codons starting at
