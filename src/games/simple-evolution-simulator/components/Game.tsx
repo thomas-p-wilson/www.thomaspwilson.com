@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { DEFAULT_MUTATION_CONFIG, scaleMutationConfig } from "../engine/genome";
-import { createSimulation, getLineageRecords, getOrganisms, step, type SimulationState } from "../engine/simulation";
+import {
+  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getOrganisms, step,
+  type SimulationState,
+} from "../engine/simulation";
 import ControlsPanel from "./ControlsPanel";
 import GenomeViewer from "./GenomeViewer";
 import IntroSequence from "./IntroSequence";
@@ -101,8 +104,11 @@ export default function Game() {
   const sim = simRef.current;
   const organisms = sim ? getOrganisms(sim) : [];
   const lineageRecords = sim ? getLineageRecords(sim) : [];
+  const cellTraits = sim ? getCellTraits(sim) : new Map();
+  const bonds = sim ? getColonyBonds(sim) : [];
   const selectedOrganism = organisms.find((o) => o.id === selectedId) ?? null;
   const selectedRecord = selectedId ? sim?.lineage.get(selectedId) : undefined;
+  const selectedColonySize = sim && selectedOrganism ? getColonySize(sim, selectedOrganism.id) : 1;
 
   return (
     <div className="rounded-2xl bg-slate-950 border border-slate-800 p-4 md:p-6">
@@ -111,6 +117,8 @@ export default function Game() {
           <div className="w-full overflow-auto rounded-lg border border-slate-800 bg-slate-900/40 p-2 flex justify-center">
             <WorldCanvas
               organisms={organisms}
+              cellTraits={cellTraits}
+              bonds={bonds}
               width={WORLD_WIDTH}
               height={WORLD_HEIGHT}
               cellSize={CELL_SIZE}
@@ -119,8 +127,10 @@ export default function Game() {
             />
           </div>
           <p className="text-xs text-slate-500 text-center max-w-md">
-            Click any cell to inspect that organism. Brighter rings mark organisms with several active genes —
-            simple replicators well on their way to being cells.
+            Click any organism to inspect it. Brighter rings mark organisms with several active genes — simple
+            replicators well on their way to being cells. Thin lines connect bonded colony-mates — independent
+            organisms whose surface proteins recognize each other; darker, denser organisms have differentiated
+            under Structural Reinforcement from sitting deep inside a colony.
           </p>
         </div>
 
@@ -135,7 +145,9 @@ export default function Game() {
               onMutationMultiplierChange={setMutationMultiplier}
               temperature={temperature}
               onTemperatureChange={setTemperature}
-              stats={sim?.stats ?? { population: 0, maxGeneration: 0, births: 0, deaths: 0 }}
+              stats={sim?.stats ?? {
+                population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
+              }}
               tick={sim?.tick ?? 0}
               onOpenGenomeViewer={() => openGenomeViewer()}
               onOpenLineageTree={() => setLineageOpen(true)}
@@ -147,6 +159,8 @@ export default function Game() {
             <OrganismInspector
               organism={selectedOrganism}
               record={selectedRecord}
+              cellTraits={cellTraits}
+              colonySize={selectedColonySize}
               onOpenGenome={openGenomeViewer}
               onOpenLineage={() => setLineageOpen(true)}
               onSelectParent={setSelectedId}

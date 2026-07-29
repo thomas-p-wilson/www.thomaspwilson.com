@@ -13,6 +13,15 @@ describe("createOrganism", () => {
     expect(organism.phenotype).toEqual(decode(genome));
   });
 
+  it("starts at exactly the given position — one organism, one grid cell", () => {
+    const genome = randomGenome(60, createRng(1));
+    const organism = createOrganism({
+      id: "a", genome, x: 3, y: 7, energy: 10, generation: 0, parentIds: [], birthTick: 0,
+    });
+    expect(organism.x).toBe(3);
+    expect(organism.y).toBe(7);
+  });
+
   it("starts at age 0 regardless of birthTick", () => {
     const organism = createOrganism({
       id: "a", genome: randomGenome(60, createRng(1)), x: 0, y: 0, energy: 10, generation: 3,

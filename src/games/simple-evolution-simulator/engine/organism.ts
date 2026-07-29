@@ -1,8 +1,8 @@
-// The Organism model itself. Deliberately just data plus two constructor
-// helpers — nothing here runs every tick. `decode()` (the potentially
-// nontrivial part) only runs when an organism is first created or born,
-// never on every simulation step; see simulation.ts for the tick loop that
-// reads `organism.phenotype` directly.
+// The Organism model itself. Deliberately just data plus a tiny helper —
+// nothing here runs every tick. `decode()` (the potentially nontrivial part)
+// only runs when an organism is first created or born, never on every
+// simulation step; see simulation.ts for the tick loop that reads
+// `organism.phenotype` directly.
 import { decode } from "./phenotype";
 import type { Genome, Organism } from "./types";
 

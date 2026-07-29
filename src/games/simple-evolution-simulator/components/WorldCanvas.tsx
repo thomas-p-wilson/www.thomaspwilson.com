@@ -1,9 +1,16 @@
 import { useEffect, useMemo, useRef } from "react";
-import type { Organism } from "../engine/types";
-import { organismStyle } from "./organismColor";
+import type { Organism, TraitId } from "../engine/types";
+import { cellStyle } from "./organismColor";
 
 interface WorldCanvasProps {
   organisms: Organism[];
+  /** Organism id -> that organism's resolved regulatory trait values; see
+   * engine/simulation.ts's getCellTraits(). */
+  cellTraits: Map<string, Partial<Record<TraitId, number>>>;
+  /** This tick's bonded (compatible-and-adjacent) organism id pairs — see
+   * engine/simulation.ts's getColonyBonds(). Drawn as connecting lines so
+   * colony membership reads visually. */
+  bonds: Array<[string, string]>;
   width: number;
   height: number;
   selectedId: string | null;
@@ -13,17 +20,17 @@ interface WorldCanvasProps {
 
 const GRID_LINE_COLOR = "rgba(148, 163, 184, 0.12)";
 const BACKGROUND_COLOR = "#0b1120";
+const BOND_LINE_COLOR = "rgba(250, 204, 21, 0.4)";
 
-export default function WorldCanvas({ organisms, width, height, selectedId, onSelect, cellSize = 14 }: WorldCanvasProps) {
+export default function WorldCanvas({
+  organisms, cellTraits, bonds, width, height, selectedId, onSelect, cellSize = 14,
+}: WorldCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // O(1) lookup from grid cell to organism, rebuilt whenever the population
-  // snapshot changes (cheap: population is bounded by grid size).
-  const byCell = useMemo(() => {
-    const map = new Map<string, Organism>();
-    for (const organism of organisms) map.set(`${organism.x},${organism.y}`, organism);
-    return map;
-  }, [organisms]);
+  // O(1) lookups, rebuilt whenever the population snapshot changes (cheap:
+  // population is bounded by grid size).
+  const byCell = useMemo(() => new Map(organisms.map((o) => [`${o.x},${o.y}`, o] as const)), [organisms]);
+  const byId = useMemo(() => new Map(organisms.map((o) => [o.id, o] as const)), [organisms]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -58,10 +65,29 @@ export default function WorldCanvas({ organisms, width, height, selectedId, onSe
     }
     ctx.stroke();
 
+    // Bond lines drawn first so organism circles sit on top of them. Only
+    // straight (non-wrapped) adjacency is drawn — a bond across the world's
+    // toroidal seam is real (colonies can and do form across the wrap) but
+    // would draw a line clear across the canvas, which reads as noise rather
+    // than structure; skipping it is a rendering simplification only, the
+    // bond itself still counts for colony size/regulatory context/movement.
+    ctx.strokeStyle = BOND_LINE_COLOR;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (const [aId, bId] of bonds) {
+      const a = byId.get(aId);
+      const b = byId.get(bId);
+      if (!a || !b) continue;
+      if (Math.abs(a.x - b.x) > 1 || Math.abs(a.y - b.y) > 1) continue;
+      ctx.moveTo(a.x * cellSize + cellSize / 2, a.y * cellSize + cellSize / 2);
+      ctx.lineTo(b.x * cellSize + cellSize / 2, b.y * cellSize + cellSize / 2);
+    }
+    ctx.stroke();
+
     for (const organism of organisms) {
-      const style = organismStyle(organism.phenotype);
       const cx = organism.x * cellSize + cellSize / 2;
       const cy = organism.y * cellSize + cellSize / 2;
+      const style = cellStyle(organism.phenotype, cellTraits.get(organism.id));
       const radius = (cellSize / 2 - 1) * style.radiusFactor;
 
       ctx.beginPath();
@@ -83,7 +109,7 @@ export default function WorldCanvas({ organisms, width, height, selectedId, onSe
         ctx.stroke();
       }
     }
-  }, [organisms, width, height, cellSize, selectedId]);
+  }, [organisms, cellTraits, bonds, byId, width, height, cellSize, selectedId]);
 
   function handleClick(event: React.MouseEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current;

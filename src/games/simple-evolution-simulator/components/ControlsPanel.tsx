@@ -47,6 +47,8 @@ export default function ControlsPanel({
         <StatTile label="Generation" value={stats.maxGeneration} />
         <StatTile label="Tick" value={tick} />
         <StatTile label="Births / Deaths" value={`${stats.births} / ${stats.deaths}`} />
+        <StatTile label="In Colonies" value={stats.organismsInColonies} />
+        <StatTile label="Largest Colony" value={stats.largestColony} />
       </div>
 
       <div className="space-y-4">
