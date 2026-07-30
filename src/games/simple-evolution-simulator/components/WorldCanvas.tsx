@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { preferredTemperature } from "../engine/organism";
+import { energyCapFor, maxAgeFor } from "../engine/simulation";
 import type { Organism, TraitId } from "../engine/types";
 import { biomeCellColor } from "./biomeColor";
-import { cellStyle } from "./organismColor";
+import { cellStyle, type OrganismColorMode } from "./organismColor";
 
 interface WorldCanvasProps {
   organisms: Organism[];
   /** Organism id -> that organism's resolved regulatory trait values; see
    * engine/simulation.ts's getCellTraits(). */
   cellTraits: Map<string, Partial<Record<TraitId, number>>>;
+  /** What organism fill color encodes — see organismColor.ts's
+   * OrganismColorMode. */
+  colorMode: OrganismColorMode;
   /** This tick's bonded (compatible-and-adjacent) organism id pairs — see
    * engine/simulation.ts's getColonyBonds(). Drawn as connecting lines so
    * colony membership reads visually. */
@@ -29,6 +34,24 @@ interface WorldCanvasProps {
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
+/** This organism's 0..1 value for `colorMode`, normalized against that
+ * organism's own niche/cap/lifespan (see engine/organism.ts's
+ * preferredTemperature, engine/simulation.ts's energyCapFor/maxAgeFor) so a
+ * mode's meaning doesn't drift as the population changes. Unused (and not
+ * called) when colorMode is "phenotype". */
+function metricValueFor(organism: Organism, colorMode: OrganismColorMode): number {
+  switch (colorMode) {
+    case "temperature":
+      return preferredTemperature(organism);
+    case "energy":
+      return clamp01(organism.energy / energyCapFor(organism));
+    case "age":
+      return clamp01(organism.age / maxAgeFor(organism));
+    case "phenotype":
+      return 0;
+  }
+}
+
 const GRID_LINE_COLOR = "rgba(148, 163, 184, 0.12)";
 const BACKGROUND_COLOR = "#0b1120";
 const BOND_LINE_COLOR = "rgba(250, 204, 21, 0.4)";
@@ -39,7 +62,7 @@ const MIN_CELL_SIZE = 6;
 const MAX_CELL_SIZE = 28;
 
 export default function WorldCanvas({
-  organisms, cellTraits, bonds, biomeOffset, baseTemperature, width, height, selectedId, onSelect,
+  organisms, cellTraits, colorMode, bonds, biomeOffset, baseTemperature, width, height, selectedId, onSelect,
 }: WorldCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -132,7 +155,7 @@ export default function WorldCanvas({
     for (const organism of organisms) {
       const cx = organism.x * cellSize + cellSize / 2;
       const cy = organism.y * cellSize + cellSize / 2;
-      const style = cellStyle(organism.phenotype, cellTraits.get(organism.id));
+      const style = cellStyle(organism.phenotype, cellTraits.get(organism.id), colorMode, metricValueFor(organism, colorMode));
       const radius = (cellSize / 2 - 1) * style.radiusFactor;
 
       ctx.beginPath();
@@ -154,7 +177,7 @@ export default function WorldCanvas({
         ctx.stroke();
       }
     }
-  }, [organisms, cellTraits, bonds, biomeOffset, baseTemperature, byId, width, height, cellSize, selectedId]);
+  }, [organisms, cellTraits, colorMode, bonds, biomeOffset, baseTemperature, byId, width, height, cellSize, selectedId]);
 
   function handleClick(event: React.MouseEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current;

@@ -12,6 +12,7 @@ import ControlsPanel from "./ControlsPanel";
 import GenomeViewer from "./GenomeViewer";
 import IntroSequence from "./IntroSequence";
 import LineageTree from "./LineageTree";
+import type { OrganismColorMode } from "./organismColor";
 import OrganismInspector from "./OrganismInspector";
 import StatsView from "./StatsView";
 import WorldCanvas from "./WorldCanvas";
@@ -30,6 +31,7 @@ export default function Game() {
   const [mutationMultiplier, setMutationMultiplier] = useState(1);
   const [temperature, setTemperature] = useState(0.5);
   const [worldSizeIndex, setWorldSizeIndex] = useState(DEFAULT_WORLD_SIZE_INDEX);
+  const [colorMode, setColorMode] = useState<OrganismColorMode>("phenotype");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [genomeOpen, setGenomeOpen] = useState(false);
   const [genomeFocusIndex, setGenomeFocusIndex] = useState<number | undefined>(undefined);
@@ -184,6 +186,7 @@ export default function Game() {
               <WorldCanvas
                 organisms={organisms}
                 cellTraits={cellTraits}
+                colorMode={colorMode}
                 bonds={bonds}
                 biomeOffset={sim?.biomeOffset ?? null}
                 baseTemperature={sim?.environment.temperature ?? temperature}
@@ -227,6 +230,8 @@ export default function Game() {
               worldSizeIndex={worldSizeIndex}
               worldSizePresets={WORLD_SIZE_PRESETS}
               onWorldSizeChange={handleWorldSizeChange}
+              colorMode={colorMode}
+              onColorModeChange={setColorMode}
               stats={stats}
               tick={sim?.tick ?? 0}
               onOpenGenomeViewer={() => openGenomeViewer()}

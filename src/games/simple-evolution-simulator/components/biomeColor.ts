@@ -2,8 +2,11 @@
 // engine/biome.ts) to a background tint so spatial biome variation reads
 // visually — distinct from, and drawn beneath, the organisms rendered on
 // top of it. Nothing here feeds back into the engine.
-const COLD_HUE = 205; // blue
-const HOT_HUE = 20; // warm red-orange
+// Exported so organismColor.ts's temperature color mode can reuse the exact
+// same ramp — an organism's color is then directly comparable against the
+// biome tint it's standing on.
+export const COLD_HUE = 205; // blue
+export const HOT_HUE = 20; // warm red-orange
 
 export function biomeCellColor(temperature: number): string {
   const t = Math.min(1, Math.max(0, temperature));

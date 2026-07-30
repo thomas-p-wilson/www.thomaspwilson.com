@@ -407,8 +407,19 @@ function killOrganism(state: SimulationState, organism: Organism): void {
   state.stats.deaths += 1;
 }
 
-function maxAgeFor(organism: Organism): number {
+/** This organism's own death-age threshold — used both by the tick loop's
+ * death check and by the UI's age color mode to normalize age as a fraction
+ * of *this organism's* lifespan rather than a world-wide average. */
+export function maxAgeFor(organism: Organism): number {
   return BASE_MAX_AGE * (0.5 + organism.phenotype.traits.membraneStability * 0.5);
+}
+
+/** This organism's own energy-storage cap — see the Energy Storage gene's
+ * doc comment near ENERGY_STORAGE_BASE_CAP's use in `feedAndAge`. Exported
+ * so the UI's energy color mode can normalize against the same per-organism
+ * cap the engine actually enforces, rather than a fixed or world-wide max. */
+export function energyCapFor(organism: Organism): number {
+  return ENERGY_STORAGE_BASE_CAP * organism.phenotype.traits.energyStorage;
 }
 
 function freeNeighbor(state: SimulationState, x: number, y: number): { x: number; y: number } | null {
@@ -531,7 +542,7 @@ function feedAndAge(state: SimulationState, organism: Organism): void {
   // Energy Storage caps how much surplus an organism can bank; anything
   // above the cap is wasted rather than hoarded, so the gene only pays off
   // when food is patchy enough for banked energy to matter.
-  const storageCap = ENERGY_STORAGE_BASE_CAP * organism.phenotype.traits.energyStorage;
+  const storageCap = energyCapFor(organism);
   if (organism.energy > storageCap) organism.energy = storageCap;
 }
 

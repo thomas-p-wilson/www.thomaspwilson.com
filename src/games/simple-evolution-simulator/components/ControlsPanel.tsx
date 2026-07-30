@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import type { SimulationStats } from "../engine/simulation";
 import type { WorldSizePreset } from "../engine/worldSize";
+import { metricColor, type OrganismColorMode } from "./organismColor";
 
 interface ControlsPanelProps {
   running: boolean;
@@ -16,6 +17,8 @@ interface ControlsPanelProps {
   worldSizeIndex: number;
   worldSizePresets: WorldSizePreset[];
   onWorldSizeChange: (index: number) => void;
+  colorMode: OrganismColorMode;
+  onColorModeChange: (mode: OrganismColorMode) => void;
   stats: SimulationStats;
   tick: number;
   onOpenGenomeViewer: () => void;
@@ -30,10 +33,49 @@ const StatTile = ({ label, value }: { label: string; value: string | number }) =
   </div>
 );
 
+const COLOR_MODES: Array<{ id: OrganismColorMode; label: string }> = [
+  { id: "phenotype", label: "Trait" },
+  { id: "temperature", label: "Temp" },
+  { id: "energy", label: "Energy" },
+  { id: "age", label: "Age" },
+];
+
+// Low/high captions per non-phenotype mode, paired with a gradient strip
+// built from the same ramp WorldCanvas actually paints with (metricColor),
+// so the legend can't drift out of sync with what's on screen.
+const COLOR_MODE_CAPTIONS: Record<Exclude<OrganismColorMode, "phenotype">, { low: string; high: string }> = {
+  temperature: { low: "Cold-adapted", high: "Hot-adapted" },
+  energy: { low: "Near-empty", high: "Full energy" },
+  age: { low: "Newborn", high: "End of life" },
+};
+
+const ColorModeLegend = ({ colorMode }: { colorMode: OrganismColorMode }) => {
+  if (colorMode === "phenotype") {
+    return (
+      <p className="text-[11px] text-slate-500 mt-1">
+        Color reflects each organism's pigment, metabolism, and membrane-stability traits.
+      </p>
+    );
+  }
+  const { low, high } = COLOR_MODE_CAPTIONS[colorMode];
+  return (
+    <div className="mt-1.5">
+      <div
+        className="h-2 rounded-full"
+        style={{ background: `linear-gradient(to right, ${metricColor(colorMode, 0)}, ${metricColor(colorMode, 1)})` }}
+      />
+      <div className="flex justify-between text-[11px] text-slate-500 mt-1">
+        <span>{low}</span>
+        <span>{high}</span>
+      </div>
+    </div>
+  );
+};
+
 export default function ControlsPanel({
   running, onToggleRunning, speed, onSpeedChange, mutationMultiplier, onMutationMultiplierChange,
   temperature, onTemperatureChange, worldSizeIndex, worldSizePresets, onWorldSizeChange,
-  stats, tick, onOpenGenomeViewer, onOpenLineageTree, onReset,
+  colorMode, onColorModeChange, stats, tick, onOpenGenomeViewer, onOpenLineageTree, onReset,
 }: ControlsPanelProps) {
   const worldSize = worldSizePresets[worldSizeIndex];
   return (
@@ -58,6 +100,24 @@ export default function ControlsPanel({
       </div>
 
       <div className="space-y-4">
+        <div>
+          <div className="text-xs mb-1">Organism color</div>
+          <div className="grid grid-cols-4 gap-1">
+            {COLOR_MODES.map((mode) => (
+              <Button
+                key={mode.id}
+                size="sm"
+                variant={colorMode === mode.id ? "secondary" : "ghost"}
+                onClick={() => onColorModeChange(mode.id)}
+                className={colorMode === mode.id ? "" : "text-slate-400 hover:text-slate-100"}
+              >
+                {mode.label}
+              </Button>
+            ))}
+          </div>
+          <ColorModeLegend colorMode={colorMode} />
+        </div>
+
         <div>
           <div className="flex justify-between text-xs mb-1">
             <span>Speed</span>
