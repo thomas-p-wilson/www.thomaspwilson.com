@@ -1,9 +1,11 @@
+import { LayoutGrid, LineChart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { DEFAULT_MUTATION_CONFIG, scaleMutationConfig } from "../engine/genome";
 import {
-  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getOrganisms, step,
-  type SimulationState,
+  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getOrganisms, getStatsHistory,
+  getTicksUntilAbiogenesis, step, type SimulationState,
 } from "../engine/simulation";
 import { DEFAULT_WORLD_SIZE_INDEX, WORLD_SIZE_PRESETS, type WorldSizePreset } from "../engine/worldSize";
 import ControlsPanel from "./ControlsPanel";
@@ -11,15 +13,18 @@ import GenomeViewer from "./GenomeViewer";
 import IntroSequence from "./IntroSequence";
 import LineageTree from "./LineageTree";
 import OrganismInspector from "./OrganismInspector";
+import StatsView from "./StatsView";
 import WorldCanvas from "./WorldCanvas";
 
 const BASE_TICKS_PER_SECOND = 8;
 const MAX_STEPS_PER_FRAME = 20;
 
 type Phase = "intro" | "playing";
+type ViewMode = "world" | "stats";
 
 export default function Game() {
   const [phase, setPhase] = useState<Phase>("intro");
+  const [viewMode, setViewMode] = useState<ViewMode>("world");
   const [running, setRunning] = useState(true);
   const [speed, setSpeed] = useState(1);
   const [mutationMultiplier, setMutationMultiplier] = useState(1);
@@ -30,6 +35,12 @@ export default function Game() {
   const [genomeFocusIndex, setGenomeFocusIndex] = useState<number | undefined>(undefined);
   const [lineageOpen, setLineageOpen] = useState(false);
   const [, setVersion] = useState(0);
+  // Shown once per simulation run on the first extinction; re-armed by
+  // startNewSimulation. Doesn't reset on a later extinction within the same
+  // run — once the player has seen and dismissed it, repeat die-offs (real
+  // and expected — see engine/simulation.ts's spawnAbiogenesis) just proceed
+  // silently instead of interrupting again.
+  const [extinctionNoticeDismissed, setExtinctionNoticeDismissed] = useState(false);
 
   const simRef = useRef<SimulationState | null>(null);
 
@@ -47,6 +58,7 @@ export default function Game() {
       mutation: scaleMutationConfig(DEFAULT_MUTATION_CONFIG, mutationMultiplier),
     });
     setSelectedId(null);
+    setExtinctionNoticeDismissed(false);
     setVersion((v) => v + 1);
   }
 
@@ -67,11 +79,20 @@ export default function Game() {
     startNewSimulation(WORLD_SIZE_PRESETS[index]);
   }
 
+  // Not hooks — plain reads of the mutable sim ref — so these are safe to
+  // compute ahead of the intro-phase early return below and reuse both in
+  // the tick loop's pause condition and in the render body further down.
+  const sim = simRef.current;
+  const ticksUntilAbiogenesis = sim ? getTicksUntilAbiogenesis(sim) : null;
+  const showExtinctionNotice = ticksUntilAbiogenesis !== null && !extinctionNoticeDismissed;
+
   // Main tick loop. Speed changes intentionally restart the accumulator
   // (harmless); mutation rate and temperature are applied via the effects
-  // below so they take effect immediately without resetting timing.
+  // below so they take effect immediately without resetting timing. Paused
+  // while the extinction notice is up (showExtinctionNotice) — dismissing it
+  // is what lets ticks (and the abiogenesis countdown) resume.
   useEffect(() => {
-    if (phase !== "playing" || !running) return;
+    if (phase !== "playing" || !running || showExtinctionNotice) return;
     let raf = 0;
     let last = performance.now();
     let acc = 0;
@@ -92,7 +113,7 @@ export default function Game() {
     }
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [phase, running, speed]);
+  }, [phase, running, speed, showExtinctionNotice]);
 
   useEffect(() => {
     if (!simRef.current) return;
@@ -108,40 +129,88 @@ export default function Game() {
     return <IntroSequence onComplete={handleIntroComplete} />;
   }
 
-  const sim = simRef.current;
   const organisms = sim ? getOrganisms(sim) : [];
   const lineageRecords = sim ? getLineageRecords(sim) : [];
   const cellTraits = sim ? getCellTraits(sim) : new Map();
   const bonds = sim ? getColonyBonds(sim) : [];
+  const statsHistory = sim ? getStatsHistory(sim) : [];
   const selectedOrganism = organisms.find((o) => o.id === selectedId) ?? null;
   const selectedRecord = selectedId ? sim?.lineage.get(selectedId) : undefined;
   const selectedColonySize = sim && selectedOrganism ? getColonySize(sim, selectedOrganism.id) : 1;
+  const zeroStatSummary = { avg: 0, min: 0, max: 0 };
+  const stats = sim?.stats ?? {
+    population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
+    genomeLength: zeroStatSummary, age: zeroStatSummary, colonySize: zeroStatSummary,
+  };
 
   return (
     <div className="h-screen w-screen bg-slate-950 p-4 pt-16 md:p-6 md:pt-16 overflow-auto">
       <div className="flex flex-col lg:flex-row gap-6 h-full">
         <div className="flex-1 flex flex-col items-center justify-center gap-3 min-h-0">
-          <div className="w-full h-full rounded-lg border border-slate-800 bg-slate-900/40 p-2">
-            <WorldCanvas
-              organisms={organisms}
-              cellTraits={cellTraits}
-              bonds={bonds}
-              biomeOffset={sim?.biomeOffset ?? null}
-              baseTemperature={sim?.environment.temperature ?? temperature}
-              width={WORLD_SIZE_PRESETS[worldSizeIndex].width}
-              height={WORLD_SIZE_PRESETS[worldSizeIndex].height}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-            />
+          <div className="flex gap-1 self-start sm:self-center">
+            <Button
+              size="sm"
+              variant={viewMode === "world" ? "secondary" : "ghost"}
+              onClick={() => setViewMode("world")}
+              className={`gap-1.5 ${viewMode === "world" ? "" : "text-slate-400 hover:text-slate-100"}`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" /> World
+            </Button>
+            <Button
+              size="sm"
+              variant={viewMode === "stats" ? "secondary" : "ghost"}
+              onClick={() => setViewMode("stats")}
+              className={`gap-1.5 ${viewMode === "stats" ? "" : "text-slate-400 hover:text-slate-100"}`}
+            >
+              <LineChart className="w-3.5 h-3.5" /> Stats
+            </Button>
           </div>
-          <p className="text-xs text-slate-500 text-center max-w-md">
-            Click any organism to inspect it. Brighter rings mark organisms with several active genes — simple
-            replicators well on their way to being cells. Thin lines connect bonded colony-mates — independent
-            organisms whose surface proteins recognize each other; darker, denser organisms have differentiated
-            under Structural Reinforcement from sitting deep inside a colony. Background shading shows each
-            region's local temperature — cooler blue, warmer red — fixed for this planet, shifting uniformly
-            with the Temperature control.
-          </p>
+          <div className="relative w-full h-full rounded-lg border border-slate-800 bg-slate-900/40 p-2">
+            {showExtinctionNotice && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-slate-950/90 p-6 text-center">
+                <div className="max-w-sm space-y-4">
+                  <p className="text-sm text-amber-200">
+                    This lineage went extinct — a total die-off isn&apos;t the end of the story. Life on early
+                    planets often failed and re-emerged more than once; a fresh spark may spontaneously appear in
+                    about {ticksUntilAbiogenesis} ticks.
+                  </p>
+                  <Button size="sm" onClick={() => setExtinctionNoticeDismissed(true)}>
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            )}
+            {viewMode === "world" ? (
+              <WorldCanvas
+                organisms={organisms}
+                cellTraits={cellTraits}
+                bonds={bonds}
+                biomeOffset={sim?.biomeOffset ?? null}
+                baseTemperature={sim?.environment.temperature ?? temperature}
+                width={WORLD_SIZE_PRESETS[worldSizeIndex].width}
+                height={WORLD_SIZE_PRESETS[worldSizeIndex].height}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+              />
+            ) : (
+              <StatsView stats={stats} history={statsHistory} tick={sim?.tick ?? 0} />
+            )}
+          </div>
+          {viewMode === "world" ? (
+            <p className="text-xs text-slate-500 text-center max-w-md">
+              Click any organism to inspect it. Brighter rings mark organisms with several active genes — simple
+              replicators well on their way to being cells. Thin lines connect bonded colony-mates — independent
+              organisms whose surface proteins recognize each other; darker, denser organisms have differentiated
+              under Structural Reinforcement from sitting deep inside a colony. Background shading shows each
+              region's local temperature — cooler blue, warmer red — fixed for this planet, shifting uniformly
+              with the Temperature control.
+            </p>
+          ) : (
+            <p className="text-xs text-slate-500 text-center max-w-md">
+              Aggregate population trends over the run — genome length, age, and colony size distributions, each
+              with current/average/min/max and a trendline.
+            </p>
+          )}
         </div>
 
         <div className="w-full lg:w-80 shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
@@ -158,9 +227,7 @@ export default function Game() {
               worldSizeIndex={worldSizeIndex}
               worldSizePresets={WORLD_SIZE_PRESETS}
               onWorldSizeChange={handleWorldSizeChange}
-              stats={sim?.stats ?? {
-                population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
-              }}
+              stats={stats}
               tick={sim?.tick ?? 0}
               onOpenGenomeViewer={() => openGenomeViewer()}
               onOpenLineageTree={() => setLineageOpen(true)}

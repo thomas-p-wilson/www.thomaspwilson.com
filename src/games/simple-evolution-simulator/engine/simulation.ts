@@ -9,10 +9,13 @@
 // engine/colony.ts) are a purely relational structure layered on top: bonds
 // between still-fully-independent organisms, recomputed fresh every tick
 // from actual Moore-adjacent pairs, never a shared body/genome/energy pool.
-import { generateBiomeOffsetField, localTemperature } from "./biome";
+import {
+  FOOD_ANCHOR_OFFSET_RANGE, generateBiomeOffsetField, localFoodRegenRate, localTemperature,
+  TEMPERATURE_ANCHOR_OFFSET_RANGE,
+} from "./biome";
 import { areCompatible, computeColonies, type ColonyGraph } from "./colony";
 import { createSeedGenome, mutate, scaleMutationConfig } from "./genome";
-import { createOrganism, reproduce } from "./organism";
+import { createOrganism, preferredTemperature, reproduce } from "./organism";
 import { effectiveTraitValue, resolveCellTraits } from "./phenotype";
 import { createRng, randomInt, type Rng } from "./rng";
 import type { EnvironmentConfig, LineageRecord, MutationConfig, Organism, TraitId } from "./types";
@@ -21,6 +24,44 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
 const BASE_METABOLIC_COST = 0.55;
 const THERMAL_PENALTY_FACTOR = 0.5;
+// Mismatch-to-own-niche throttles fecundity directly, on top of (not instead
+// of) the metabolic thermalCost above — separating "does this organism
+// survive" from "does it establish a lineage here" avoids the dead end of
+// just raising THERMAL_PENALTY_FACTOR: a bigger flat metabolic tax turned out
+// to be bimodal (either too weak to matter, or high enough to wipe out the
+// whole population — nearly everyone carries *some* mismatch most of the
+// time, so it can't discriminate "settled well" from "settled badly"). These
+// two hit reproduction specifically: a badly-mismatched organism can still
+// live and wander, it just won't successfully found a colony there.
+//
+// Empirically tuned down hard from an initial guess (1.5 / 2): across 11
+// seeds x 3000 ticks, that guess pushed extinction from a baseline ~3/11 to
+// 7/11 with barely better actual-vs-random-placement mismatch discrimination
+// than these gentler values give. The population here is small (starts at 4)
+// and the temperature field is now wide (TEMPERATURE_ANCHOR_OFFSET_RANGE,
+// engine/biome.ts) — early-generation stochastic extinction is a real risk
+// this mechanic can tip over, not just a "make it stronger for a stronger
+// effect" dial.
+const REPRO_MISMATCH_RATE_SENSITIVITY = 0.3;
+const REPRO_MISMATCH_COST_SENSITIVITY = 0.5;
+// Absolute-temperature "pace of life" — independent of an organism's own
+// thermalTolerance/preferredTemperature, mirrors real ectotherm biology
+// (metabolic and developmental rates broadly track ambient temperature up to
+// an optimum, then fall off from heat stress — the Q10 effect). Every
+// organism at a given cell experiences the same pace, however well-adapted it
+// is to that cell: this is what makes some absolute regions of the map
+// generally richer for everyone, layered on top of (not replacing) the
+// relative, evolvable mismatch pressure above.
+const PACE_OPTIMUM = 0.6; // slightly warm of the 0.5 midpoint, not the hot extreme
+const PACE_CURVE_STEEPNESS = 3;
+const PACE_FLOOR = 0.3; // pace never bottoms out at exactly 0 even at the thermal extremes
+// Kept deliberately gentle (see REPRO_MISMATCH_*'s tuning note above): unlike
+// mismatch, pace applies to *every* organism regardless of adaptation, so
+// even a modest sensitivity (0.15) measurably worsened extinction risk in the
+// same sweep (3/11 -> 7/11) since a wide swath of the map now sits far from
+// PACE_OPTIMUM. 0.05 still gives a real, measured effect without that cliff.
+const PACE_COST_SENSITIVITY = 0.05;
+const PACE_REPRODUCTION_SENSITIVITY = 0.05;
 const REPRODUCE_ENERGY_THRESHOLD = 14;
 const REPRODUCE_ENERGY_COST = 9;
 const CHILD_START_ENERGY = 6;
@@ -88,6 +129,17 @@ const NEIGHBOR_OFFSETS: Array<[number, number]> = [
   [-1, 1], [0, 1], [1, 1],
 ];
 
+/** Current-tick distribution summary for a per-organism metric. Zeroed
+ * (rather than e.g. +/-Infinity) when the population is empty, so callers
+ * never need to special-case "no organisms" before rendering it. */
+export interface StatSummary {
+  avg: number;
+  min: number;
+  max: number;
+}
+
+const ZERO_STAT_SUMMARY: StatSummary = { avg: 0, min: 0, max: 0 };
+
 export interface SimulationStats {
   population: number;
   maxGeneration: number;
@@ -99,7 +151,38 @@ export interface SimulationStats {
   /** Largest current colony's member count (1 if the population has no
    * colony of size >= 2 at all, including an empty population). */
   largestColony: number;
+  /** Genome length (base pairs) across the current population. */
+  genomeLength: StatSummary;
+  /** Age (ticks since birth) across the current population. */
+  age: StatSummary;
+  /** Colony size (1 for a solo organism) across the current population —
+   * same per-organism values `organismsInColonies`/`largestColony` are
+   * derived from. */
+  colonySize: StatSummary;
 }
+
+/** One sampled point in a run's population-statistics history — see
+ * `SimulationState.history`. */
+export interface StatHistorySample {
+  tick: number;
+  population: number;
+  genomeLength: StatSummary;
+  age: StatSummary;
+  colonySize: StatSummary;
+}
+
+// Recording every tick would grow unbounded over a long-running sim; sampling
+// every Nth tick keeps trendlines smooth enough to read while bounding both
+// memory and per-sample render cost. Once the ring buffer fills, the oldest
+// sample is dropped for each new one — a run's history view scrolls forward
+// rather than growing forever.
+const STATS_HISTORY_SAMPLE_INTERVAL_TICKS = 10;
+const STATS_HISTORY_MAX_SAMPLES = 600;
+/** How many ticks a total die-off stays empty before a fresh spark of life
+ * spontaneously appears (see spawnAbiogenesis) — long enough to read as a
+ * real event, not instant, short enough not to feel stuck/broken. At the
+ * default 8 ticks/second x 1x speed, ~19 seconds. */
+const ABIOGENESIS_WAIT_TICKS = 150;
 
 export interface SimulationState {
   tick: number;
@@ -115,6 +198,12 @@ export interface SimulationState {
    * combine with the live environment.temperature via getLocalTemperature to
    * get a cell's actual local temperature (see todos/planetary-biomes.md). */
   biomeOffset: Float32Array;
+  /** Grid cell -> fixed relative richness offset from environment.foodRegenRate
+   * (see engine/biome.ts's localFoodRegenRate). Generated once at creation,
+   * independently of biomeOffset, so hot/dry, hot/wet, cold/dry, and cold/wet
+   * regions can all emerge on the same planet rather than food richness being
+   * hardcoded to track temperature. */
+  foodOffset: Float32Array;
   environment: EnvironmentConfig;
   mutation: MutationConfig;
   /** All-time archive, including dead organisms, for lineage/ancestry views. */
@@ -122,6 +211,10 @@ export interface SimulationState {
   rng: Rng;
   nextId: number;
   stats: SimulationStats;
+  /** Sampled history of population statistics over the run, oldest first —
+   * see `recordStatsHistorySample`. Bounded ring buffer, not a full per-tick
+   * archive. */
+  history: StatHistorySample[];
   /**
    * Organism id -> that organism's resolved regulatory trait values,
    * recomputed every tick after all mechanics run (see
@@ -143,6 +236,12 @@ export interface SimulationState {
    * which can also include organisms connected only transitively through a
    * third party. */
   bonds: Array<[string, string]>;
+  /** Tick population first hit 0, or null if currently non-extinct. Drives
+   * ABIOGENESIS_WAIT_TICKS below — a total die-off isn't a dead end, it's a
+   * real, expected outcome for a small early population (see maybeReproduce's
+   * REPRO_MISMATCH_* tuning note), so life gets another spontaneous chance to
+   * take hold rather than leaving the world empty forever. */
+  extinctSinceTick: number | null;
 }
 
 export interface CreateSimulationOptions {
@@ -169,6 +268,27 @@ function cellTemperature(state: SimulationState, x: number, y: number): number {
   return localTemperature(state.environment.temperature, state.biomeOffset, cellIndex(state, x, y));
 }
 
+/** A cell's actual local food-regeneration rate — the live baseline scaled by
+ * this cell's fixed spatial richness offset (see engine/biome.ts). */
+function cellFoodRegenRate(state: SimulationState, x: number, y: number): number {
+  return localFoodRegenRate(state.environment.foodRegenRate, state.foodOffset, cellIndex(state, x, y));
+}
+
+/**
+ * Absolute-temperature "pace of life" at a given local temperature, in [PACE_FLOOR, 1]
+ * — a symmetric hump peaking at PACE_OPTIMUM and falling off toward both thermal
+ * extremes (real ectotherm biology: metabolic/developmental rate tracks ambient
+ * temperature up to an optimum, then heat stress drags it back down — not an
+ * unbounded "hotter is always better" ramp). Independent of any organism's own
+ * thermalTolerance/preferredTemperature: every organism at this cell experiences
+ * the same pace, however well it's personally adapted here — see
+ * PACE_COST_SENSITIVITY/PACE_REPRODUCTION_SENSITIVITY for how it's applied.
+ */
+function thermalPace(localTemp: number): number {
+  const pace = 1 - PACE_CURVE_STEEPNESS * (localTemp - PACE_OPTIMUM) ** 2;
+  return Math.min(1, Math.max(PACE_FLOOR, pace));
+}
+
 function nextOrganismId(state: SimulationState): string {
   state.nextId += 1;
   return `org-${state.nextId}`;
@@ -184,21 +304,30 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     grid: new Array(options.width * options.height).fill(null),
     food: new Float32Array(options.width * options.height),
     biomeOffset: new Float32Array(options.width * options.height),
+    foodOffset: new Float32Array(options.width * options.height),
     environment: { ...options.environment },
     mutation: { ...options.mutation },
     lineage: new Map(),
     rng,
     nextId: 0,
-    stats: { population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0 },
+    stats: {
+      population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
+      genomeLength: ZERO_STAT_SUMMARY, age: ZERO_STAT_SUMMARY, colonySize: ZERO_STAT_SUMMARY,
+    },
+    history: [],
     cellTraits: new Map(),
     colonies: { colonyOf: new Map(), colonySize: new Map() },
     bonds: [],
+    extinctSinceTick: null,
   };
 
   for (let i = 0; i < state.food.length; i++) {
     state.food[i] = rng() * FOOD_MAX_PER_CELL;
   }
-  state.biomeOffset = generateBiomeOffsetField(state.width, state.height, rng);
+  state.biomeOffset = generateBiomeOffsetField(state.width, state.height, rng, TEMPERATURE_ANCHOR_OFFSET_RANGE);
+  // Independent anchor set/field from biomeOffset (see engine/biome.ts) — food
+  // richness varies on its own axis rather than being tied to temperature.
+  state.foodOffset = generateBiomeOffsetField(state.width, state.height, rng, FOOD_ANCHOR_OFFSET_RANGE);
 
   const seedCount = options.initialPopulation ?? 4;
   const centerX = Math.floor(state.width / 2);
@@ -207,22 +336,13 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     const x = wrap(centerX + randomInt(rng, 5) - 2, state.width);
     const y = wrap(centerY + randomInt(rng, 5) - 2, state.height);
     if (state.grid[cellIndex(state, x, y)]) continue;
-    // Seeded adapted to *this* site's local temperature, not the world's flat
-    // baseline — a planet's earliest life should start out suited to the
-    // actual patch of ground it arose on (see todos/planetary-biomes.md).
-    const localEnvironment = { ...state.environment, temperature: cellTemperature(state, x, y) };
-    const genome = createSeedGenome(rng, localEnvironment);
-    const id = nextOrganismId(state);
-    const organism = createOrganism({
-      id, genome, x, y, energy: INITIAL_ENERGY, generation: 0, parentIds: [], birthTick: 0,
-    });
-    placeOrganism(state, organism);
-    recordBirth(state, organism);
+    spawnPrimordialOrganism(state, x, y);
   }
 
   refreshColonies(state);
   refreshCellRegulatoryTraits(state);
   refreshStats(state);
+  recordStatsHistorySample(state);
   return state;
 }
 
@@ -242,6 +362,40 @@ function recordBirth(state: SimulationState, organism: Organism): void {
   });
   state.stats.births += 1;
   state.stats.maxGeneration = Math.max(state.stats.maxGeneration, organism.generation);
+}
+
+/** Creates and places one fresh, non-mutated organism adapted to its own
+ * spawn site's local temperature — shared by createSimulation's initial seed
+ * loop and spawnAbiogenesis below (a total die-off's spontaneous restart).
+ * birthTick is always the current tick, which for the initial seed loop is 0
+ * anyway. */
+function spawnPrimordialOrganism(state: SimulationState, x: number, y: number): void {
+  // Seeded adapted to *this* site's local temperature, not the world's flat
+  // baseline — a planet's earliest life should start out suited to the
+  // actual patch of ground it arose on (see todos/planetary-biomes.md).
+  const siteTemperature = cellTemperature(state, x, y);
+  const localEnvironment = { ...state.environment, temperature: siteTemperature };
+  const genome = createSeedGenome(state.rng, localEnvironment);
+  const id = nextOrganismId(state);
+  const organism = createOrganism({
+    id, genome, x, y, energy: INITIAL_ENERGY, generation: 0, parentIds: [], birthTick: state.tick,
+    birthTemperature: siteTemperature,
+  });
+  placeOrganism(state, organism);
+  recordBirth(state, organism);
+}
+
+/**
+ * A total die-off isn't a permanent dead end: after ABIOGENESIS_WAIT_TICKS
+ * spent empty, a fresh spark of life spontaneously appears at a uniformly
+ * random cell (real early-Earth abiogenesis plausibly happened, failed, and
+ * re-occurred more than once before life took hold for good) — no occupancy
+ * check needed since population 0 means the whole grid is empty.
+ */
+function spawnAbiogenesis(state: SimulationState): void {
+  const x = randomInt(state.rng, state.width);
+  const y = randomInt(state.rng, state.height);
+  spawnPrimordialOrganism(state, x, y);
 }
 
 function killOrganism(state: SimulationState, organism: Organism): void {
@@ -336,10 +490,11 @@ function refreshColonies(state: SimulationState): void {
 }
 
 function regenerateFood(state: SimulationState): void {
-  const regen = state.environment.foodRegenRate;
-  if (regen <= 0) return;
+  const baseRegen = state.environment.foodRegenRate;
+  if (baseRegen <= 0) return;
   for (let i = 0; i < state.food.length; i++) {
     if (state.food[i] < FOOD_MAX_PER_CELL) {
+      const regen = localFoodRegenRate(baseRegen, state.foodOffset, i);
       state.food[i] = Math.min(FOOD_MAX_PER_CELL, state.food[i] + regen);
     }
   }
@@ -353,10 +508,17 @@ function feedAndAge(state: SimulationState, organism: Organism): void {
   state.food[idx] -= bite;
   organism.energy += bite;
 
+  const localTemp = cellTemperature(state, organism.x, organism.y);
   const sizeCost = BASE_METABOLIC_COST * (0.6 + organism.phenotype.traits.size * 0.5);
-  const thermalMismatch = Math.abs(cellTemperature(state, organism.x, organism.y) - organism.phenotype.traits.thermalTolerance);
+  const thermalMismatch = Math.abs(localTemp - preferredTemperature(organism));
   const thermalCost = thermalMismatch * THERMAL_PENALTY_FACTOR;
   const maintenanceCost = GENOME_MAINTENANCE_COST_PER_BASE * organism.genome.length;
+
+  // Absolute-temperature pace of life (see thermalPace) — independent of this
+  // organism's own thermalMismatch: baseline upkeep costs more away from
+  // PACE_OPTIMUM regardless of adaptation, on top of (not instead of) the
+  // mismatch-driven thermalCost above.
+  const paceCostMultiplier = 1 + (1 - thermalPace(localTemp)) * PACE_COST_SENSITIVITY;
 
   // Structural Reinforcement's real fitness payoff: a colony member's
   // expressed structuralIntegrity directly discounts its *entire* per-tick
@@ -364,7 +526,7 @@ function feedAndAge(state: SimulationState, organism: Organism): void {
   // for why this has to cover size cost too, not just thermal/maintenance.
   const structuralIntegrity = effectiveTraitValue(organism.phenotype, "structuralIntegrity", state.cellTraits.get(organism.id));
   const costReduction = clamp01(structuralIntegrity) * STRUCTURAL_REINFORCEMENT_COST_REDUCTION;
-  organism.energy -= (sizeCost + thermalCost + maintenanceCost) * (1 - costReduction);
+  organism.energy -= ((sizeCost + maintenanceCost) * paceCostMultiplier + thermalCost) * (1 - costReduction);
 
   // Energy Storage caps how much surplus an organism can bank; anything
   // above the cap is wasted rather than hoarded, so the gene only pays off
@@ -432,11 +594,11 @@ function bestThermalNeighbor(
  * exactly like before thermotaxis existed. */
 function moveOrganism(state: SimulationState, organism: Organism): void {
   if (state.rng() >= organism.phenotype.traits.motility) return;
-  const { thermotaxis, foraging, thermalTolerance } = organism.phenotype.traits;
+  const { thermotaxis, foraging } = organism.phenotype.traits;
   const roll = state.rng();
   let target: { x: number; y: number } | null;
   if (roll < thermotaxis) {
-    target = bestThermalNeighbor(state, organism.x, organism.y, thermalTolerance);
+    target = bestThermalNeighbor(state, organism.x, organism.y, preferredTemperature(organism));
   } else if (roll < thermotaxis + foraging) {
     target = bestFoodNeighbor(state, organism.x, organism.y);
   } else {
@@ -530,7 +692,7 @@ function moveColony(state: SimulationState, root: string): void {
   const totalMismatch = (ox: number, oy: number): number =>
     members.reduce((sum, m) => {
       const temp = cellTemperature(state, wrap(m.x + ox, state.width), wrap(m.y + oy, state.height));
-      return sum + Math.abs(temp - m.phenotype.traits.thermalTolerance);
+      return sum + Math.abs(temp - preferredTemperature(m));
     }, 0);
 
   const avgThermotaxis = members.reduce((sum, m) => sum + m.phenotype.traits.thermotaxis, 0) / members.length;
@@ -590,16 +752,27 @@ function reproduceIndependent(state: SimulationState, organism: Organism, cost: 
     y: site.y,
     childEnergy: CHILD_START_ENERGY,
     birthTick: state.tick,
+    birthTemperature: cellTemperature(state, site.x, site.y),
   });
   placeOrganism(state, child);
   recordBirth(state, child);
 }
 
 function maybeReproduce(state: SimulationState, organism: Organism): void {
+  const localTemp = cellTemperature(state, organism.x, organism.y);
+  const thermalMismatch = Math.abs(localTemp - preferredTemperature(organism));
+
   // Replication cost scales with genome length, so a bloated genome must
   // first bank proportionally more energy — the direct selection pressure
   // that keeps genome growth tied to whether the extra length earns its keep.
-  const replicationCost = REPRODUCE_ENERGY_COST + organism.genome.length * REPLICATION_COST_PER_BASE;
+  // It also scales with thermal mismatch (REPRO_MISMATCH_COST_SENSITIVITY,
+  // alongside THERMAL_PENALTY_FACTOR above): a badly-mismatched organism needs
+  // to bank more energy per reproduction attempt, on top of attempting less
+  // often (see effectiveReplicationRate below). This throttles fecundity, not
+  // baseline survival — the organism itself still lives and can wander, it
+  // just can't cheaply establish a lineage somewhere poorly suited.
+  const baseReplicationCost = REPRODUCE_ENERGY_COST + organism.genome.length * REPLICATION_COST_PER_BASE;
+  const replicationCost = baseReplicationCost * (1 + thermalMismatch * REPRO_MISMATCH_COST_SENSITIVITY);
   if (organism.energy < Math.max(REPRODUCE_ENERGY_THRESHOLD, replicationCost)) return;
 
   // Growth Suppression's division-of-labor trade-off: a deeply-embedded
@@ -608,8 +781,17 @@ function maybeReproduce(state: SimulationState, organism: Organism): void {
   // members and solo organisms (growthSuppression at or near baseline 0)
   // reproduce at essentially their full genomic rate.
   const growthSuppression = effectiveTraitValue(organism.phenotype, "growthSuppression", state.cellTraits.get(organism.id));
+  // Thermal mismatch (relative to this organism's own niche) and absolute-
+  // temperature pace of life (thermalPace — same for everyone regardless of
+  // adaptation) each independently discount how often reproduction actually
+  // succeeds this tick, alongside growthSuppression's existing discount.
+  const mismatchRatePenalty = clamp01(thermalMismatch * REPRO_MISMATCH_RATE_SENSITIVITY);
+  const pacePenalty = (1 - thermalPace(localTemp)) * PACE_REPRODUCTION_SENSITIVITY;
   const effectiveReplicationRate =
-    organism.phenotype.traits.replicationRate * (1 - clamp01(growthSuppression) * GROWTH_SUPPRESSION_REPLICATION_PENALTY);
+    organism.phenotype.traits.replicationRate *
+    (1 - clamp01(growthSuppression) * GROWTH_SUPPRESSION_REPLICATION_PENALTY) *
+    (1 - mismatchRatePenalty) *
+    (1 - clamp01(pacePenalty));
   if (state.rng() >= effectiveReplicationRate) return;
 
   reproduceIndependent(state, organism, replicationCost);
@@ -633,15 +815,69 @@ function refreshStats(state: SimulationState): void {
   let maxGen = state.stats.maxGeneration;
   let organismsInColonies = 0;
   let largestColony = state.organisms.size > 0 ? 1 : 0;
+
+  let genomeLengthSum = 0;
+  let genomeLengthMin = Infinity;
+  let genomeLengthMax = -Infinity;
+  let ageSum = 0;
+  let ageMin = Infinity;
+  let ageMax = -Infinity;
+  let colonySizeSum = 0;
+  let colonySizeMin = Infinity;
+  let colonySizeMax = -Infinity;
+
+  // Reuses the same per-organism colony-size lookup organismsInColonies/
+  // largestColony already need, rather than a second independent pass.
   for (const organism of state.organisms.values()) {
     maxGen = Math.max(maxGen, organism.generation);
     const size = colonySizeOf(state, organism.id);
     if (size > 1) organismsInColonies++;
     largestColony = Math.max(largestColony, size);
+
+    const genomeLength = organism.genome.length;
+    genomeLengthSum += genomeLength;
+    genomeLengthMin = Math.min(genomeLengthMin, genomeLength);
+    genomeLengthMax = Math.max(genomeLengthMax, genomeLength);
+
+    ageSum += organism.age;
+    ageMin = Math.min(ageMin, organism.age);
+    ageMax = Math.max(ageMax, organism.age);
+
+    colonySizeSum += size;
+    colonySizeMin = Math.min(colonySizeMin, size);
+    colonySizeMax = Math.max(colonySizeMax, size);
   }
   state.stats.maxGeneration = maxGen;
   state.stats.organismsInColonies = organismsInColonies;
   state.stats.largestColony = largestColony;
+
+  const count = state.organisms.size;
+  state.stats.genomeLength = count > 0
+    ? { avg: genomeLengthSum / count, min: genomeLengthMin, max: genomeLengthMax }
+    : ZERO_STAT_SUMMARY;
+  state.stats.age = count > 0
+    ? { avg: ageSum / count, min: ageMin, max: ageMax }
+    : ZERO_STAT_SUMMARY;
+  state.stats.colonySize = count > 0
+    ? { avg: colonySizeSum / count, min: colonySizeMin, max: colonySizeMax }
+    : ZERO_STAT_SUMMARY;
+}
+
+/** Appends the current tick's stats to `state.history` at the configured
+ * sample interval, dropping the oldest sample once the ring buffer is full.
+ * Objects assigned onto `state.stats` in `refreshStats` are always fresh
+ * literals (never mutated in place), so sharing those references directly
+ * into the history sample is safe. */
+function recordStatsHistorySample(state: SimulationState): void {
+  if (state.tick % STATS_HISTORY_SAMPLE_INTERVAL_TICKS !== 0) return;
+  state.history.push({
+    tick: state.tick,
+    population: state.stats.population,
+    genomeLength: state.stats.genomeLength,
+    age: state.stats.age,
+    colonySize: state.stats.colonySize,
+  });
+  if (state.history.length > STATS_HISTORY_MAX_SAMPLES) state.history.shift();
 }
 
 /** Advances the simulation by exactly one tick. */
@@ -682,6 +918,22 @@ export function step(state: SimulationState): void {
   refreshColonies(state);
   refreshCellRegulatoryTraits(state);
   refreshStats(state);
+
+  if (state.stats.population === 0) {
+    if (state.extinctSinceTick === null) {
+      state.extinctSinceTick = state.tick;
+    } else if (state.tick - state.extinctSinceTick >= ABIOGENESIS_WAIT_TICKS) {
+      spawnAbiogenesis(state);
+      state.extinctSinceTick = null;
+      refreshColonies(state);
+      refreshCellRegulatoryTraits(state);
+      refreshStats(state);
+    }
+  } else {
+    state.extinctSinceTick = null;
+  }
+
+  recordStatsHistorySample(state);
 }
 
 export function getOrganisms(state: SimulationState): Organism[] {
@@ -708,8 +960,34 @@ export function getColonyBonds(state: SimulationState): Array<[string, string]> 
   return state.bonds;
 }
 
+/** Sampled population-statistics history for the run so far — see
+ * `SimulationState.history`. */
+export function getStatsHistory(state: SimulationState): StatHistorySample[] {
+  return state.history;
+}
+
 /** A given grid cell's actual local temperature — the world's live baseline
  * plus that cell's fixed spatial biome offset (see engine/biome.ts). */
 export function getLocalTemperature(state: SimulationState, x: number, y: number): number {
   return cellTemperature(state, x, y);
+}
+
+/** A given grid cell's absolute-temperature "pace of life" — see thermalPace. */
+export function getThermalPace(state: SimulationState, x: number, y: number): number {
+  return thermalPace(cellTemperature(state, x, y));
+}
+
+/** A given grid cell's actual local food-regeneration rate — the world's live
+ * baseline scaled by that cell's fixed spatial richness offset (see
+ * engine/biome.ts). */
+export function getLocalFoodRegenRate(state: SimulationState, x: number, y: number): number {
+  return cellFoodRegenRate(state, x, y);
+}
+
+/** Ticks remaining before a fresh organism spontaneously appears after a
+ * total die-off, or null if the population isn't currently extinct — see
+ * ABIOGENESIS_WAIT_TICKS/spawnAbiogenesis. */
+export function getTicksUntilAbiogenesis(state: SimulationState): number | null {
+  if (state.extinctSinceTick === null) return null;
+  return Math.max(0, ABIOGENESIS_WAIT_TICKS - (state.tick - state.extinctSinceTick));
 }

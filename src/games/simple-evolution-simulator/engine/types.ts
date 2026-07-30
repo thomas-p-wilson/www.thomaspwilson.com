@@ -169,6 +169,14 @@ export interface Organism {
   /** Asexual reproduction in this first pass, so at most one entry. */
   parentIds: string[];
   birthTick: number;
+  /** Local temperature (see engine/biome.ts) of the cell this organism was
+   * born/seeded on, frozen at birth — this individual's own environment, not
+   * a genome-encoded trait. Combined with the genetic `thermalTolerance` trait
+   * to derive `preferredTemperature` (engine/organism.ts): a developmental
+   * imprinting effect alongside the heritable one, so two siblings with
+   * identical genomes but different birth sites can end up with slightly
+   * different actual thermal niches. */
+  birthTemperature: number;
 }
 
 /** Permanent record kept even after an organism dies, for lineage/ancestry views. */
@@ -187,7 +195,11 @@ export interface EnvironmentConfig {
    * spatially around this baseline (see engine/biome.ts's per-cell
    * `SimulationState.biomeOffset` and todos/planetary-biomes.md). */
   temperature: number;
-  /** How much food regenerates per cell per tick. */
+  /** Global *baseline* food regeneration per cell per tick. A cell's actual
+   * local regen rate also varies spatially around this baseline (see
+   * engine/biome.ts's per-cell `SimulationState.foodOffset`), independently
+   * of the temperature field, so a planet can have e.g. a hot-dry region and
+   * a cold-wet one simultaneously (see todos/planetary-biomes.md). */
   foodRegenRate: number;
 }
 
