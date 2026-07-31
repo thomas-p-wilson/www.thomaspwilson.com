@@ -9,6 +9,7 @@
 // engine/colony.ts) are a purely relational structure layered on top: bonds
 // between still-fully-independent organisms, recomputed fresh every tick
 // from actual Moore-adjacent pairs, never a shared body/genome/energy pool.
+import { baselineTemperature, incidentFluxWm2, orbitalDistanceAu } from "./astrophysics";
 import {
   FOOD_ANCHOR_OFFSET_RANGE, generateBiomeOffsetField, localFoodRegenRate, localTemperature,
   TEMPERATURE_ANCHOR_OFFSET_RANGE,
@@ -18,7 +19,7 @@ import { createSeedGenome, mutate, scaleMutationConfig } from "./genome";
 import { createOrganism, preferredTemperature, reproduce } from "./organism";
 import { effectiveTraitValue, resolveCellTraits } from "./phenotype";
 import { createRng, randomInt, type Rng } from "./rng";
-import type { EnvironmentConfig, LineageRecord, MutationConfig, Organism, TraitId } from "./types";
+import type { AstroConfig, EnvironmentConfig, LineageRecord, MutationConfig, Organism, TraitId } from "./types";
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
@@ -159,6 +160,17 @@ export interface SimulationStats {
    * same per-organism values `organismsInColonies`/`largestColony` are
    * derived from. */
   colonySize: StatSummary;
+  /** The grid's actual mean local temperature (baseline plus every cell's
+   * biome offset, clamped per-cell — see engine/biome.ts), normalized [0,1]
+   * like `environment.temperature`. A whole-planet figure, not a per-organism
+   * StatSummary; distinct from the astro-derived baseline itself since
+   * clamping and the biome-offset field's own random anchors can pull the
+   * true spatial average slightly away from it. */
+  avgTemperature: number;
+  /** Instantaneous incident stellar flux at the current orbital distance, in
+   * W/m^2 (see engine/astrophysics.ts's incidentFluxWm2) — 0 for a world with
+   * no AstroConfig, which has no star/orbit to derive it from. */
+  incidentFluxWm2: number;
 }
 
 /** One sampled point in a run's population-statistics history — see
@@ -169,6 +181,8 @@ export interface StatHistorySample {
   genomeLength: StatSummary;
   age: StatSummary;
   colonySize: StatSummary;
+  avgTemperature: number;
+  incidentFluxWm2: number;
 }
 
 // Recording every tick would grow unbounded over a long-running sim; sampling
@@ -205,6 +219,10 @@ export interface SimulationState {
    * hardcoded to track temperature. */
   foodOffset: Float32Array;
   environment: EnvironmentConfig;
+  /** Optional star/orbit parameters (see engine/astrophysics.ts). When
+   * present, `environment.temperature` is recomputed from these every tick
+   * instead of staying flat — see AstroConfig's doc comment in types.ts. */
+  astro?: AstroConfig;
   mutation: MutationConfig;
   /** All-time archive, including dead organisms, for lineage/ancestry views. */
   lineage: Map<string, LineageRecord>;
@@ -249,6 +267,9 @@ export interface CreateSimulationOptions {
   height: number;
   seed: number;
   environment: EnvironmentConfig;
+  /** See SimulationState.astro — omit to keep a flat, directly-set baseline
+   * (e.g. every existing test constructs a state this way). */
+  astro?: AstroConfig;
   mutation: MutationConfig;
   /** How many primordial organisms to seed near the center. */
   initialPopulation?: number;
@@ -306,6 +327,7 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     biomeOffset: new Float32Array(options.width * options.height),
     foodOffset: new Float32Array(options.width * options.height),
     environment: { ...options.environment },
+    astro: options.astro ? { stellar: { ...options.astro.stellar }, orbital: { ...options.astro.orbital } } : undefined,
     mutation: { ...options.mutation },
     lineage: new Map(),
     rng,
@@ -313,6 +335,7 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     stats: {
       population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
       genomeLength: ZERO_STAT_SUMMARY, age: ZERO_STAT_SUMMARY, colonySize: ZERO_STAT_SUMMARY,
+      avgTemperature: 0, incidentFluxWm2: 0,
     },
     history: [],
     cellTraits: new Map(),
@@ -328,6 +351,13 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
   // Independent anchor set/field from biomeOffset (see engine/biome.ts) — food
   // richness varies on its own axis rather than being tied to temperature.
   state.foodOffset = generateBiomeOffsetField(state.width, state.height, rng, FOOD_ANCHOR_OFFSET_RANGE);
+
+  // If astro-driven, the baseline has to be derived before the seed loop
+  // below spawns any organism adapted to it (spawnPrimordialOrganism reads
+  // state.environment.temperature via cellTemperature).
+  if (state.astro) {
+    state.environment.temperature = baselineTemperature(state.astro.stellar, state.astro.orbital, state.tick);
+  }
 
   const seedCount = options.initialPopulation ?? 4;
   const centerX = Math.floor(state.width / 2);
@@ -821,6 +851,19 @@ function refreshCellRegulatoryTraits(state: SimulationState): void {
   }
 }
 
+/** The grid's actual mean local temperature — baseline plus every cell's
+ * fixed biome offset, clamped per-cell (see engine/biome.ts) — rather than
+ * just re-reporting the baseline: clamping near the extremes, and the biome
+ * offset field's own small, random anchor set, mean this can genuinely
+ * differ from environment.temperature by a bit, not just echo it. */
+function averageLocalTemperature(state: SimulationState): number {
+  let sum = 0;
+  for (let i = 0; i < state.biomeOffset.length; i++) {
+    sum += localTemperature(state.environment.temperature, state.biomeOffset, i);
+  }
+  return sum / state.biomeOffset.length;
+}
+
 function refreshStats(state: SimulationState): void {
   state.stats.population = state.organisms.size;
   let maxGen = state.stats.maxGeneration;
@@ -872,6 +915,13 @@ function refreshStats(state: SimulationState): void {
   state.stats.colonySize = count > 0
     ? { avg: colonySizeSum / count, min: colonySizeMin, max: colonySizeMax }
     : ZERO_STAT_SUMMARY;
+
+  // Whole-planet figures, independent of population (still meaningful even
+  // through an extinction/abiogenesis gap).
+  state.stats.avgTemperature = averageLocalTemperature(state);
+  state.stats.incidentFluxWm2 = state.astro
+    ? incidentFluxWm2(state.astro.stellar, state.astro.orbital, state.tick)
+    : 0;
 }
 
 /** Appends the current tick's stats to `state.history` at the configured
@@ -887,6 +937,8 @@ function recordStatsHistorySample(state: SimulationState): void {
     genomeLength: state.stats.genomeLength,
     age: state.stats.age,
     colonySize: state.stats.colonySize,
+    avgTemperature: state.stats.avgTemperature,
+    incidentFluxWm2: state.stats.incidentFluxWm2,
   });
   if (state.history.length > STATS_HISTORY_MAX_SAMPLES) state.history.shift();
 }
@@ -894,6 +946,15 @@ function recordStatsHistorySample(state: SimulationState): void {
 /** Advances the simulation by exactly one tick. */
 export function step(state: SimulationState): void {
   state.tick += 1;
+
+  // Astro-driven worlds recompute their baseline from orbital mechanics
+  // every tick (see engine/astrophysics.ts) instead of it staying at
+  // whatever was passed in at creation — this is what turns eccentricity
+  // into an actual over-time hot/cold swing rather than a one-shot value.
+  if (state.astro) {
+    state.environment.temperature = baselineTemperature(state.astro.stellar, state.astro.orbital, state.tick);
+  }
+
   regenerateFood(state);
 
   // Snapshot ids up front: organisms born this tick shouldn't act this tick,
@@ -993,6 +1054,14 @@ export function getThermalPace(state: SimulationState, x: number, y: number): nu
  * engine/biome.ts). */
 export function getLocalFoodRegenRate(state: SimulationState, x: number, y: number): number {
   return cellFoodRegenRate(state, x, y);
+}
+
+/** This planet's actual current distance from its star, in AU — null for a
+ * world with no AstroConfig (a flat, directly-set baseline has no orbit to
+ * report). See engine/astrophysics.ts's orbitalDistanceAu. */
+export function getOrbitalDistanceAu(state: SimulationState): number | null {
+  if (!state.astro) return null;
+  return orbitalDistanceAu(state.astro.stellar, state.astro.orbital, state.tick);
 }
 
 /** Ticks remaining before a fresh organism spontaneously appears after a

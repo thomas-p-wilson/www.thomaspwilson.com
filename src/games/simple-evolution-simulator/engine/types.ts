@@ -207,3 +207,47 @@ export interface WorldConfig {
   width: number;
   height: number;
 }
+
+/** A handful of representative main-sequence star types rather than a
+ * continuous H-R-diagram model — see engine/astrophysics.ts's STAR_TABLE for
+ * the temperature/radius/mass/color each maps to. */
+export type SpectralClass = "M" | "K" | "G" | "F" | "A";
+
+/** A world's parent star. Also the future hook for chlorophyll-style
+ * photosynthesis: different spectral classes peak at different visible
+ * wavelengths (see astrophysics.ts's peakWavelengthNm), which a pigment gene
+ * could eventually need to match — not wired to any mechanic yet. */
+export interface StellarConfig {
+  spectralClass: SpectralClass;
+}
+
+/** A planet's orbit and reflectivity. Together with StellarConfig (see
+ * engine/astrophysics.ts), this replaces a flat, directly-set baseline
+ * temperature with one derived from real orbital mechanics. */
+export interface OrbitalConfig {
+  /** Semi-major axis, in AU — the primary driver of average incident
+   * radiation (inverse-square with distance). */
+  semiMajorAxisAu: number;
+  /** Orbital eccentricity, [0, ~0.8). 0 is circular (constant distance, so a
+   * constant baseline temperature); higher values swing the planet's actual
+   * distance — and therefore its temperature — between periapsis and
+   * apoapsis once per orbit, rather than a fixed thermal niche. */
+  eccentricity: number;
+  /** Bond albedo, [0,1]: fraction of incident radiation reflected rather
+   * than absorbed. Higher albedo (more ice/cloud) means a colder equilibrium
+   * temperature for the same stellar input. */
+  albedo: number;
+}
+
+/**
+ * Optional astrophysical layer (see engine/astrophysics.ts). When present on
+ * a SimulationState, `environment.temperature` is recomputed every tick from
+ * these instead of staying at whatever value was passed in at creation.
+ * Absent by default (including for every existing test, which constructs a
+ * SimulationState without it) — the sim then behaves exactly as it always
+ * has, with a flat, directly-set baseline.
+ */
+export interface AstroConfig {
+  stellar: StellarConfig;
+  orbital: OrbitalConfig;
+}

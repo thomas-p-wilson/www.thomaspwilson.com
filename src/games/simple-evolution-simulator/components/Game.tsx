@@ -2,11 +2,13 @@ import { LayoutGrid, LineChart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { DEFAULT_ORBITAL_CONFIG, DEFAULT_STELLAR_CONFIG } from "../engine/astrophysics";
 import { DEFAULT_MUTATION_CONFIG, scaleMutationConfig } from "../engine/genome";
 import {
-  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getOrganisms, getStatsHistory,
-  getTicksUntilAbiogenesis, step, type SimulationState,
+  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getOrbitalDistanceAu,
+  getOrganisms, getStatsHistory, getTicksUntilAbiogenesis, step, type SimulationState,
 } from "../engine/simulation";
+import type { OrbitalConfig, StellarConfig } from "../engine/types";
 import { DEFAULT_WORLD_SIZE_INDEX, WORLD_SIZE_PRESETS, type WorldSizePreset } from "../engine/worldSize";
 import ControlsPanel from "./ControlsPanel";
 import GenomeViewer from "./GenomeViewer";
@@ -29,7 +31,8 @@ export default function Game() {
   const [running, setRunning] = useState(true);
   const [speed, setSpeed] = useState(1);
   const [mutationMultiplier, setMutationMultiplier] = useState(1);
-  const [temperature, setTemperature] = useState(0.5);
+  const [stellarConfig, setStellarConfig] = useState<StellarConfig>(DEFAULT_STELLAR_CONFIG);
+  const [orbitalConfig, setOrbitalConfig] = useState<OrbitalConfig>(DEFAULT_ORBITAL_CONFIG);
   const [worldSizeIndex, setWorldSizeIndex] = useState(DEFAULT_WORLD_SIZE_INDEX);
   const [colorMode, setColorMode] = useState<OrganismColorMode>("phenotype");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -56,7 +59,10 @@ export default function Game() {
       width: size.width,
       height: size.height,
       seed: Math.floor(Math.random() * 2 ** 31),
-      environment: { temperature, foodRegenRate: 0.18 },
+      // temperature here is a placeholder immediately overwritten by astro
+      // (see createSimulation) — the real baseline comes from stellar/orbital.
+      environment: { temperature: 0.5, foodRegenRate: 0.18 },
+      astro: { stellar: stellarConfig, orbital: orbitalConfig },
       mutation: scaleMutationConfig(DEFAULT_MUTATION_CONFIG, mutationMultiplier),
     });
     setSelectedId(null);
@@ -89,8 +95,8 @@ export default function Game() {
   const showExtinctionNotice = ticksUntilAbiogenesis !== null && !extinctionNoticeDismissed;
 
   // Main tick loop. Speed changes intentionally restart the accumulator
-  // (harmless); mutation rate and temperature are applied via the effects
-  // below so they take effect immediately without resetting timing. Paused
+  // (harmless); mutation rate and stellar/orbital config are applied via the
+  // effects below so they take effect immediately without resetting timing. Paused
   // while the extinction notice is up (showExtinctionNotice) — dismissing it
   // is what lets ticks (and the abiogenesis countdown) resume.
   useEffect(() => {
@@ -124,8 +130,8 @@ export default function Game() {
 
   useEffect(() => {
     if (!simRef.current) return;
-    simRef.current.environment = { ...simRef.current.environment, temperature };
-  }, [temperature]);
+    simRef.current.astro = { stellar: stellarConfig, orbital: orbitalConfig };
+  }, [stellarConfig, orbitalConfig]);
 
   if (phase === "intro") {
     return <IntroSequence onComplete={handleIntroComplete} />;
@@ -143,6 +149,7 @@ export default function Game() {
   const stats = sim?.stats ?? {
     population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
     genomeLength: zeroStatSummary, age: zeroStatSummary, colonySize: zeroStatSummary,
+    avgTemperature: 0, incidentFluxWm2: 0,
   };
 
   return (
@@ -189,7 +196,7 @@ export default function Game() {
                 colorMode={colorMode}
                 bonds={bonds}
                 biomeOffset={sim?.biomeOffset ?? null}
-                baseTemperature={sim?.environment.temperature ?? temperature}
+                baseTemperature={sim?.environment.temperature ?? 0.5}
                 width={WORLD_SIZE_PRESETS[worldSizeIndex].width}
                 height={WORLD_SIZE_PRESETS[worldSizeIndex].height}
                 selectedId={selectedId}
@@ -206,7 +213,7 @@ export default function Game() {
               organisms whose surface proteins recognize each other; darker, denser organisms have differentiated
               under Structural Reinforcement from sitting deep inside a colony. Background shading shows each
               region's local temperature — cooler blue, warmer red — fixed for this planet, shifting uniformly
-              with the Temperature control.
+              with its star and orbit.
             </p>
           ) : (
             <p className="text-xs text-slate-500 text-center max-w-md">
@@ -225,8 +232,12 @@ export default function Game() {
               onSpeedChange={setSpeed}
               mutationMultiplier={mutationMultiplier}
               onMutationMultiplierChange={setMutationMultiplier}
-              temperature={temperature}
-              onTemperatureChange={setTemperature}
+              stellarConfig={stellarConfig}
+              onStellarConfigChange={setStellarConfig}
+              orbitalConfig={orbitalConfig}
+              onOrbitalConfigChange={setOrbitalConfig}
+              baselineTemperature={sim?.environment.temperature ?? 0.5}
+              orbitalDistanceAu={sim ? getOrbitalDistanceAu(sim) : null}
               worldSizeIndex={worldSizeIndex}
               worldSizePresets={WORLD_SIZE_PRESETS}
               onWorldSizeChange={handleWorldSizeChange}

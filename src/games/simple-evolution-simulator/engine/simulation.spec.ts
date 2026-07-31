@@ -4,7 +4,7 @@ import { createOrganism } from "./organism";
 import { decode } from "./phenotype";
 import {
   createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getLocalFoodRegenRate,
-  getLocalTemperature, getOrganisms, getThermalPace, getTicksUntilAbiogenesis, step,
+  getLocalTemperature, getOrganisms, getStatsHistory, getThermalPace, getTicksUntilAbiogenesis, step,
 } from "./simulation";
 import { createRng } from "./rng";
 import { GENE_TABLE } from "./genes";
@@ -226,6 +226,52 @@ describe("planetary biomes (per-cell local temperature)", () => {
       expect(pace).toBeGreaterThan(0); // never bottoms out at exactly 0
       expect(pace).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+describe("planetary stats (avgTemperature / incidentFluxWm2)", () => {
+  it("avgTemperature reflects the grid's real mean local temperature, not just the flat baseline", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0, environment: { temperature: 0.5, foodRegenRate: 0 } });
+    // Two non-zero offsets among many zeros (none clamping, since 0.5 +/- 0.3
+    // both stay in [0,1]) — the grid mean should land exactly at the flat
+    // baseline plus their small contribution, not just re-report 0.5.
+    state.biomeOffset.fill(0);
+    state.biomeOffset[0] = 0.3;
+    state.biomeOffset[1] = -0.1;
+    step(state); // refreshStats (which sets avgTemperature) only runs inside step/createSimulation
+    const cellCount = state.biomeOffset.length;
+    expect(state.stats.avgTemperature).toBeCloseTo(0.5 + (0.3 - 0.1) / cellCount, 6);
+  });
+
+  it("incidentFluxWm2 is 0 for a world with no AstroConfig", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
+    step(state);
+    expect(state.stats.incidentFluxWm2).toBe(0);
+  });
+
+  it("incidentFluxWm2 matches astrophysics.incidentFluxWm2 for an astro-driven world", () => {
+    const state = createSimulation({
+      ...baseOptions(),
+      initialPopulation: 0,
+      astro: { stellar: { spectralClass: "G" }, orbital: { semiMajorAxisAu: 1, eccentricity: 0, albedo: 0.3 } },
+    });
+    step(state);
+    expect(state.stats.incidentFluxWm2).toBeGreaterThan(1000);
+    expect(state.stats.incidentFluxWm2).toBeLessThan(2000); // Earth's real solar constant is ~1361 W/m^2
+  });
+
+  it("both planetary stats are recorded into the sampled history", () => {
+    const state = createSimulation({
+      ...baseOptions(),
+      initialPopulation: 0,
+      astro: { stellar: { spectralClass: "G" }, orbital: { semiMajorAxisAu: 1, eccentricity: 0, albedo: 0.3 } },
+    });
+    for (let i = 0; i < 10; i++) step(state);
+    const history = getStatsHistory(state);
+    expect(history.length).toBeGreaterThan(0);
+    const last = history[history.length - 1];
+    expect(last.avgTemperature).toBeCloseTo(state.stats.avgTemperature, 5);
+    expect(last.incidentFluxWm2).toBeCloseTo(state.stats.incidentFluxWm2, 5);
   });
 });
 

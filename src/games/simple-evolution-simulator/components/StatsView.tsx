@@ -32,28 +32,34 @@ const StatReadout = ({ label, summary, unit }: { label: string; summary: StatSum
   </div>
 );
 
+/** One trendline's already-shaped data points — the caller derives these
+ * directly from StatHistorySample so Trendline itself doesn't need to know
+ * which metrics are per-organism StatSummarys (min/max present) vs flat,
+ * whole-planet scalars like population/avgTemperature/incidentFluxWm2
+ * (min/max omitted). */
+interface TrendPoint {
+  tick: number;
+  avg: number;
+  min?: number;
+  max?: number;
+}
+
 function Trendline({
-  title, data, dataKeyPrefix, color, unit,
+  title, data, color, unit,
 }: {
   title: string;
-  data: StatHistorySample[];
-  dataKeyPrefix: "population" | "genomeLength" | "age" | "colonySize";
+  data: TrendPoint[];
   color: string;
   unit: string;
 }) {
-  const chartData = data.map((sample) => ({
-    tick: sample.tick,
-    avg: dataKeyPrefix === "population" ? sample.population : sample[dataKeyPrefix].avg,
-    min: dataKeyPrefix === "population" ? sample.population : sample[dataKeyPrefix].min,
-    max: dataKeyPrefix === "population" ? sample.population : sample[dataKeyPrefix].max,
-  }));
+  const hasRange = data.some((point) => point.min !== undefined);
 
   return (
     <div className="rounded-lg bg-slate-800/40 border border-slate-700 p-3">
       <div className="text-xs font-medium text-slate-300 mb-2">{title}</div>
       <div className="h-40 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+          <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid stroke={GRID_COLOR} strokeDasharray="3 3" />
             <XAxis dataKey="tick" stroke={AXIS_COLOR} tick={{ fontSize: 10 }} />
             <YAxis stroke={AXIS_COLOR} tick={{ fontSize: 10 }} width={36} />
@@ -62,19 +68,27 @@ function Trendline({
               labelFormatter={(tick: number) => `Tick ${tick}`}
               formatter={(value: number, name: string) => [value.toFixed(1) + ` ${unit}`, name]}
             />
-            {dataKeyPrefix !== "population" && (
+            {hasRange && (
               <>
                 <Line type="monotone" dataKey="max" name="max" stroke={color} strokeOpacity={0.35} strokeWidth={1} dot={false} />
                 <Line type="monotone" dataKey="min" name="min" stroke={color} strokeOpacity={0.35} strokeWidth={1} dot={false} />
               </>
             )}
-            <Line type="monotone" dataKey="avg" name={dataKeyPrefix === "population" ? "population" : "avg"} stroke={color} strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="avg" name={hasRange ? "avg" : "value"} stroke={color} strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>
     </div>
   );
 }
+
+const ValueTile = ({ label, value, sublabel }: { label: string; value: string; sublabel?: string }) => (
+  <div className="rounded-lg bg-slate-800/70 border border-slate-700 px-3 py-2">
+    <div className="text-[10px] uppercase tracking-wide text-slate-400">{label}</div>
+    <div className="text-lg font-semibold text-slate-100 tabular-nums">{value}</div>
+    {sublabel && <div className="text-[11px] text-slate-500 tabular-nums">{sublabel}</div>}
+  </div>
+);
 
 export default function StatsView({ stats, history, tick }: StatsViewProps) {
   if (stats.population === 0) {
@@ -85,28 +99,48 @@ export default function StatsView({ stats, history, tick }: StatsViewProps) {
     );
   }
 
+  const summaryPoints = (key: "genomeLength" | "age" | "colonySize"): TrendPoint[] =>
+    history.map((sample) => ({ tick: sample.tick, avg: sample[key].avg, min: sample[key].min, max: sample[key].max }));
+
   return (
     <div className="w-full h-full overflow-y-auto p-1">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
         <StatReadout label="Genome length" summary={stats.genomeLength} unit="bp" />
         <StatReadout label="Age" summary={stats.age} unit="ticks" />
         <StatReadout label="Colony size" summary={stats.colonySize} unit="members" />
-        <div className="rounded-lg bg-slate-800/70 border border-slate-700 px-3 py-2">
-          <div className="text-[10px] uppercase tracking-wide text-slate-400">Population</div>
-          <div className="text-lg font-semibold text-slate-100 tabular-nums">{stats.population}</div>
-          <div className="text-[11px] text-slate-500 tabular-nums">tick {tick}</div>
-        </div>
+        <ValueTile label="Population" value={String(stats.population)} sublabel={`tick ${tick}`} />
+        <ValueTile label="Avg. planetary temp" value={`${Math.round(stats.avgTemperature * 100)}°`} />
+        <ValueTile label="Incident energy" value={Math.round(stats.incidentFluxWm2).toLocaleString()} sublabel="W/m²" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Trendline title="Population" data={history} dataKeyPrefix="population" color="#38bdf8" unit="" />
-        <Trendline title="Genome length (bp)" data={history} dataKeyPrefix="genomeLength" color="#a78bfa" unit="bp" />
-        <Trendline title="Age (ticks)" data={history} dataKeyPrefix="age" color="#fb923c" unit="ticks" />
-        <Trendline title="Colony size (members)" data={history} dataKeyPrefix="colonySize" color="#34d399" unit="members" />
+        <Trendline
+          title="Population"
+          data={history.map((sample) => ({ tick: sample.tick, avg: sample.population }))}
+          color="#38bdf8"
+          unit=""
+        />
+        <Trendline title="Genome length (bp)" data={summaryPoints("genomeLength")} color="#a78bfa" unit="bp" />
+        <Trendline title="Age (ticks)" data={summaryPoints("age")} color="#fb923c" unit="ticks" />
+        <Trendline title="Colony size (members)" data={summaryPoints("colonySize")} color="#34d399" unit="members" />
+        <Trendline
+          title="Avg. planetary temperature"
+          data={history.map((sample) => ({ tick: sample.tick, avg: sample.avgTemperature * 100 }))}
+          color="#f472b6"
+          unit="°"
+        />
+        <Trendline
+          title="Incident energy (W/m²)"
+          data={history.map((sample) => ({ tick: sample.tick, avg: sample.incidentFluxWm2 }))}
+          color="#facc15"
+          unit="W/m²"
+        />
       </div>
       <p className="text-[11px] text-slate-500 mt-3">
         Sampled every 10 ticks; the most recent 600 samples are kept, so long runs scroll forward rather than growing
         unbounded. Faint lines show each sample's min/max across the population; the solid line is the average.
+        Planetary temperature and incident energy are whole-planet figures (no min/max — every organism shares one
+        planet), driven by the Star &amp; orbit controls.
       </p>
     </div>
   );
