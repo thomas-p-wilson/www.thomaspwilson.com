@@ -5,12 +5,13 @@ import { gamingProjects } from "@/data/gaming-projects";
 export default function Gaming() {
   return (
     <SimpleProjectListPage
-      title="Gaming"
+      title="Gaming & Misc"
       titleAccent="Projects"
-      description="Tools, mods, and save-file tinkering for games worth tinkering with."
+      description="Games worth tinkering with, plus interactive odds and ends that didn't fit anywhere else."
       icon={Gamepad2}
       items={gamingProjects}
       emptyMessage="Nothing published here yet — check back soon."
+      basePath="/projects/gaming"
     />
   );
 }
