@@ -88,7 +88,7 @@ const quantityFields = (prefix: "in" | "out", readOnly: boolean): CalculatorFiel
             const standardVolume = num(v, `${prefix}GasQty`);
             return {
               solveFor: "volume",
-              moles: isNaN(standardVolume) ? "1" : molesAtStandardConditions(standardVolume).toPrecision(6),
+              moles: Number.isNaN(standardVolume) ? "1" : molesAtStandardConditions(standardVolume).toPrecision(6),
               pressure: String(STANDARD_PRESSURE_PA),
               temperature: String(STANDARD_TEMPERATURE_K),
             };
@@ -167,7 +167,7 @@ export const fuelEquivalence: CalculatorSpec = {
     const inQty = num(values, inQtyField);
     const inHV = heatingValue("in", values.inFuel, values);
     const outHV = heatingValue("out", values.outFuel, values);
-    if ([inQty, inHV, outHV].some((n) => isNaN(n)) || inQty < 0 || inHV <= 0 || outHV <= 0) return cleared;
+    if ([inQty, inHV, outHV].some((n) => Number.isNaN(n)) || inQty < 0 || inHV <= 0 || outHV <= 0) return cleared;
 
     const totalEnergy = inQty * inHV;
     const outQty = totalEnergy / outHV;

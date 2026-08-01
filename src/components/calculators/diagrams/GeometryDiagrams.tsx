@@ -1,6 +1,6 @@
 import { DiagramFrame, diagramColors as c } from "./DiagramFrame";
 
-const isPositive = (n: number) => typeof n === "number" && !isNaN(n) && n > 0;
+const isPositive = (n: number) => typeof n === "number" && !Number.isNaN(n) && n > 0;
 
 export function CircleDiagram({ radius }: { radius: number }) {
   if (!isPositive(radius)) return null;

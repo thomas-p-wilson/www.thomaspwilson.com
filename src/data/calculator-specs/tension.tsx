@@ -22,7 +22,7 @@ const DEG_PER_RAD = 180 / Math.PI;
 // T1 = W*cos(a2)/sin(a1+a2), T2 = W*cos(a1)/sin(a1+a2) — solved from horizontal components
 // canceling (T1*cos(a1) = T2*cos(a2)) and vertical components summing to the weight.
 function tensionsFromAngles(weight: number, angle1Deg: number, angle2Deg: number): { t1: number; t2: number } | null {
-  if (isNaN(angle1Deg) || isNaN(angle2Deg) || angle1Deg <= 0 || angle2Deg <= 0 || angle1Deg >= 180 || angle2Deg >= 180) return null;
+  if (Number.isNaN(angle1Deg) || Number.isNaN(angle2Deg) || angle1Deg <= 0 || angle2Deg <= 0 || angle1Deg >= 180 || angle2Deg >= 180) return null;
   const a1 = angle1Deg * RAD_PER_DEG, a2 = angle2Deg * RAD_PER_DEG;
   const denom = Math.sin(a1 + a2);
   if (Math.abs(denom) < 1e-9) return null;
@@ -116,7 +116,7 @@ export const tensionCalculator: CalculatorSpec = {
   calculate: (values) => {
     const mass = num(values, "mass");
     const gravity = num(values, "gravity");
-    if (isNaN(mass) || mass < 0 || isNaN(gravity) || gravity <= 0) return values;
+    if (Number.isNaN(mass) || mass < 0 || Number.isNaN(gravity) || gravity <= 0) return values;
     const weight = parseFloat(weightFromMass.calculate({ ...weightFromMass.defaults, mass: String(mass), gravity: String(gravity) }).weight);
 
     const result = { ...values, weight: weight.toFixed(3) };
@@ -133,7 +133,7 @@ export const tensionCalculator: CalculatorSpec = {
       const span = num(values, "span");
       const sag = num(values, "sagDepth");
       const position = num(values, "position");
-      if ([span, sag, position].some((n) => isNaN(n)) || span <= 0 || sag <= 0 || position <= 0 || position >= span) {
+      if ([span, sag, position].some((n) => Number.isNaN(n)) || span <= 0 || sag <= 0 || position <= 0 || position >= span) {
         return { ...result, angle1: "", angle2: "", lineLength1: "", lineLength2: "", totalLineLength: "", tension1: "", tension2: "" };
       }
       const remaining = span - position;

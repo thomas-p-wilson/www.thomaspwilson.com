@@ -55,6 +55,7 @@ export default function SimpleProjectListPage({ title, titleAccent, description,
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {items.map((item) => {
               const card = (
+                // biome-ignore lint/correctness/useJsxKeyInIterable: key is applied to the wrapping motion.a/motion.div returned below
                 <div className="p-6 rounded-2xl border border-blue-200 bg-blue-50/50 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-500">

@@ -23,7 +23,7 @@ export const circleGeometry: CalculatorSpec = {
   defaults: { radius: "10" },
   calculate: (values) => {
     const r = num(values, "radius");
-    if (isNaN(r)) return values;
+    if (Number.isNaN(r)) return values;
     return {
       ...values,
       diameter: (r * 2).toFixed(4),
@@ -54,7 +54,7 @@ export const circularSegment: CalculatorSpec = {
   calculate: (values) => {
     const r = num(values, "radius");
     const c = num(values, "chord");
-    if (isNaN(r) || isNaN(c) || r <= 0 || c > 2 * r) return { ...values, sagitta: "", angle: "", arc: "", area: "" };
+    if (Number.isNaN(r) || Number.isNaN(c) || r <= 0 || c > 2 * r) return { ...values, sagitta: "", angle: "", arc: "", area: "" };
     const angle = 2 * Math.asin(c / (2 * r));
     const sagitta = r - Math.sqrt(r * r - (c / 2) * (c / 2));
     const arc = r * angle;
@@ -82,7 +82,7 @@ export const sphereGeometry: CalculatorSpec = {
   defaults: { radius: "10" },
   calculate: (values) => {
     const r = num(values, "radius");
-    if (isNaN(r) || r <= 0) return values;
+    if (Number.isNaN(r) || r <= 0) return values;
     const surfaceArea = 4 * Math.PI * r * r;
     const volume = (4 / 3) * Math.PI * r * r * r;
     return {
@@ -115,7 +115,7 @@ export const sphericalCap: CalculatorSpec = {
   calculate: (values) => {
     const r = num(values, "radius");
     const h = num(values, "sagitta");
-    if (isNaN(r) || isNaN(h) || r <= 0 || h <= 0 || h > 2 * r) {
+    if (Number.isNaN(r) || Number.isNaN(h) || r <= 0 || h <= 0 || h > 2 * r) {
       return { ...values, chord: "", area: "", volume: "" };
     }
     const chord = 2 * Math.sqrt(2 * r * h - h * h);
@@ -143,7 +143,7 @@ export const boxVolume: CalculatorSpec = {
   defaults: { length: "0.5", width: "0.75", depth: "0.25" },
   calculate: (values) => {
     const l = num(values, "length"), w = num(values, "width"), d = num(values, "depth");
-    if (isNaN(l) || isNaN(w) || isNaN(d)) return values;
+    if (Number.isNaN(l) || Number.isNaN(w) || Number.isNaN(d)) return values;
     return { ...values, volume: (l * w * d).toFixed(6) };
   },
   visual: (values) => <BoxDiagram length={num(values, "length")} width={num(values, "width")} depth={num(values, "depth")} />,
@@ -168,7 +168,7 @@ export const parabolicSegment: CalculatorSpec = {
   calculate: (values) => {
     const f = num(values, "focalLength");
     const c = num(values, "chord");
-    if (isNaN(f) || isNaN(c) || f <= 0 || c <= 0) return { ...values, sagitta: "", area: "" };
+    if (Number.isNaN(f) || Number.isNaN(c) || f <= 0 || c <= 0) return { ...values, sagitta: "", area: "" };
     const sagitta = ((c / 2) * (c / 2)) / (4 * f);
     const area = (2 / 3) * c * sagitta; // Archimedes' parabolic segment area formula: (2/3) * base * height.
     return { ...values, sagitta: sagitta.toFixed(4), area: area.toFixed(4) };
@@ -194,8 +194,8 @@ export const paraboloidalCap: CalculatorSpec = {
   calculate: (values) => {
     const a = num(values, "radius");
     const h = num(values, "sagitta");
-    if (isNaN(a) || isNaN(h) || a <= 0 || h <= 0) return { ...values, area: "", volume: "" };
-    const area = Math.PI * a * a + ((Math.PI * a) / (6 * h * h)) * (Math.pow(a * a + 4 * h * h, 1.5) - Math.pow(a, 3));
+    if (Number.isNaN(a) || Number.isNaN(h) || a <= 0 || h <= 0) return { ...values, area: "", volume: "" };
+    const area = Math.PI * a * a + ((Math.PI * a) / (6 * h * h)) * ((a * a + 4 * h * h) ** 1.5 - a ** 3);
     const volume = (Math.PI * a * a * h) / 2;
     return { ...values, area: area.toFixed(4), volume: volume.toFixed(4) };
   },
@@ -218,7 +218,7 @@ export const cylinderVolume: CalculatorSpec = {
   defaults: { radius: "10", height: "3" },
   calculate: (values) => {
     const r = num(values, "radius"), h = num(values, "height");
-    if (isNaN(r) || isNaN(h)) return values;
+    if (Number.isNaN(r) || Number.isNaN(h)) return values;
     return { ...values, volume: (Math.PI * r * r * h).toFixed(4) };
   },
 };
@@ -240,7 +240,7 @@ export const cylinderSurfaceArea: CalculatorSpec = {
   defaults: { radius: "0.3", height: "1" },
   calculate: (values) => {
     const r = num(values, "radius"), h = num(values, "height");
-    if (isNaN(r) || isNaN(h)) return values;
+    if (Number.isNaN(r) || Number.isNaN(h)) return values;
     const circumference = 2 * Math.PI * r;
     const surfaceArea = circumference * h + 2 * Math.PI * r * r;
     return { ...values, circumference: circumference.toFixed(4), surfaceArea: surfaceArea.toFixed(4) };

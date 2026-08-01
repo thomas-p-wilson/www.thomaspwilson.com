@@ -25,3 +25,7 @@ dist-ssr
 *.sw?
 
 .env
+
+# Local Claude Code artifacts
+.claude/
+todos/

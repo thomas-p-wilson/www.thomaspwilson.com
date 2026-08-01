@@ -27,7 +27,7 @@ export default function Retirement() {
       savings: parseFloat(savings), interest: parseFloat(interest), inflation: parseFloat(inflation),
       safety: parseFloat(safety),
     };
-    if (Object.values(parsed).some((v) => typeof v === "number" && isNaN(v))) return null;
+    if (Object.values(parsed).some((v) => typeof v === "number" && Number.isNaN(v))) return null;
     if (parsed.age >= 82.3) return null;
     return projectRetirement(parsed);
   }, [age, net, expenses, netMatchInflation, expensesMatchInflation, savings, interest, inflation, safety]);
@@ -104,7 +104,7 @@ export default function Retirement() {
             <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
               <div>
-                <div className="text-2xl font-bold text-blue-600">{isNaN(rate) ? "—" : `${(rate * 100).toFixed(1)}%`}</div>
+                <div className="text-2xl font-bold text-blue-600">{Number.isNaN(rate) ? "—" : `${(rate * 100).toFixed(1)}%`}</div>
                 <div className="text-sm text-slate-500">Current Savings Rate</div>
               </div>
               <div>

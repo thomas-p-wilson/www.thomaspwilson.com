@@ -107,14 +107,14 @@ export default function ResistiveElementCalculator({ activeField, setActiveField
       // --- Electrical ---
       const V = parseFloat(voltage);
       const P = parseFloat(wattage);
-      if (!isNaN(V) && !isNaN(P) && V > 0) {
+      if (!Number.isNaN(V) && !Number.isNaN(P) && V > 0) {
         newValues.current = (P / V).toFixed(3);
         newValues.resistance = (V * V / P).toFixed(3);
       }
 
       // --- Wire ---
       const d = parseFloat(diameter);
-      if (!isNaN(d)) {
+      if (!Number.isNaN(d)) {
         const r = d / 2;
         newValues.radius = r.toExponential(3);
         const A_wire = Math.PI * r * r;
@@ -122,7 +122,7 @@ export default function ResistiveElementCalculator({ activeField, setActiveField
 
         const rho = parseFloat(resistivity);
         const R_target = parseFloat(newValues.resistance);
-        if (!isNaN(rho) && !isNaN(R_target) && rho > 0) {
+        if (!Number.isNaN(rho) && !Number.isNaN(R_target) && rho > 0) {
           const L_wire = (R_target * A_wire) / rho;
           newValues.length = L_wire.toFixed(3);
 
@@ -130,7 +130,7 @@ export default function ResistiveElementCalculator({ activeField, setActiveField
           newValues.surfaceArea = SA_wire.toFixed(3);
 
           // Surface Loading
-          if (!isNaN(P) && SA_wire > 0) {
+          if (!Number.isNaN(P) && SA_wire > 0) {
             const SA_wire_sq_in = SA_wire * 1550; // m^2 to in^2
             newValues.wireSurfaceLoad = (P / SA_wire_sq_in).toFixed(2);
           }
@@ -141,7 +141,7 @@ export default function ResistiveElementCalculator({ activeField, setActiveField
       const D_coil = parseFloat(meanCoilDiameter);
       const s_turn = parseFloat(turnSpacing);
       const L_wire_val = parseFloat(newValues.length);
-      if (!isNaN(D_coil) && !isNaN(s_turn) && !isNaN(L_wire_val) && D_coil > 0) {
+      if (!Number.isNaN(D_coil) && !Number.isNaN(s_turn) && !Number.isNaN(L_wire_val) && D_coil > 0) {
         const C_turn = Math.PI * D_coil;
         newValues.turnCircumference = C_turn.toFixed(4);
 
@@ -155,9 +155,9 @@ export default function ResistiveElementCalculator({ activeField, setActiveField
     return newValues;
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run once on mount only, calculate is stable per render
   useEffect(() => {
     setValues((prev) => calculate(prev));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInputChange = (field: keyof ResistiveElementValues) => (e: ChangeEvent<HTMLInputElement>) => {

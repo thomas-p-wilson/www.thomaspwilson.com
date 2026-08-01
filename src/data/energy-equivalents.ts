@@ -295,7 +295,7 @@ export const energyEquivalents: EnergyEquivalent[] = [
  * source fuel isn't known, e.g. post-conversion-chain output) to draw from the full list unfiltered.
  */
 export function randomEquivalent(totalEnergyKWh: number, fuelKey?: string, excludeId?: string): { id: string; text: string } | undefined {
-  if (!isFinite(totalEnergyKWh) || totalEnergyKWh <= 0) return undefined;
+  if (!Number.isFinite(totalEnergyKWh) || totalEnergyKWh <= 0) return undefined;
   const relevant = fuelKey
     ? energyEquivalents.filter((e) => e.fuels.includes("any") || e.fuels.includes(fuelKey))
     : energyEquivalents;

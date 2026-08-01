@@ -3,7 +3,9 @@
     "composite": true,
     "skipLibCheck": true,
     "allowJs": true,
-    "noEmit": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tsc-cache/node",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true

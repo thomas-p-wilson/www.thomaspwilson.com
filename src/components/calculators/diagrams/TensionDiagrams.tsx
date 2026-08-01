@@ -1,6 +1,6 @@
 import { DiagramFrame, diagramColors as c } from "./DiagramFrame";
 
-const isPositive = (n: number) => typeof n === "number" && !isNaN(n) && n > 0;
+const isPositive = (n: number) => typeof n === "number" && !Number.isNaN(n) && n > 0;
 
 export type TensionScenario =
   | { kind: "vertical" }
@@ -68,7 +68,7 @@ export function TensionDiagram({ scenario }: { scenario: TensionScenario }) {
   }
 
   const { span, sagDepth, position } = scenario;
-  if (!isPositive(span) || !isPositive(sagDepth) || isNaN(position) || position <= 0 || position >= span) return null;
+  if (!isPositive(span) || !isPositive(sagDepth) || Number.isNaN(position) || position <= 0 || position >= span) return null;
   const left = 50, right = 270, anchorY = 40;
   const scaleX = (right - left) / span;
   const loadX = left + position * scaleX;

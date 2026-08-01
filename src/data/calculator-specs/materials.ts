@@ -18,8 +18,8 @@ export const wireGauge: CalculatorSpec = {
   defaults: { gauge: "16" },
   calculate: (values) => {
     const gauge = num(values, "gauge");
-    if (isNaN(gauge)) return values;
-    const diameter = (0.127 * Math.pow(92, (36 - gauge) / 39)) / 1000;
+    if (Number.isNaN(gauge)) return values;
+    const diameter = (0.127 * 92 ** ((36 - gauge) / 39)) / 1000;
     const area = Math.PI * (diameter / 2) * (diameter / 2);
     const cmil = area / 5.067074790975e-10;
     return { ...values, diameter: diameter.toExponential(4), area: area.toExponential(4), cmil: cmil.toFixed(1) };
@@ -52,7 +52,7 @@ export const helixSizing: CalculatorSpec = {
     const length = num(values, "length") * 1000; // m -> mm, to match the mm-scale coil inputs
     const coilDiameter = num(values, "coilDiameter");
     const turnSpacing = num(values, "turnSpacing");
-    if (isNaN(length) || isNaN(coilDiameter) || isNaN(turnSpacing)) return values;
+    if (Number.isNaN(length) || Number.isNaN(coilDiameter) || Number.isNaN(turnSpacing)) return values;
     const turnCircumference = Math.PI * coilDiameter;
     const turnLength = Math.sqrt(turnSpacing * turnSpacing + turnCircumference * turnCircumference);
     const turns = length / turnLength;
@@ -87,7 +87,7 @@ export const kilnWattage: CalculatorSpec = {
     const height = num(values, "chamberHeight");
     const diameter = num(values, "chamberDiameter");
     const density = num(values, "wattsPerUnitArea");
-    if (isNaN(height) || isNaN(diameter) || isNaN(density)) return values;
+    if (Number.isNaN(height) || Number.isNaN(diameter) || Number.isNaN(density)) return values;
     const radius = diameter / 2;
     const surfaceArea = 2 * Math.PI * radius * height + 2 * Math.PI * radius * radius;
     return {
@@ -119,7 +119,7 @@ export const materialMass: CalculatorSpec = {
   calculate: (values) => {
     const volume = num(values, "volume");
     const density = num(values, "density");
-    if (isNaN(volume) || isNaN(density)) return values;
+    if (Number.isNaN(volume) || Number.isNaN(density)) return values;
     return { ...values, mass: (volume * density).toFixed(2) };
   },
 };
@@ -147,7 +147,7 @@ export const thermalMassStorage: CalculatorSpec = {
     const capacity = num(values, "capacity");
     const pressure = num(values, "absolutePressure");
     const depleted = num(values, "depletedTemperature");
-    if (isNaN(capacity) || isNaN(pressure) || pressure <= 0 || isNaN(depleted)) return values;
+    if (Number.isNaN(capacity) || Number.isNaN(pressure) || pressure <= 0 || Number.isNaN(depleted)) return values;
 
     const t1 = 373.15, p1 = 14.696, L = 40660, R = 8.314;
     const boilingPoint = 1 / (-((Math.log(p1 / pressure) / (-L / R)) - 1 / t1));
