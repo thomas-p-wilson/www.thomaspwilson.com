@@ -31,8 +31,8 @@ const categories = [
     external: false,
   },
   {
-    title: "Gaming",
-    description: "Tools, mods, and save-file tinkering for games worth tinkering with.",
+    title: "Gaming & Misc",
+    description: "Games worth tinkering with, plus interactive odds and ends that didn't fit anywhere else.",
     icon: Gamepad2,
     href: "/projects/gaming",
     external: false,

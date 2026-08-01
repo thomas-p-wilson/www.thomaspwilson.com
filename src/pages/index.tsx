@@ -4,6 +4,7 @@ import Projects from "./Projects";
 import CalculatorsList from "./projects/Calculators";
 import Physical from "./projects/Physical";
 import Gaming from "./projects/Gaming";
+import PiPrecision from "./projects/gaming/PiPrecision";
 import Resume from "./Resume";
 import UnitConverter from "./UnitConverter";
 import ResistiveElementSizing from "./ResistiveElementSizing";
@@ -43,6 +44,7 @@ export default function Pages() {
             />
           ))}
           <Route path="/projects/gaming" element={<Gaming />} />
+          <Route path="/projects/gaming/pi-precision" element={<PiPrecision />} />
           <Route path="/projects/calculators" element={<CalculatorsList />} />
           <Route path="/projects/calculators/unit-converter" element={<UnitConverter />} />
           <Route path="/projects/calculators/resistive-element-sizing" element={<ResistiveElementSizing />} />

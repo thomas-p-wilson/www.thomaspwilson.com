@@ -7,6 +7,8 @@ export interface SimpleProject {
   id: string;
   title: string;
   description: string;
+  /** Combined with the page's basePath to link to an internal project page. Mutually exclusive with `url`. */
+  slug?: string;
   url?: string;
   technologies?: string[];
 }
@@ -18,9 +20,11 @@ interface SimpleProjectListPageProps {
   icon: LucideIcon;
   items: SimpleProject[];
   emptyMessage: string;
+  /** Base path used to build a link for items with a `slug` (e.g. "/projects/gaming"). */
+  basePath?: string;
 }
 
-export default function SimpleProjectListPage({ title, titleAccent, description, icon: Icon, items, emptyMessage }: SimpleProjectListPageProps) {
+export default function SimpleProjectListPage({ title, titleAccent, description, icon: Icon, items, emptyMessage, basePath }: SimpleProjectListPageProps) {
   return (
     <div className="bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-6xl mx-auto px-6 py-12">
@@ -74,6 +78,13 @@ export default function SimpleProjectListPage({ title, titleAccent, description,
                   )}
                 </div>
               );
+              if (item.slug && basePath) {
+                return (
+                  <motion.div key={item.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
+                    <Link to={`${basePath}/${item.slug}`}>{card}</Link>
+                  </motion.div>
+                );
+              }
               return item.url ? (
                 <motion.a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
                   {card}
