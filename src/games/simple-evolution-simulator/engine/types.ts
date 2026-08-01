@@ -10,7 +10,7 @@ export type Base = "A" | "C" | "G" | "U";
 export type Genome = string;
 
 /** One character of the translated (post-codon-table) symbol alphabet. */
-export type Symbol = string;
+export type CodonSymbol = string;
 
 export type TraitId =
   | "replicationRate"

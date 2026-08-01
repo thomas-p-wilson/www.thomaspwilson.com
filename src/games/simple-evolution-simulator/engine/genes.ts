@@ -207,7 +207,7 @@ export const GENE_TABLE: GeneDefinition[] = [
     baseline: 0.1,
     mapValue: (s) => 0.2 + clamp01(s) * 0.8,
     kind: "regulatory",
-    resolveStrength: ({ selfMatchStrength, neighborDensity }) => selfMatchStrength * Math.pow(neighborDensity, 0.25),
+    resolveStrength: ({ selfMatchStrength, neighborDensity }) => selfMatchStrength * neighborDensity ** 0.25,
   },
   {
     id: "growth-suppression",

@@ -7,7 +7,7 @@
 // even for very short genomes.
 //
 // This is a fixed design constant: the table never changes at runtime.
-import type { Base, Genome, Symbol } from "./types";
+import type { Base, CodonSymbol, Genome } from "./types";
 
 export const BASES: Base[] = ["A", "C", "G", "U"];
 
@@ -29,7 +29,7 @@ function isBase(char: string): char is Base {
  * extreme version of real tRNA wobble redundancy. Combined with the pairing
  * fold, every symbol is reachable by 8 of the 64 possible codons.
  */
-export function codonToSymbol(codon: string): Symbol {
+export function codonToSymbol(codon: string): CodonSymbol {
   const b1 = codon[0];
   const b2 = codon[1];
   const i1 = isBase(b1) ? BASE_INDEX[b1] : 0;
@@ -40,7 +40,7 @@ export function codonToSymbol(codon: string): Symbol {
 }
 
 /** Picks one representative codon that decodes to the given symbol. */
-export function symbolToCodon(symbol: Symbol): string {
+export function symbolToCodon(symbol: CodonSymbol): string {
   const index = SYMBOL_ALPHABET.indexOf(symbol);
   const pairIndex = Math.max(0, index) * 2;
   const i1 = Math.floor(pairIndex / 4);

@@ -23,6 +23,7 @@ function organismWithSurfaceProtein(id: string, active: boolean, matchedSequence
     generation: 0,
     parentIds: [],
     birthTick: 0,
+    birthTemperature: phenotype.traits.thermalTolerance,
   };
 }
 
