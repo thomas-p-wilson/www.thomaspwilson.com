@@ -66,7 +66,7 @@ export function calculateMortgageSchedule(
       return;
     }
     const r = term.interest / 12;
-    const part = Math.pow(1 + r, monthlyPayments);
+    const part = (1 + r) ** monthlyPayments;
     const amount = (balance * ((r * part) / (part - 1))) * multiplier;
     termAmounts[i] = { amount, rate: term.interest };
   });

@@ -17,10 +17,10 @@ const frequencyOptions = compoundingOptions.filter((o) => o.value !== "threesixt
 
 function effectiveRate(nominal: number, compounding: string): number {
   const n = compoundingFrequencies[compounding];
-  return Math.pow(1 + nominal / n, n) - 1;
+  return (1 + nominal / n) ** n - 1;
 }
 function periodicRate(effective: number, frequency: string): number {
-  return Math.pow(1 + effective, 1 / paymentFrequencies[frequency]) - 1;
+  return (1 + effective) ** (1 / paymentFrequencies[frequency]) - 1;
 }
 
 // Ported from origin/2020's loan-payment calculator. The original wired its
@@ -53,12 +53,12 @@ export const loanPayment: CalculatorSpec = {
     const principal = num(values, "principal");
     const rate = num(values, "rate");
     const years = num(values, "amortizationPeriod");
-    if (isNaN(principal) || isNaN(rate) || isNaN(years) || !values.frequency || !values.compounding) return values;
+    if (Number.isNaN(principal) || Number.isNaN(rate) || Number.isNaN(years) || !values.frequency || !values.compounding) return values;
 
     const effective = effectiveRate(rate, values.compounding);
     const periodic = periodicRate(effective, values.frequency);
     const payments = paymentFrequencies[values.frequency] * years;
-    const pvFactor = Math.pow(1 + periodic, payments);
+    const pvFactor = (1 + periodic) ** payments;
     if (periodic === 0) return values;
     const payment = (principal * periodic) / (1 - 1 / pvFactor);
     const total = payment * payments;
@@ -92,7 +92,7 @@ export const effectiveInterestRate: CalculatorSpec = {
   defaults: { nominal: "0.06", compounding: "annually", frequency: "monthly" },
   calculate: (values) => {
     const nominal = num(values, "nominal");
-    if (isNaN(nominal) || !values.compounding || !values.frequency) return values;
+    if (Number.isNaN(nominal) || !values.compounding || !values.frequency) return values;
     const effective = effectiveRate(nominal, values.compounding);
     const periodic = periodicRate(effective, values.frequency);
     return { ...values, effective: effective.toFixed(6), periodic: periodic.toFixed(6) };

@@ -35,10 +35,10 @@ export const idealGasLaw: CalculatorSpec = {
     const p = num(values, "pressure"), v = num(values, "volume"), t = num(values, "temperature"), n = num(values, "moles");
     const R = IDEAL_GAS_CONSTANT;
     const result = { ...values };
-    if (values.solveFor === "pressure" && !isNaN(v) && v !== 0) result.pressure = ((n * R * t) / v).toPrecision(6);
-    if (values.solveFor === "volume" && !isNaN(p) && p !== 0) result.volume = ((n * R * t) / p).toPrecision(6);
-    if (values.solveFor === "temperature" && !isNaN(n) && n !== 0) result.temperature = ((p * v) / (n * R)).toPrecision(6);
-    if (values.solveFor === "moles" && !isNaN(t) && t !== 0) result.moles = ((p * v) / (R * t)).toPrecision(6);
+    if (values.solveFor === "pressure" && !Number.isNaN(v) && v !== 0) result.pressure = ((n * R * t) / v).toPrecision(6);
+    if (values.solveFor === "volume" && !Number.isNaN(p) && p !== 0) result.volume = ((n * R * t) / p).toPrecision(6);
+    if (values.solveFor === "temperature" && !Number.isNaN(n) && n !== 0) result.temperature = ((p * v) / (n * R)).toPrecision(6);
+    if (values.solveFor === "moles" && !Number.isNaN(t) && t !== 0) result.moles = ((p * v) / (R * t)).toPrecision(6);
     return result;
   },
   notes: [`Ideal gas constant R = ${IDEAL_GAS_CONSTANT} J/(K·mol).`],
@@ -66,7 +66,7 @@ export const centrifugalForce: CalculatorSpec = {
   defaults: { mass: "1", radius: "0.5", angularVelocity: "10" },
   calculate: (values) => {
     const m = num(values, "mass"), r = num(values, "radius"), w = num(values, "angularVelocity");
-    if (isNaN(m) || isNaN(r) || isNaN(w) || r === 0) return values;
+    if (Number.isNaN(m) || Number.isNaN(r) || Number.isNaN(w) || r === 0) return values;
     const v = w * r;
     return {
       ...values,
@@ -124,7 +124,7 @@ export const flywheel: CalculatorSpec = {
     const r = num(values, "radius"), h = num(values, "height"), w = num(values, "angularVelocity");
     const config = inertiaConfigurations[values.configuration];
     const density = materialDensities[values.material];
-    if (isNaN(r) || isNaN(h) || isNaN(w) || !config || !density) return values;
+    if (Number.isNaN(r) || Number.isNaN(h) || Number.isNaN(w) || !config || !density) return values;
 
     const volume = Math.PI * r * r * h; // m^3
     const mass = density * volume; // kg
@@ -164,7 +164,7 @@ export const weightFromMass: CalculatorSpec = {
   calculate: (values) => {
     const mass = num(values, "mass");
     const gravity = num(values, "gravity");
-    if (isNaN(mass) || isNaN(gravity)) return values;
+    if (Number.isNaN(mass) || Number.isNaN(gravity)) return values;
     return { ...values, weight: (mass * gravity).toFixed(3) };
   },
   notes: [`W = m × g. Standard gravity on Earth is ${STANDARD_GRAVITY_M_S2} m/s².`],
@@ -186,7 +186,7 @@ export const spinCastRotation: CalculatorSpec = {
   defaults: { focalLength: "121.92" },
   calculate: (values) => {
     const f = num(values, "focalLength");
-    if (isNaN(f) || f <= 0) return { ...values, rotation: "" };
+    if (Number.isNaN(f) || f <= 0) return { ...values, rotation: "" };
     const rotation = Math.sqrt((STANDARD_GRAVITY_M_S2 * 100) / (2 * f)); // g in cm/s^2, to match f in cm
     return { ...values, rotation: rotation.toFixed(3) };
   },
@@ -228,7 +228,7 @@ export const massMomentOfInertia: CalculatorSpec = {
   calculate: (values) => {
     const mass = num(values, "mass"), radius = num(values, "radius");
     const config = inertiaConfigurations[values.configuration];
-    if (isNaN(mass) || isNaN(radius) || !config) return values;
+    if (Number.isNaN(mass) || Number.isNaN(radius) || !config) return values;
     const inertia = config.needsInnerOuterRadius
       ? config.inertiaZ(mass, radius, num(values, "innerRadius"))
       : config.inertiaZ(mass, radius);

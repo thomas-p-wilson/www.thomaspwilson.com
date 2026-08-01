@@ -42,7 +42,7 @@ export default function Mortgage() {
 
   const result = useMemo(() => {
     const principal = parseFloat(total) - parseFloat(downpayment);
-    if (isNaN(principal) || principal <= 0 || isNaN(amortization) || isNaN(termLength) || termLength <= 0) {
+    if (Number.isNaN(principal) || principal <= 0 || Number.isNaN(amortization) || Number.isNaN(termLength) || termLength <= 0) {
       return null;
     }
     const terms = Array.from({ length: termSlotCount }, (_, i) => ({

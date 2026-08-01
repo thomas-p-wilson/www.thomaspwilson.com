@@ -7,11 +7,11 @@ export function FunEnergyFact({ kWh, fuelKey }: { kWh: number; fuelKey?: string 
   const [nonce, setNonce] = useState(0);
   const lastId = useRef<string | undefined>(undefined);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: nonce is an intentional cache-buster to force a reshuffle
   const fact = useMemo(() => {
     const result = randomEquivalent(kWh, fuelKey, lastId.current);
     lastId.current = result?.id;
     return result;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kWh, fuelKey, nonce]);
 
   if (!fact) return null;

@@ -319,11 +319,11 @@ export const telescopeMirror: CalculatorSpec = {
     const apertureDiameter = num(values, "apertureDiameter");
     const primaryFocalLength = num(values, "primaryFocalLength");
     const primaryEdgeThickness = num(values, "primaryEdgeThickness");
-    if ([apertureDiameter, primaryFocalLength, primaryEdgeThickness].some((n) => isNaN(n) || n <= 0)) {
+    if ([apertureDiameter, primaryFocalLength, primaryEdgeThickness].some((n) => Number.isNaN(n) || n <= 0)) {
       return values;
     }
     const barlowReducerFactorInput = num(values, "barlowReducerFactor");
-    const barlowReducerFactor = !isNaN(barlowReducerFactorInput) && barlowReducerFactorInput > 0 ? barlowReducerFactorInput : 1;
+    const barlowReducerFactor = !Number.isNaN(barlowReducerFactorInput) && barlowReducerFactorInput > 0 ? barlowReducerFactorInput : 1;
 
     const apertureRadius = apertureDiameter / 2;
     const apertureArea = circleGeometry.calculate({ ...circleGeometry.defaults, radius: String(apertureRadius) }).area;
@@ -380,16 +380,16 @@ export const telescopeMirror: CalculatorSpec = {
     if (values.secondaryEnabled === "true") {
       if (values.secondaryType === "cassegrain") {
         const backFocusDistance = num(values, "secondaryBackFocusDistance");
-        if (!isNaN(backFocusDistance) && backFocusDistance > 0) {
+        if (!Number.isNaN(backFocusDistance) && backFocusDistance > 0) {
           if (values.secondarySolveFor === "focalLength") {
             const f2 = num(values, "secondaryFocalLength");
-            if (!isNaN(f2) && f2 > 0) {
+            if (!Number.isNaN(f2) && f2 > 0) {
               secondaryMagnification = cassegrainMagnificationFromFocalLength(primaryFocalLength, backFocusDistance, f2);
               if (secondaryMagnification != null) secondaryFocalLength = f2;
             }
           } else {
             const M = num(values, "secondaryMagnification");
-            if (!isNaN(M) && M > 1) {
+            if (!Number.isNaN(M) && M > 1) {
               secondaryMagnification = M;
               secondaryFocalLength = cassegrainFocalLengthFromMagnification(primaryFocalLength, backFocusDistance, M);
             }
@@ -407,7 +407,7 @@ export const telescopeMirror: CalculatorSpec = {
         }
 
         const secondaryDiameter = num(values, "secondaryDiameter");
-        if (!isNaN(secondaryDiameter) && secondaryDiameter > 0) {
+        if (!Number.isNaN(secondaryDiameter) && secondaryDiameter > 0) {
           obstructingDiameter = secondaryDiameter;
 
           // The beam the secondary reflects narrows linearly from the secondary itself down to the
@@ -419,7 +419,7 @@ export const telescopeMirror: CalculatorSpec = {
         }
       } else {
         const toFocus = num(values, "secondaryToFocusDistance");
-        if (!isNaN(toFocus) && toFocus > 0) {
+        if (!Number.isNaN(toFocus) && toFocus > 0) {
           secondaryMinorAxis = (apertureDiameter * toFocus) / primaryFocalLength;
           obstructingDiameter = secondaryMinorAxis;
         }
@@ -453,19 +453,19 @@ export const telescopeMirror: CalculatorSpec = {
         const sensorWidth = num(values, "sensorWidth");
         const sensorHeight = num(values, "sensorHeight");
         const pixelSize = num(values, "pixelSize");
-        if (!isNaN(sensorWidth) && sensorWidth > 0) fovWidth = 2 * Math.atan(sensorWidth / (2 * focalLengthMm)) * DEG_PER_RAD * 60;
-        if (!isNaN(sensorHeight) && sensorHeight > 0) fovHeight = 2 * Math.atan(sensorHeight / (2 * focalLengthMm)) * DEG_PER_RAD * 60;
-        if (!isNaN(pixelSize) && pixelSize > 0) pixelScale = (pixelSize / 1000 / focalLengthMm) * ARCSEC_PER_RAD;
+        if (!Number.isNaN(sensorWidth) && sensorWidth > 0) fovWidth = 2 * Math.atan(sensorWidth / (2 * focalLengthMm)) * DEG_PER_RAD * 60;
+        if (!Number.isNaN(sensorHeight) && sensorHeight > 0) fovHeight = 2 * Math.atan(sensorHeight / (2 * focalLengthMm)) * DEG_PER_RAD * 60;
+        if (!Number.isNaN(pixelSize) && pixelSize > 0) pixelScale = (pixelSize / 1000 / focalLengthMm) * ARCSEC_PER_RAD;
       } else {
         const eyepieceFocalLength = num(values, "eyepieceFocalLength");
-        if (!isNaN(eyepieceFocalLength) && eyepieceFocalLength > 0) {
+        if (!Number.isNaN(eyepieceFocalLength) && eyepieceFocalLength > 0) {
           magnification = focalLengthMm / eyepieceFocalLength;
           if (values.fovMethod === "fieldstop") {
             const fieldStop = num(values, "eyepieceFieldStop");
-            if (!isNaN(fieldStop) && fieldStop > 0) trueFOV = (fieldStop / focalLengthMm) * DEG_PER_RAD;
+            if (!Number.isNaN(fieldStop) && fieldStop > 0) trueFOV = (fieldStop / focalLengthMm) * DEG_PER_RAD;
           } else {
             const afov = num(values, "eyepieceAFOV");
-            if (!isNaN(afov) && afov > 0 && magnification > 0) trueFOV = afov / magnification;
+            if (!Number.isNaN(afov) && afov > 0 && magnification > 0) trueFOV = afov / magnification;
           }
         }
       }

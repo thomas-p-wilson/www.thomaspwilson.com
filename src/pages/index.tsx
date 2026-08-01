@@ -18,6 +18,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from "react-route
 
 function ScrollToTop() {
   const { pathname } = useLocation();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the intentional trigger to re-run on navigation
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);

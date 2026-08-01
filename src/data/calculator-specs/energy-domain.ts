@@ -29,7 +29,7 @@ export const solarPanels: CalculatorSpec = {
     const panelRating = num(values, "panelRating");
     const panelPrice = num(values, "panelPrice");
     const efficiency = num(values, "efficiencyModifier");
-    if ([dailyDemand, insolation, panelRating, panelPrice, efficiency].some(isNaN) || insolation === 0) return values;
+    if ([dailyDemand, insolation, panelRating, panelPrice, efficiency].some(Number.isNaN) || insolation === 0) return values;
 
     const demandPerInsolationHour = dailyDemand / insolation;
     const realRating = panelRating * efficiency;
@@ -86,7 +86,7 @@ export const chemicalStorage: CalculatorSpec = {
     const cellCapacity = num(values, "cellCapacity");
     const cellCost = num(values, "cellCost");
     const taxes = num(values, "taxes");
-    if (!chemistry || [capacity, cellCapacity, cellCost, taxes].some(isNaN) || cellCapacity === 0) return values;
+    if (!chemistry || [capacity, cellCapacity, cellCost, taxes].some(Number.isNaN) || cellCapacity === 0) return values;
 
     const nameplateCapacity = capacity / chemistry.nominalChargeCycle;
     const cellCount = nameplateCapacity / (cellCapacity / 1000);

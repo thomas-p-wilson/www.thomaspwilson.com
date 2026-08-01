@@ -78,7 +78,7 @@ export const energyConversionChain: CalculatorSpec = {
   calculate: (values) => {
     const cleared = { ...values, step1EnergyOut: "", step2EnergyOut: "", step3EnergyOut: "", energyOut: "", overallEfficiency: "" };
     const energyIn = num(values, "energyIn");
-    if (isNaN(energyIn) || energyIn < 0) return cleared;
+    if (Number.isNaN(energyIn) || energyIn < 0) return cleared;
 
     const result = { ...cleared };
     let energy = energyIn;
@@ -88,12 +88,12 @@ export const energyConversionChain: CalculatorSpec = {
       const enabled = !step.enabledKey || values[step.enabledKey] === "true";
       if (!enabled) continue;
       const efficiency = num(values, step.efficiencyKey);
-      if (broken || isNaN(efficiency) || efficiency < 0 || efficiency > 100) {
+      if (broken || Number.isNaN(efficiency) || efficiency < 0 || efficiency > 100) {
         broken = true;
         continue;
       }
       energy = energy * (efficiency / 100);
-      result[step.outKey] = energy.toFixed(3);
+      (result as Record<string, string>)[step.outKey] = energy.toFixed(3);
     }
 
     if (broken) return result;

@@ -1,6 +1,6 @@
 import { DiagramFrame, diagramColors as c } from "./DiagramFrame";
 
-const isPositive = (n: number) => typeof n === "number" && !isNaN(n) && n > 0;
+const isPositive = (n: number) => typeof n === "number" && !Number.isNaN(n) && n > 0;
 
 export type MirrorElement =
   | { role: "primary"; apertureDiameter: number; focalLength: number; sagitta: number }
