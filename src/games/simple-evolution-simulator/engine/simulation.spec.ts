@@ -712,3 +712,141 @@ describe("colony bonding (aggregative multicellularity)", () => {
     expect(centerLoss).toBeLessThan(soloLoss);
   });
 });
+
+describe("trophic sharing (colony energy transfer)", () => {
+  it("a bonded colony member expressing Trophic Sharing draws energy from an energy-richer neighbor", () => {
+    // Two otherwise-identical setups (same genome, same starting energies,
+    // same forced Structural Reinforcement expression on "poor" so both
+    // conditions get the same cost-reduction payoff and upkeep) differing
+    // only in whether "poor"'s Trophic Sharing gene itself resolves active —
+    // isolates the transfer's effect from every other per-tick cost, exactly
+    // like the Structural Reinforcement test above isolates colony density.
+    const genome = randomGenome(60, createRng(9));
+    const srIdx = GENE_TABLE.findIndex((g) => g.id === "structural-reinforcement");
+    const tsIdx = GENE_TABLE.findIndex((g) => g.id === "trophic-sharing");
+
+    function buildScenario(sharingActive: boolean) {
+      const state = createSimulation({
+        ...baseOptions(), initialPopulation: 0, environment: { temperature: 0.5, foodRegenRate: 0 },
+      });
+      state.food.fill(0); // no food-driven energy gain for either organism
+
+      function build(id: string, x: number, y: number, energy: number): Organism {
+        const o = createOrganism({ id, genome, x, y, energy, generation: 0, parentIds: [], birthTick: 0 });
+        o.phenotype = {
+          ...o.phenotype,
+          traits: {
+            ...o.phenotype.traits, energyStorage: 50, motility: 0, foraging: 0, thermotaxis: 0,
+            thermalTolerance: 0.5, replicationRate: 0,
+          },
+        };
+        forceSurfaceProtein(o, "012345");
+        const genes = o.phenotype.genes.slice();
+        genes[srIdx] = { ...genes[srIdx], matchStrength: 0 };
+        genes[tsIdx] = { ...genes[tsIdx], matchStrength: 0 };
+        o.phenotype = { ...o.phenotype, genes };
+        return o;
+      }
+
+      const rich = build("rich", 5, 5, 300);
+      const poor = build("poor", 6, 5, 30);
+      // Only "poor" expresses the dependency chain that lets it draw shared
+      // energy — Structural Reinforcement forced active identically in both
+      // scenarios (same upkeep cost-reduction either way), Trophic Sharing
+      // forced active only in the "with sharing" scenario.
+      const poorGenes = poor.phenotype.genes.slice();
+      poorGenes[srIdx] = { ...poorGenes[srIdx], matchStrength: 1 };
+      poorGenes[tsIdx] = { ...poorGenes[tsIdx], matchStrength: sharingActive ? 1 : 0 };
+      poor.phenotype = { ...poor.phenotype, genes: poorGenes };
+
+      state.organisms.set(rich.id, rich);
+      state.organisms.set(poor.id, poor);
+      state.grid[5 * state.width + 5] = rich.id;
+      state.grid[5 * state.width + 6] = poor.id;
+      return state;
+    }
+
+    const withSharing = buildScenario(true);
+    const withoutSharing = buildScenario(false);
+
+    step(withSharing); // registers the bond and this tick's colony-density snapshot
+    step(withoutSharing);
+    expect(getColonySize(withSharing, "poor")).toBe(2);
+    expect(getColonySize(withoutSharing, "poor")).toBe(2);
+
+    step(withSharing); // this tick's shareColonyEnergy now sees the bonded pair
+    step(withoutSharing);
+
+    const poorEnergyWithSharing = withSharing.organisms.get("poor")!.energy;
+    const poorEnergyWithoutSharing = withoutSharing.organisms.get("poor")!.energy;
+    expect(poorEnergyWithSharing).toBeGreaterThan(poorEnergyWithoutSharing);
+
+    const richEnergyWithSharing = withSharing.organisms.get("rich")!.energy;
+    const richEnergyWithoutSharing = withoutSharing.organisms.get("rich")!.energy;
+    expect(richEnergyWithSharing).toBeLessThan(richEnergyWithoutSharing);
+  });
+
+  it("never drains a donor below its own reproduction-energy safety margin", () => {
+    const genome = randomGenome(60, createRng(9));
+    const srIdx = GENE_TABLE.findIndex((g) => g.id === "structural-reinforcement");
+    const tsIdx = GENE_TABLE.findIndex((g) => g.id === "trophic-sharing");
+
+    const state = createSimulation({
+      ...baseOptions(), initialPopulation: 0, environment: { temperature: 0.5, foodRegenRate: 0 },
+    });
+    state.food.fill(0); // no food-driven energy gain, regardless of the shared genome's metabolismEfficiency
+    state.biomeOffset.fill(0); // every cell's local temperature is exactly environment.temperature
+
+    // size, thermalTolerance, and birthTemperature are all forced/pinned so
+    // each organism's own per-tick upkeep cost is fully deterministic —
+    // otherwise the shared random genome's decoded traits would make the
+    // exact reserve-boundary energy values below unpredictable.
+    function build(id: string, x: number, y: number, energy: number): Organism {
+      const o = createOrganism({
+        id, genome, x, y, energy, generation: 0, parentIds: [], birthTick: 0, birthTemperature: 0.5,
+      });
+      o.phenotype = {
+        ...o.phenotype,
+        traits: {
+          ...o.phenotype.traits, size: 1, energyStorage: 50, motility: 0, foraging: 0, thermotaxis: 0,
+          thermalTolerance: 0.5, replicationRate: 0,
+        },
+      };
+      forceSurfaceProtein(o, "012345");
+      const genes = o.phenotype.genes.slice();
+      genes[srIdx] = { ...genes[srIdx], matchStrength: 0 };
+      genes[tsIdx] = { ...genes[tsIdx], matchStrength: 0 };
+      o.phenotype = { ...o.phenotype, genes };
+      return o;
+    }
+
+    // Donor starts just above the safety margin (after its own upkeep, its
+    // surplus is smaller than what the receiver's pull would otherwise take);
+    // receiver starts far below it, maximizing demand.
+    const donor = build("donor", 5, 5, 16);
+    const receiver = build("receiver", 6, 5, 2);
+    const receiverGenes = receiver.phenotype.genes.slice();
+    receiverGenes[srIdx] = { ...receiverGenes[srIdx], matchStrength: 1 };
+    receiverGenes[tsIdx] = { ...receiverGenes[tsIdx], matchStrength: 1 };
+    receiver.phenotype = { ...receiver.phenotype, genes: receiverGenes };
+
+    state.organisms.set(donor.id, donor);
+    state.organisms.set(receiver.id, receiver);
+    state.grid[5 * state.width + 5] = donor.id;
+    state.grid[5 * state.width + 6] = receiver.id;
+
+    step(state); // registers the bond and this tick's colony-density snapshot
+    const donorBeforeShare = state.organisms.get("donor")!.energy;
+    step(state); // this tick's shareColonyEnergy now sees the bonded pair
+
+    const donorAfter = state.organisms.get("donor")!.energy;
+    const receiverAfter = state.organisms.get("receiver")!.energy;
+    // The reserve floor (REPRODUCE_ENERGY_THRESHOLD, 14) is the binding
+    // constraint here, not the flat per-edge cap: donor ends up pinned right
+    // at it rather than merely somewhere above it.
+    expect(donorAfter).toBeCloseTo(14, 2);
+    expect(donorAfter).toBeGreaterThanOrEqual(14 - 1e-6);
+    expect(receiverAfter).toBeGreaterThan(0.5);
+    expect(donorBeforeShare - donorAfter).toBeGreaterThan(0); // a transfer actually happened
+  });
+});

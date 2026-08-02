@@ -122,6 +122,15 @@ const STRUCTURAL_REINFORCEMENT_COST_REDUCTION = 0.95;
 // reproduce less; exposed/surface members reproduce at their full rate). See
 // maybeReproduce below.
 const GROWTH_SUPPRESSION_REPLICATION_PENALTY = 0.6;
+// Trophic Sharing (see genes.ts): energy moves along colony bond edges from
+// whichever member currently has more of it toward its bonded neighbor, in
+// proportion to the receiving member's resolved Trophic Sharing strength —
+// see shareColonyEnergy. First-pass constants, not yet empirically tuned
+// against real long-run colony survival the way STRUCTURAL_REINFORCEMENT_
+// COST_REDUCTION and COLONY_COMPATIBILITY_THRESHOLD were (see
+// todos/colony-energy-sharing.md).
+const TROPHIC_SHARE_RATE = 0.5; // fraction of the donor/receiver energy gap moved per tick
+const TROPHIC_SHARE_MAX_PER_EDGE = 3; // cap on how much one bond edge can move in one tick
 
 /** Moore (8-neighbor) offsets, toroidal-wrapped by the caller. */
 const NEIGHBOR_OFFSETS: Array<[number, number]> = [
@@ -528,6 +537,56 @@ function refreshColonies(state: SimulationState): void {
 
   state.bonds = edges;
   state.colonies = computeColonies(ids, edges);
+}
+
+/**
+ * Potential one-tick transfer from `donor` to `receiver` along a bond edge:
+ * proportional to the energy gap between them and `receiveStrength` (the
+ * receiver's resolved Trophic Sharing value — see genes.ts). Zero whenever
+ * the receiver doesn't express the gene at all, or isn't actually behind the
+ * donor (energy only flows down the gradient, never "backward"). Capped so
+ * the donor never drops below REPRODUCE_ENERGY_THRESHOLD — its own safety
+ * margin — and so no single edge moves more than TROPHIC_SHARE_MAX_PER_EDGE
+ * in one tick, regardless of how large the gap is.
+ */
+function trophicShareAmount(receiver: Organism, donor: Organism, receiveStrength: number): number {
+  if (receiveStrength <= 0 || donor.energy <= receiver.energy) return 0;
+  const donorSurplus = Math.max(0, donor.energy - REPRODUCE_ENERGY_THRESHOLD);
+  const desired = TROPHIC_SHARE_RATE * receiveStrength * (donor.energy - receiver.energy);
+  return Math.min(desired, donorSurplus, TROPHIC_SHARE_MAX_PER_EDGE);
+}
+
+/**
+ * Redistributes energy along this tick's colony bond edges (state.bonds —
+ * last tick's snapshot, the same one-tick lag every other regulatory-context
+ * consumer already reads against, see colonySizeOf's doc comment) before
+ * death is evaluated in `step`, so a starving interior member can actually be
+ * saved by a surplus neighbor instead of dying before ever receiving one.
+ * Checked in both directions per edge, but `donor.energy <= receiver.energy`
+ * can't hold true both ways at once — the two directions are mutually
+ * exclusive by construction, not by an extra guard.
+ */
+function shareColonyEnergy(state: SimulationState): void {
+  for (const [aId, bId] of state.bonds) {
+    const a = state.organisms.get(aId);
+    const b = state.organisms.get(bId);
+    if (!a || !b) continue;
+
+    const aReceiveStrength = effectiveTraitValue(a.phenotype, "trophicSharing", state.cellTraits.get(a.id));
+    const toA = trophicShareAmount(a, b, aReceiveStrength);
+    if (toA > 0) {
+      a.energy += toA;
+      b.energy -= toA;
+      continue;
+    }
+
+    const bReceiveStrength = effectiveTraitValue(b.phenotype, "trophicSharing", state.cellTraits.get(b.id));
+    const toB = trophicShareAmount(b, a, bReceiveStrength);
+    if (toB > 0) {
+      b.energy += toB;
+      a.energy -= toB;
+    }
+  }
 }
 
 function regenerateFood(state: SimulationState): void {
@@ -960,6 +1019,21 @@ export function step(state: SimulationState): void {
   // Snapshot ids up front: organisms born this tick shouldn't act this tick,
   // and organisms that died mid-iteration are simply skipped.
   const ids = Array.from(state.organisms.keys());
+
+  // Feeding happens for every organism before death is evaluated for any of
+  // them — required for shareColonyEnergy below to be able to save a
+  // starving member with a neighbor's surplus. This split has no effect on
+  // feedAndAge itself: each organism reads/writes only its own energy and its
+  // own grid cell's food, so interleaved-vs-batched order was never
+  // observable before Trophic Sharing existed.
+  for (const id of ids) {
+    const organism = state.organisms.get(id);
+    if (!organism) continue;
+    feedAndAge(state, organism);
+  }
+
+  shareColonyEnergy(state);
+
   // A colony's move is decided once for the whole group, the first time any
   // of its members comes up in this loop — not once per member — so later
   // colony-mates encountered this same tick just skip movement (already
@@ -969,7 +1043,6 @@ export function step(state: SimulationState): void {
     const organism = state.organisms.get(id);
     if (!organism) continue;
 
-    feedAndAge(state, organism);
     if (organism.energy <= 0 || organism.age > maxAgeFor(organism)) {
       killOrganism(state, organism);
       continue;

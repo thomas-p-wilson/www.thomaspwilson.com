@@ -230,4 +230,26 @@ export const GENE_TABLE: GeneDefinition[] = [
     dependsOn: ["structural-reinforcement"],
     resolveStrength: ({ selfMatchStrength, dependencyValues }) => selfMatchStrength * clamp01(dependencyValues[0] ?? 0),
   },
+  {
+    id: "trophic-sharing",
+    label: "Trophic Sharing",
+    description:
+      "A second, independent downstream consequence of Structural Reinforcement (same dependency shape as Growth " +
+      "Suppression, a sibling gene off the same upstream signal): how strongly this organism can draw shared energy " +
+      "from bonded colony neighbors that currently have surplus (see engine/simulation.ts's shareColonyEnergy). " +
+      "Models division-of-labor energy transport (e.g. cytoplasmic bridges) between foraging-capable surface " +
+      "members, which keep direct food access and therefore run an energy surplus, and deeply-embedded interior " +
+      "members, which Structural Reinforcement already shields from upkeep but which still have no exposed food " +
+      "cell of their own to forage from. Silent (baseline 0, no pull at all) unless both this gene's own motif is " +
+      "present *and* Structural Reinforcement is already meaningfully expressed for this organism — a solo " +
+      "organism or a colony surface member never expresses this regardless of genome.",
+    trait: "trophicSharing",
+    motif: "062571",
+    activationThreshold: 0.45,
+    baseline: 0,
+    mapValue: (s) => clamp01(s),
+    kind: "regulatory",
+    dependsOn: ["structural-reinforcement"],
+    resolveStrength: ({ selfMatchStrength, dependencyValues }) => selfMatchStrength * clamp01(dependencyValues[0] ?? 0),
+  },
 ];

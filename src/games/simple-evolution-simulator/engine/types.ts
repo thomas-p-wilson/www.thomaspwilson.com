@@ -26,7 +26,8 @@ export type TraitId =
   | "energyStorage"
   | "surfaceProtein"
   | "structuralIntegrity"
-  | "growthSuppression";
+  | "growthSuppression"
+  | "trophicSharing";
 
 /**
  * Inputs a *regulatory* gene's `resolveStrength` can draw on to compose its
