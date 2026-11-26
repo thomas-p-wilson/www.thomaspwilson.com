@@ -109,6 +109,7 @@ export default function ControlsPanel({
         <StatTile label="Births / Deaths" value={`${stats.births} / ${stats.deaths}`} />
         <StatTile label="In Colonies" value={stats.organismsInColonies} />
         <StatTile label="Largest Colony" value={stats.largestColony} />
+        <StatTile label="Fragments" value={stats.fragmentCount} />
       </div>
 
       <div className="space-y-4">

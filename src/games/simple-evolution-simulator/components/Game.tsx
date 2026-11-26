@@ -5,8 +5,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { DEFAULT_ORBITAL_CONFIG, DEFAULT_STELLAR_CONFIG } from "../engine/astrophysics";
 import { DEFAULT_MUTATION_CONFIG, scaleMutationConfig } from "../engine/genome";
 import {
-  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getOrbitalDistanceAu,
-  getOrganisms, getStatsHistory, getTicksUntilAbiogenesis, step, type SimulationState,
+  createSimulation, getCellTraits, getColonyBonds, getColonySize, getFirstGraduation, getLineageRecords,
+  getOrbitalDistanceAu, getOrganisms, getStatsHistory, getTicksUntilAbiogenesis, step, type SimulationState,
 } from "../engine/simulation";
 import type { OrbitalConfig, StellarConfig } from "../engine/types";
 import { DEFAULT_WORLD_SIZE_INDEX, WORLD_SIZE_PRESETS, type WorldSizePreset } from "../engine/worldSize";
@@ -46,6 +46,10 @@ export default function Game() {
   // and expected — see engine/simulation.ts's spawnAbiogenesis) just proceed
   // silently instead of interrupting again.
   const [extinctionNoticeDismissed, setExtinctionNoticeDismissed] = useState(false);
+  // Shown once per run, the tick a fragment first graduates into a real,
+  // self-replicating organism (see engine/simulation.ts's stepFragments) —
+  // re-armed by startNewSimulation, same as the extinction notice.
+  const [graduationNoticeDismissed, setGraduationNoticeDismissed] = useState(false);
 
   const simRef = useRef<SimulationState | null>(null);
 
@@ -67,6 +71,7 @@ export default function Game() {
     });
     setSelectedId(null);
     setExtinctionNoticeDismissed(false);
+    setGraduationNoticeDismissed(false);
     setVersion((v) => v + 1);
   }
 
@@ -93,14 +98,19 @@ export default function Game() {
   const sim = simRef.current;
   const ticksUntilAbiogenesis = sim ? getTicksUntilAbiogenesis(sim) : null;
   const showExtinctionNotice = ticksUntilAbiogenesis !== null && !extinctionNoticeDismissed;
+  const firstGraduation = sim ? getFirstGraduation(sim) : null;
+  // Fragment chemistry runs continuously regardless of population (see
+  // stepFragments), so this can in principle fire while the population is
+  // simultaneously extinct — graduation takes priority if both are pending.
+  const showGraduationNotice = firstGraduation !== null && !graduationNoticeDismissed;
 
   // Main tick loop. Speed changes intentionally restart the accumulator
   // (harmless); mutation rate and stellar/orbital config are applied via the
   // effects below so they take effect immediately without resetting timing. Paused
-  // while the extinction notice is up (showExtinctionNotice) — dismissing it
-  // is what lets ticks (and the abiogenesis countdown) resume.
+  // while the extinction or first-graduation notice is up — dismissing it is
+  // what lets ticks (and the abiogenesis countdown) resume.
   useEffect(() => {
-    if (phase !== "playing" || !running || showExtinctionNotice) return;
+    if (phase !== "playing" || !running || showExtinctionNotice || showGraduationNotice) return;
     let raf = 0;
     let last = performance.now();
     let acc = 0;
@@ -121,7 +131,7 @@ export default function Game() {
     }
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [phase, running, speed, showExtinctionNotice]);
+  }, [phase, running, speed, showExtinctionNotice, showGraduationNotice]);
 
   useEffect(() => {
     if (!simRef.current) return;
@@ -149,7 +159,7 @@ export default function Game() {
   const stats = sim?.stats ?? {
     population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
     genomeLength: zeroStatSummary, age: zeroStatSummary, colonySize: zeroStatSummary,
-    avgTemperature: 0, incidentFluxWm2: 0,
+    avgTemperature: 0, incidentFluxWm2: 0, fragmentCount: 0,
   };
 
   return (
@@ -175,7 +185,20 @@ export default function Game() {
             </Button>
           </div>
           <div className="relative w-full h-full rounded-lg border border-slate-800 bg-slate-900/40 p-2">
-            {showExtinctionNotice && (
+            {showGraduationNotice ? (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-slate-950/90 p-6 text-center">
+                <div className="max-w-sm space-y-4">
+                  <p className="text-sm text-emerald-200">
+                    A stray chain of bases drifting in the chemical soup has just crossed a threshold: it can copy
+                    itself. Genuine, heritable, self-replicating life has begun — everything from here evolves from
+                    that one chain, and from whatever other chains cross the same threshold on their own, elsewhere.
+                  </p>
+                  <Button size="sm" onClick={() => setGraduationNoticeDismissed(true)}>
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            ) : showExtinctionNotice && (
               <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-slate-950/90 p-6 text-center">
                 <div className="max-w-sm space-y-4">
                   <p className="text-sm text-amber-200">

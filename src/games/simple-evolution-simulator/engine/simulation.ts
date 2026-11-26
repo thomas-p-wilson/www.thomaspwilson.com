@@ -15,11 +15,12 @@ import {
   TEMPERATURE_ANCHOR_OFFSET_RANGE,
 } from "./biome";
 import { areCompatible, computeColonies, type ColonyGraph } from "./colony";
-import { createSeedGenome, mutate, scaleMutationConfig } from "./genome";
+import { FRAGMENT_MIN_INITIAL_LENGTH, GRADUATION_GENE_ID, growFragment, randomFragmentSequence, splitFragment } from "./fragment";
+import { createSeedGenome, MIN_GENOME_LENGTH, mutate, scaleMutationConfig } from "./genome";
 import { createOrganism, preferredTemperature, reproduce } from "./organism";
-import { effectiveTraitValue, resolveCellTraits } from "./phenotype";
+import { decode, effectiveTraitValue, resolveCellTraits } from "./phenotype";
 import { createRng, randomInt, type Rng } from "./rng";
-import type { AstroConfig, EnvironmentConfig, LineageRecord, MutationConfig, Organism, TraitId } from "./types";
+import type { AstroConfig, EnvironmentConfig, Fragment, LineageRecord, MutationConfig, Organism, TraitId } from "./types";
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
@@ -132,6 +133,24 @@ const GROWTH_SUPPRESSION_REPLICATION_PENALTY = 0.6;
 const TROPHIC_SHARE_RATE = 0.5; // fraction of the donor/receiver energy gap moved per tick
 const TROPHIC_SHARE_MAX_PER_EDGE = 3; // cap on how much one bond edge can move in one tick
 
+// Pre-genetic chemistry (see engine/fragment.ts and stepFragments below): runs
+// unconditionally every tick, independent of whether the population is
+// currently extinct — multiple, unrelated fragments can graduate into real
+// organisms on their own schedule, side by side with an already-live
+// population, not just as a one-shot fallback after a total die-off (that
+// existing mechanic, spawnAbiogenesis, is left in place below as a backstop;
+// see its own doc comment). First-pass constants throughout, not yet
+// empirically tuned — in particular, how long a monomer soup actually takes
+// to produce a first graduation under these numbers hasn't been measured over
+// a long run yet.
+const FRAGMENT_NUCLEATION_RATE = 0.0005; // per food-bearing cell per tick, scaled by that cell's food fraction
+const FRAGMENT_GROWTH_RATE = 0.05; // per tick, scaled by local food fraction
+const FRAGMENT_CATALYZED_GROWTH_MULTIPLIER = 4; // once a fragment expresses *any* gene at all (see stepFragments)
+const FRAGMENT_MONOMER_COST_PER_BASE = 0.3; // food consumed per base assembled, nucleation or growth alike
+const THERMAL_SPLIT_SENSITIVITY = 0.03; // scales (1 - thermalPace) into a per-tick thermal-shock probability
+const FRAGMENT_DECAY_RATE = 0.02; // per tick at FRAGMENT_MIN_INITIAL_LENGTH; scaled down for longer, more stable chains
+const FRAGMENT_POPULATION_CAP = 300; // a defensive safety valve, not a tuned game mechanic
+
 /** Moore (8-neighbor) offsets, toroidal-wrapped by the caller. */
 const NEIGHBOR_OFFSETS: Array<[number, number]> = [
   [-1, -1], [0, -1], [1, -1],
@@ -180,6 +199,10 @@ export interface SimulationStats {
    * W/m^2 (see engine/astrophysics.ts's incidentFluxWm2) — 0 for a world with
    * no AstroConfig, which has no star/orbit to derive it from. */
   incidentFluxWm2: number;
+  /** Current pre-genetic Fragment count (see engine/fragment.ts and
+   * stepFragments) — the population that hasn't yet graduated into a real
+   * Organism, or may never. */
+  fragmentCount: number;
 }
 
 /** One sampled point in a run's population-statistics history — see
@@ -269,6 +292,17 @@ export interface SimulationState {
    * REPRO_MISMATCH_* tuning note), so life gets another spontaneous chance to
    * take hold rather than leaving the world empty forever. */
   extinctSinceTick: number | null;
+  /** Pre-genetic chemistry population — see engine/fragment.ts and
+   * stepFragments. Runs unconditionally every tick, independent of
+   * `extinctSinceTick`/spawnAbiogenesis: multiple, unrelated fragments can
+   * graduate into real organisms on their own schedule, whether or not the
+   * population is currently extinct. */
+  fragments: Map<string, Fragment>;
+  /** The tick and organism id of the very first Fragment ever to graduate
+   * into a real Organism this run, or null before that's happened — set once
+   * and never overwritten (see graduateFragment). Drives the one-time "life
+   * has begun" announcement in the UI. */
+  firstGraduation: { tick: number; organismId: string } | null;
 }
 
 export interface CreateSimulationOptions {
@@ -280,7 +314,12 @@ export interface CreateSimulationOptions {
    * (e.g. every existing test constructs a state this way). */
   astro?: AstroConfig;
   mutation: MutationConfig;
-  /** How many primordial organisms to seed near the center. */
+  /** How many primordial organisms to seed near the center — defaults to 0.
+   * A real run starts from nothing but a monomer/food field (see
+   * stepFragments): the first organism ever to exist comes from a fragment
+   * actually graduating, not a guaranteed head start. Existing at all mainly
+   * so tests can opt into a known, immediate population when what they're
+   * testing has nothing to do with abiogenesis pacing. */
   initialPopulation?: number;
 }
 
@@ -324,6 +363,13 @@ function nextOrganismId(state: SimulationState): string {
   return `org-${state.nextId}`;
 }
 
+/** Shares the same counter as nextOrganismId — the "frag-" prefix already
+ * keeps ids from colliding, so there's no need for a second counter field. */
+function nextFragmentId(state: SimulationState): string {
+  state.nextId += 1;
+  return `frag-${state.nextId}`;
+}
+
 export function createSimulation(options: CreateSimulationOptions): SimulationState {
   const rng = createRng(options.seed);
   const state: SimulationState = {
@@ -344,13 +390,15 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     stats: {
       population: 0, maxGeneration: 0, births: 0, deaths: 0, organismsInColonies: 0, largestColony: 0,
       genomeLength: ZERO_STAT_SUMMARY, age: ZERO_STAT_SUMMARY, colonySize: ZERO_STAT_SUMMARY,
-      avgTemperature: 0, incidentFluxWm2: 0,
+      avgTemperature: 0, incidentFluxWm2: 0, fragmentCount: 0,
     },
     history: [],
     cellTraits: new Map(),
     colonies: { colonyOf: new Map(), colonySize: new Map() },
     bonds: [],
     extinctSinceTick: null,
+    fragments: new Map(),
+    firstGraduation: null,
   };
 
   for (let i = 0; i < state.food.length; i++) {
@@ -368,7 +416,7 @@ export function createSimulation(options: CreateSimulationOptions): SimulationSt
     state.environment.temperature = baselineTemperature(state.astro.stellar, state.astro.orbital, state.tick);
   }
 
-  const seedCount = options.initialPopulation ?? 4;
+  const seedCount = options.initialPopulation ?? 0;
   const centerX = Math.floor(state.width / 2);
   const centerY = Math.floor(state.height / 2);
   for (let i = 0; i < seedCount; i++) {
@@ -435,6 +483,103 @@ function spawnAbiogenesis(state: SimulationState): void {
   const x = randomInt(state.rng, state.width);
   const y = randomInt(state.rng, state.height);
   spawnPrimordialOrganism(state, x, y);
+}
+
+/**
+ * Promotes `fragment` into a real, independent Organism — the graduation
+ * moment itself. Fails (returns false, leaving the fragment untouched to
+ * retry next tick) only if the target cell is already occupied by a real
+ * organism, since organisms — unlike fragments — are grid-exclusive. The
+ * genome is the fragment's sequence exactly as-is: mutation only starts
+ * applying once this organism actually reproduces, same as any other.
+ */
+function graduateFragment(state: SimulationState, fragment: Fragment): boolean {
+  const idx = cellIndex(state, fragment.x, fragment.y);
+  if (state.grid[idx]) return false;
+
+  const siteTemperature = cellTemperature(state, fragment.x, fragment.y);
+  state.food[idx] = Math.max(0, state.food[idx] - Math.min(state.food[idx], CHILD_START_ENERGY));
+  const id = nextOrganismId(state);
+  const organism = createOrganism({
+    id, genome: fragment.sequence, x: fragment.x, y: fragment.y, energy: CHILD_START_ENERGY,
+    generation: 0, parentIds: fragment.parentIds, birthTick: state.tick, birthTemperature: siteTemperature,
+  });
+  placeOrganism(state, organism);
+  recordBirth(state, organism);
+  if (state.firstGraduation === null) state.firstGraduation = { tick: state.tick, organismId: id };
+  return true;
+}
+
+/**
+ * Pre-genetic chemistry, run unconditionally every tick regardless of
+ * population (see engine/fragment.ts and SimulationState.fragments' doc
+ * comment): nucleates new fragments from local food concentration, then grows,
+ * thermally splits, decays, or graduates each existing one. Fragments are
+ * processed from a snapshot (like organisms in `step`) so a fragment born
+ * this tick via a split doesn't also act this tick.
+ */
+function stepFragments(state: SimulationState): void {
+  if (state.fragments.size < FRAGMENT_POPULATION_CAP) {
+    for (let i = 0; i < state.food.length; i++) {
+      if (state.fragments.size >= FRAGMENT_POPULATION_CAP) break;
+      const foodFraction = state.food[i] / FOOD_MAX_PER_CELL;
+      if (foodFraction <= 0 || state.rng() >= FRAGMENT_NUCLEATION_RATE * foodFraction) continue;
+      const sequence = randomFragmentSequence(state.rng);
+      const cost = Math.min(state.food[i], sequence.length * FRAGMENT_MONOMER_COST_PER_BASE);
+      state.food[i] -= cost;
+      const id = nextFragmentId(state);
+      state.fragments.set(id, { id, sequence, x: i % state.width, y: Math.floor(i / state.width), age: 0, parentIds: [] });
+    }
+  }
+
+  for (const fragment of Array.from(state.fragments.values())) {
+    fragment.age += 1;
+    const idx = cellIndex(state, fragment.x, fragment.y);
+
+    // Graduation is checked first, against this tick's starting sequence
+    // (the same one-tick lag every other regulatory context in this file
+    // already reads against) — a fragment that graduates this tick skips
+    // growth/splitting/decay entirely; it's an organism now.
+    const decoded = decode(fragment.sequence);
+    if (fragment.sequence.length >= MIN_GENOME_LENGTH) {
+      const graduationGene = decoded.genes.find((g) => g.geneId === GRADUATION_GENE_ID);
+      if (graduationGene?.active && graduateFragment(state, fragment)) {
+        state.fragments.delete(fragment.id);
+        continue;
+      }
+    }
+
+    const localTemp = cellTemperature(state, fragment.x, fragment.y);
+    const catalyzed = decoded.activeGeneCount > 0;
+    const foodFraction = state.food[idx] / FOOD_MAX_PER_CELL;
+    const growthChance = FRAGMENT_GROWTH_RATE * (catalyzed ? FRAGMENT_CATALYZED_GROWTH_MULTIPLIER : 1) * foodFraction;
+    if (foodFraction > 0 && state.rng() < growthChance) {
+      const cost = Math.min(state.food[idx], FRAGMENT_MONOMER_COST_PER_BASE);
+      state.food[idx] -= cost;
+      fragment.sequence = growFragment(fragment.sequence, state.rng);
+    }
+
+    const splitChance = THERMAL_SPLIT_SENSITIVITY * (1 - thermalPace(localTemp));
+    if (state.rng() < splitChance) {
+      const halves = splitFragment(fragment.sequence, state.rng);
+      state.fragments.delete(fragment.id);
+      if (halves) {
+        for (const half of halves) {
+          const childId = nextFragmentId(state);
+          state.fragments.set(childId, { id: childId, sequence: half, x: fragment.x, y: fragment.y, age: 0, parentIds: [fragment.id] });
+        }
+      } else {
+        state.food[idx] = Math.min(FOOD_MAX_PER_CELL, state.food[idx] + fragment.sequence.length * FRAGMENT_MONOMER_COST_PER_BASE);
+      }
+      continue;
+    }
+
+    const decayChance = FRAGMENT_DECAY_RATE / Math.max(1, fragment.sequence.length / FRAGMENT_MIN_INITIAL_LENGTH);
+    if (state.rng() < decayChance) {
+      state.fragments.delete(fragment.id);
+      state.food[idx] = Math.min(FOOD_MAX_PER_CELL, state.food[idx] + fragment.sequence.length * FRAGMENT_MONOMER_COST_PER_BASE);
+    }
+  }
 }
 
 function killOrganism(state: SimulationState, organism: Organism): void {
@@ -981,6 +1126,7 @@ function refreshStats(state: SimulationState): void {
   state.stats.incidentFluxWm2 = state.astro
     ? incidentFluxWm2(state.astro.stellar, state.astro.orbital, state.tick)
     : 0;
+  state.stats.fragmentCount = state.fragments.size;
 }
 
 /** Appends the current tick's stats to `state.history` at the configured
@@ -1019,6 +1165,14 @@ export function step(state: SimulationState): void {
   // Snapshot ids up front: organisms born this tick shouldn't act this tick,
   // and organisms that died mid-iteration are simply skipped.
   const ids = Array.from(state.organisms.keys());
+
+  // Runs unconditionally, independent of the extinction check further down —
+  // fragments graduating into organisms is a real, ongoing background process,
+  // not a fallback for when the population hits 0. Called after the ids
+  // snapshot above so a fragment that graduates this tick doesn't also feed/
+  // move/reproduce this same tick, exactly like a child born via
+  // reproduceIndependent.
+  stepFragments(state);
 
   // Feeding happens for every organism before death is evaluated for any of
   // them — required for shareColonyEnergy below to be able to save a
@@ -1064,18 +1218,33 @@ export function step(state: SimulationState): void {
   refreshCellRegulatoryTraits(state);
   refreshStats(state);
 
-  if (state.stats.population === 0) {
-    if (state.extinctSinceTick === null) {
-      state.extinctSinceTick = state.tick;
-    } else if (state.tick - state.extinctSinceTick >= ABIOGENESIS_WAIT_TICKS) {
-      spawnAbiogenesis(state);
+  // Gated on state.lineage.size > 0 — a population of 0 before life has ever
+  // existed isn't an "extinction," it's just the world not having produced
+  // its first organism yet (see stepFragments above, which runs regardless
+  // and is the only thing that should be responsible for that). Without this
+  // gate, a world that starts genuinely empty (see createSimulation's default
+  // initialPopulation of 0) would hit this same-tick-1 "extinct" branch
+  // immediately and force-spawn a fully-formed primordial organism via
+  // spawnAbiogenesis after ABIOGENESIS_WAIT_TICKS regardless of whether any
+  // fragment had actually graduated — short-circuiting the whole point of
+  // starting from chemistry. Once state.lineage has at least one record (the
+  // first organism, by whichever path), this reverts to exactly its original
+  // behavior: a real die-off after life has taken hold still gets the same
+  // spontaneous-restart safety net as before.
+  if (state.lineage.size > 0) {
+    if (state.stats.population === 0) {
+      if (state.extinctSinceTick === null) {
+        state.extinctSinceTick = state.tick;
+      } else if (state.tick - state.extinctSinceTick >= ABIOGENESIS_WAIT_TICKS) {
+        spawnAbiogenesis(state);
+        state.extinctSinceTick = null;
+        refreshColonies(state);
+        refreshCellRegulatoryTraits(state);
+        refreshStats(state);
+      }
+    } else {
       state.extinctSinceTick = null;
-      refreshColonies(state);
-      refreshCellRegulatoryTraits(state);
-      refreshStats(state);
     }
-  } else {
-    state.extinctSinceTick = null;
   }
 
   recordStatsHistorySample(state);
@@ -1143,4 +1312,16 @@ export function getOrbitalDistanceAu(state: SimulationState): number | null {
 export function getTicksUntilAbiogenesis(state: SimulationState): number | null {
   if (state.extinctSinceTick === null) return null;
   return Math.max(0, ABIOGENESIS_WAIT_TICKS - (state.tick - state.extinctSinceTick));
+}
+
+/** Current pre-genetic fragment population — see engine/fragment.ts. */
+export function getFragments(state: SimulationState): Fragment[] {
+  return Array.from(state.fragments.values());
+}
+
+/** The tick and organism id of this run's first-ever fragment-to-organism
+ * graduation, or null if it hasn't happened yet — see
+ * SimulationState.firstGraduation's doc comment. */
+export function getFirstGraduation(state: SimulationState): { tick: number; organismId: string } | null {
+  return state.firstGraduation;
 }

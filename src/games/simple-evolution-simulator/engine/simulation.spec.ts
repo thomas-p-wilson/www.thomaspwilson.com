@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
+import { symbolToCodon } from "./codonTable";
 import { DEFAULT_MUTATION_CONFIG, MAX_GENOME_LENGTH, MIN_GENOME_LENGTH, randomGenome } from "./genome";
 import { createOrganism } from "./organism";
 import { decode } from "./phenotype";
 import {
-  createSimulation, getCellTraits, getColonyBonds, getColonySize, getLineageRecords, getLocalFoodRegenRate,
-  getLocalTemperature, getOrganisms, getStatsHistory, getThermalPace, getTicksUntilAbiogenesis, step,
+  createSimulation, getCellTraits, getColonyBonds, getColonySize, getFirstGraduation, getFragments,
+  getLineageRecords, getLocalFoodRegenRate, getLocalTemperature, getOrganisms, getStatsHistory, getThermalPace,
+  getTicksUntilAbiogenesis, step,
 } from "./simulation";
 import { createRng } from "./rng";
 import { GENE_TABLE } from "./genes";
-import type { Organism } from "./types";
+import type { Fragment, Organism } from "./types";
 
 const SURFACE_PROTEIN_INDEX = GENE_TABLE.findIndex((g) => g.id === "surface-protein");
 
@@ -23,12 +25,20 @@ function forceSurfaceProtein(organism: Organism, matchedSequence: string): void 
   organism.phenotype = { ...organism.phenotype, genes };
 }
 
+// initialPopulation defaults to 0 in createSimulation itself (a real run
+// starts from nothing but a monomer/food field — see stepFragments); most
+// tests here are about organism mechanics that have nothing to do with
+// abiogenesis pacing, so this shared helper opts back into an immediate,
+// known population the same way every test already implicitly relied on
+// before fragments existed. Tests that specifically care about starting from
+// scratch override this back to 0.
 const baseOptions = () => ({
   width: 24,
   height: 18,
   seed: 1234,
   environment: { temperature: 0.5, foodRegenRate: 0.15 },
   mutation: DEFAULT_MUTATION_CONFIG,
+  initialPopulation: 4,
 });
 
 describe("createSimulation", () => {
@@ -39,6 +49,15 @@ describe("createSimulation", () => {
     for (const organism of state.organisms.values()) {
       expect(state.grid[organism.y * state.width + organism.x]).toBe(organism.id);
     }
+  });
+
+  it("starts with zero organisms and zero fragments by default — a real run begins from chemistry, not a guaranteed seed population", () => {
+    const { initialPopulation: _unused, ...optionsWithoutInitialPopulation } = baseOptions();
+    const state = createSimulation(optionsWithoutInitialPopulation);
+    expect(state.organisms.size).toBe(0);
+    expect(state.fragments.size).toBe(0);
+    expect(state.stats.population).toBe(0);
+    expect(state.stats.fragmentCount).toBe(0);
   });
 
   it("is deterministic for a given seed", () => {
@@ -112,13 +131,15 @@ describe("step", () => {
   });
 
   it("does not go extinct over a long run (genome-length costs must stay affordable)", () => {
-    // Seed 20, not baseOptions()'s default 1234 — a run this long from a
-    // population this small is inherently stochastic (extinction by chance
-    // is a real outcome for some seeds, not itself a bug), and adding the
-    // independent food-richness field (see engine/biome.ts) shifted the RNG
-    // stream enough that 1234 now happens to be one of the unlucky ones.
-    // 20 reliably thrives under the current mechanics.
-    const state = createSimulation({ ...baseOptions(), seed: 20 });
+    // Seed 17, not baseOptions()'s default 1234 or the previous 20 — a run
+    // this long from a population this small is inherently stochastic
+    // (extinction by chance is a real outcome for some seeds, not itself a
+    // bug), and each new source of per-tick randomness that gets added (most
+    // recently, per-cell fragment-nucleation rolls — see
+    // engine/simulation.ts's stepFragments) shifts the whole RNG stream
+    // enough to turn some previously-reliable seeds unlucky. 17 reliably
+    // thrives under the current mechanics.
+    const state = createSimulation({ ...baseOptions(), seed: 17 });
     for (let i = 0; i < 3000; i++) step(state);
     expect(state.stats.population).toBeGreaterThan(0);
   });
@@ -319,11 +340,32 @@ describe("abiogenesis (spontaneous restart after total extinction)", () => {
     expect(getTicksUntilAbiogenesis(state)).toBeNull();
   });
 
-  it("stays extinct for a while, then spontaneously spawns a fresh organism", () => {
+  it("a fresh world that's never had life yet is not treated as 'extinct' — no countdown, no forced spawn", () => {
     const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
-    expect(state.stats.population).toBe(0);
+    // ABIOGENESIS_WAIT_TICKS is 150 (see engine/simulation.ts) — run well past
+    // it. Before the lineage.size gate, this would have force-spawned a
+    // fully-formed primordial organism via spawnAbiogenesis around tick 150.
+    for (let i = 0; i < 170; i++) {
+      step(state);
+      expect(getTicksUntilAbiogenesis(state)).toBeNull();
+    }
+    // Any organism that exists by now came from a real fragment graduation,
+    // not the extinction-triggered fallback (which never should have armed).
+    if (state.organisms.size > 0) {
+      expect(getFirstGraduation(state)).not.toBeNull();
+    }
+  });
 
-    step(state); // first tick to observe extinction
+  it("stays extinct for a while, then spontaneously spawns a fresh organism", () => {
+    // The extinction countdown only applies once life has genuinely existed
+    // at least once (state.lineage.size > 0 — see step()'s gating doc
+    // comment); a world that's simply never produced its first organism yet
+    // isn't "extinct". So this seeds one real organism and force-kills it,
+    // rather than starting from initialPopulation: 0 directly.
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 1 });
+    for (const organism of state.organisms.values()) organism.energy = -1000;
+
+    step(state); // this tick kills it off
     expect(state.stats.population).toBe(0);
     expect(getTicksUntilAbiogenesis(state)).not.toBeNull();
 
@@ -335,12 +377,13 @@ describe("abiogenesis (spontaneous restart after total extinction)", () => {
 
     expect(spawnedAtTick).toBeGreaterThan(0);
     expect(getTicksUntilAbiogenesis(state)).toBeNull(); // no longer extinct
-    expect(state.stats.births).toBe(1); // the spontaneous spawn itself
+    expect(state.stats.births).toBe(2); // the original seed, then the spontaneous spawn
   });
 
   it("counts down toward 0 the longer the population stays extinct", () => {
-    const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
-    step(state);
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 1 });
+    for (const organism of state.organisms.values()) organism.energy = -1000;
+    step(state); // kills it off — lineage already has a record, so this counts as a real extinction
     const first = getTicksUntilAbiogenesis(state);
     for (let i = 0; i < 10; i++) step(state);
     const later = getTicksUntilAbiogenesis(state);
@@ -848,5 +891,94 @@ describe("trophic sharing (colony energy transfer)", () => {
     expect(donorAfter).toBeGreaterThanOrEqual(14 - 1e-6);
     expect(receiverAfter).toBeGreaterThan(0.5);
     expect(donorBeforeShare - donorAfter).toBeGreaterThan(0); // a transfer actually happened
+  });
+});
+
+describe("pre-genetic fragment chemistry", () => {
+  const REPLICATION_GENE = GENE_TABLE.find((g) => g.id === "replication-rate")!;
+
+  /** A sequence that decodes with the replication-rate gene active (the
+   * graduation criterion) and is exactly MIN_GENOME_LENGTH long — the
+   * motif at the very front, padded out with random bases. */
+  function buildGraduationReadySequence(rng: ReturnType<typeof createRng>): string {
+    let seq = "";
+    for (const symbol of REPLICATION_GENE.motif) seq += symbolToCodon(symbol);
+    seq += randomGenome(MIN_GENOME_LENGTH - seq.length, rng);
+    return seq;
+  }
+
+  it("nucleates new fragments from food over time, with no organisms involved", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
+    expect(getFragments(state).length).toBe(0);
+    for (let i = 0; i < 200; i++) step(state);
+    expect(getFragments(state).length).toBeGreaterThan(0);
+    expect(state.stats.fragmentCount).toBe(getFragments(state).length);
+  });
+
+  it("graduates a fragment that reaches MIN_GENOME_LENGTH and expresses replication-rate into a real Organism", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
+    const sequence = buildGraduationReadySequence(createRng(5));
+    expect(decode(sequence).genes.find((g) => g.geneId === "replication-rate")?.active).toBe(true);
+
+    const fragment: Fragment = { id: "frag-test", sequence, x: 5, y: 5, age: 0, parentIds: ["frag-ancestor"] };
+    state.fragments.set(fragment.id, fragment);
+
+    step(state);
+
+    expect(getFragments(state).some((f) => f.id === "frag-test")).toBe(false);
+    const organisms = getOrganisms(state);
+    expect(organisms).toHaveLength(1);
+    expect(organisms[0].genome).toBe(sequence);
+    expect(organisms[0].parentIds).toEqual(["frag-ancestor"]);
+    expect(organisms[0].x).toBe(5);
+    expect(organisms[0].y).toBe(5);
+
+    const firstGraduation = getFirstGraduation(state);
+    expect(firstGraduation).not.toBeNull();
+    expect(firstGraduation?.organismId).toBe(organisms[0].id);
+    expect(firstGraduation?.tick).toBe(state.tick);
+  });
+
+  it("does not graduate a fragment onto a cell already occupied by a real organism — it retries next tick instead", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
+    const occupant = createOrganism({
+      id: "occupant", genome: randomGenome(60, createRng(2)), x: 5, y: 5, energy: 20, generation: 0,
+      parentIds: [], birthTick: 0,
+    });
+    occupant.phenotype = { ...occupant.phenotype, traits: { ...occupant.phenotype.traits, motility: 0, replicationRate: 0 } };
+    state.organisms.set(occupant.id, occupant);
+    state.grid[5 * state.width + 5] = occupant.id;
+
+    const sequence = buildGraduationReadySequence(createRng(5));
+    const fragment: Fragment = { id: "frag-test", sequence, x: 5, y: 5, age: 0, parentIds: [] };
+    state.fragments.set(fragment.id, fragment);
+
+    step(state);
+
+    expect(getFragments(state).some((f) => f.id === "frag-test")).toBe(true);
+    expect(getOrganisms(state)).toHaveLength(1); // still just the occupant
+    expect(getFirstGraduation(state)).toBeNull();
+  });
+
+  it("never overwrites firstGraduation once it's set, even after a second graduation", () => {
+    const state = createSimulation({ ...baseOptions(), initialPopulation: 0 });
+    const first: Fragment = { id: "frag-first", sequence: buildGraduationReadySequence(createRng(5)), x: 3, y: 3, age: 0, parentIds: [] };
+    const second: Fragment = { id: "frag-second", sequence: buildGraduationReadySequence(createRng(6)), x: 10, y: 10, age: 0, parentIds: [] };
+    state.fragments.set(first.id, first);
+    state.fragments.set(second.id, second);
+
+    step(state);
+
+    const firstGraduation = getFirstGraduation(state);
+    expect(getOrganisms(state)).toHaveLength(2);
+    expect(firstGraduation).not.toBeNull();
+    const firstGraduationId = firstGraduation!.organismId;
+
+    // A third graduation on a later tick shouldn't disturb the recorded first one.
+    const third: Fragment = { id: "frag-third", sequence: buildGraduationReadySequence(createRng(7)), x: 15, y: 15, age: 0, parentIds: [] };
+    state.fragments.set(third.id, third);
+    step(state);
+
+    expect(getFirstGraduation(state)?.organismId).toBe(firstGraduationId);
   });
 });

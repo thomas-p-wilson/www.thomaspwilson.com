@@ -180,6 +180,31 @@ export interface Organism {
   birthTemperature: number;
 }
 
+/**
+ * A pre-genetic "monomer chain" — the chemistry stage before there's a real
+ * `Organism` at all. Deliberately much thinner than Organism: no phenotype
+ * cache, no energy pool, no membrane, no motility. Multiple fragments (unlike
+ * organisms) can occupy the same grid cell — they're molecule-scale, not
+ * cell-scale, so the grid's one-occupant-per-cell rule doesn't apply to them.
+ * See engine/fragment.ts for the pure sequence mechanics and
+ * engine/simulation.ts's stepFragments for the per-tick chemistry (growth,
+ * thermal-driven splitting, decay, and graduation into a real Organism).
+ */
+export interface Fragment {
+  id: string;
+  /** Same Base alphabet as a real Organism's genome — a Fragment is just a
+   * genome that hasn't crossed the graduation threshold yet. */
+  sequence: Genome;
+  x: number;
+  y: number;
+  age: number;
+  /** Ancestor fragment id this one split from, if any — carried into the
+   * resulting Organism's own `parentIds` at graduation, so lineage can (in
+   * principle) trace back through pre-genetic splits instead of starting flat
+   * at "generation 0, no parents." Empty for a freshly nucleated fragment. */
+  parentIds: string[];
+}
+
 /** Permanent record kept even after an organism dies, for lineage/ancestry views. */
 export interface LineageRecord {
   id: string;
