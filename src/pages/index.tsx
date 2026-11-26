@@ -12,6 +12,7 @@ import Mortgage from "./calculators/Mortgage";
 import Retirement from "./calculators/Retirement";
 import CalculatorPage from "@/components/calculators/CalculatorPage";
 import PhysicalProjectPage from "./projects/PhysicalProjectPage";
+import SimpleEvolutionSimulator from "./projects/gaming/SimpleEvolutionSimulator";
 import { genericCalculatorSpecs } from "@/data/calculator-specs";
 import { physicalProjects } from "@/data/physical-projects";
 import { useEffect } from "react";
@@ -45,6 +46,7 @@ export default function Pages() {
           ))}
           <Route path="/projects/gaming" element={<Gaming />} />
           <Route path="/projects/gaming/pi-precision" element={<PiPrecision />} />
+          <Route path="/projects/gaming/simple-evolution-simulator" element={<SimpleEvolutionSimulator />} />
           <Route path="/projects/calculators" element={<CalculatorsList />} />
           <Route path="/projects/calculators/unit-converter" element={<UnitConverter />} />
           <Route path="/projects/calculators/resistive-element-sizing" element={<ResistiveElementSizing />} />

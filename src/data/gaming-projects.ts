@@ -22,4 +22,13 @@ export const gamingProjects: GamingProject[] = [
       "the solar system — from Mercury out to the edge of the observable universe.",
     technologies: ["React", "TypeScript", "decimal.js"],
   },
+  {
+    id: "simple-evolution-simulator",
+    slug: "simple-evolution-simulator",
+    title: "Simple Evolution Simulator",
+    description:
+      "A Game-of-Life-styled 2D world of organisms whose traits are genuinely encoded in a mutating RNA-like " +
+      "sequence — reproduction, mutation, and lineage all playable and inspectable.",
+    technologies: ["React", "TypeScript", "Canvas", "SVG"],
+  },
 ];
