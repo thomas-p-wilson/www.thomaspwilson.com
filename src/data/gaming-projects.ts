@@ -22,4 +22,13 @@ export const gamingProjects: GamingProject[] = [
       "the solar system — from Mercury out to the edge of the observable universe.",
     technologies: ["React", "TypeScript", "decimal.js"],
   },
+  {
+    id: "shapez-speedrun",
+    slug: "shapez-speedrun",
+    title: "shapez: Level 12 in 30 Minutes",
+    description:
+      "A speedrun checklist and split timer for the shapez Speedrun Master achievement: every goal from level 1 to 12, " +
+      "how to build each shape, and how many machines it takes to keep pace.",
+    technologies: ["React", "TypeScript"],
+  },
 ];
