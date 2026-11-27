@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowDown, Code, Shield, Server, Users } from "lucide-react";
+import JobTitle from "./JobTitle";
 
 export default function HeroSection() {
   const scrollToAbout = () => {
@@ -23,12 +24,7 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <h1 className="text-6xl md:text-7xl font-light text-slate-900 mb-6 tracking-tight">
-            Senior Software
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 font-medium">
-              Developer
-            </span>
-          </h1>
+          <JobTitle />
 
           <p className="text-xl md:text-2xl text-slate-600 mb-8 font-light leading-relaxed max-w-3xl mx-auto">
             Building software professionally since 2003, with a recent focus on data privacy and security.
