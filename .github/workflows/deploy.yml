@@ -1,0 +1,79 @@
+name: Deploy
+
+# Builds the site and uploads it to DreamHost over SSH whenever master
+# changes (i.e. whenever a PR is merged). Can also be run by hand from the
+# Actions tab. See "Deployment" in README.md for the secrets this needs.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Never run two deploys at once; a newer push waits for the current one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy to DreamHost
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://www.thomaspwilson.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Same checks as CI, so a broken master never reaches the live site.
+      - name: Lint, typecheck, build, test
+        run: npm run verify
+
+      - name: Check build output
+        run: |
+          test -f dist/index.html
+          test -f dist/.htaccess
+
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.DREAMHOST_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DREAMHOST_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      # --delete removes files from the web folder that are no longer in the
+      # build (e.g. the old site, or last deploy's hashed assets), so they
+      # can't shadow app routes. Anything deleted or overwritten is moved to
+      # ~/.deploy-backups/<run id>/ beside the web folder instead of being
+      # lost. .well-known/ (HTTPS certificate checks) is never touched.
+      - name: Upload to DreamHost
+        env:
+          DH_HOST: ${{ secrets.DREAMHOST_HOST }}
+          DH_USER: ${{ secrets.DREAMHOST_USER }}
+          DH_PATH: ${{ secrets.DREAMHOST_PATH }}
+        run: |
+          rsync -rlptvz --delete \
+            --exclude '.well-known/' \
+            --backup --backup-dir="../.deploy-backups/${GITHUB_RUN_ID}" \
+            -e "ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
+            dist/ "${DH_USER}@${DH_HOST}:${DH_PATH%/}/"
+
+      - name: Smoke-test the live site
+        run: |
+          for path in / /projects; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://www.thomaspwilson.com${path}")
+            echo "${path} -> ${code}"
+            test "$code" = 200
+          done
